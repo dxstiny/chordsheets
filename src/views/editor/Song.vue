@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { ISong, ISection } from '@/types';
-import Page from './Page.vue';
-import { ref, type PropType, onMounted } from 'vue';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+import type { ISong, ISection } from "@/types";
+import Page from "./Page.vue";
+import { ref, type PropType, onMounted } from "vue";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const props = defineProps({
     song: {
@@ -35,8 +35,6 @@ onMounted(() => {
         // of parent
         const parentBottom: number =
             element.value?.getBoundingClientRect().bottom ?? 0;
-
-        console.log(bottom, parentBottom);
 
         // get page
         const page = Math.ceil(bottom / parentBottom) - 1;
@@ -71,15 +69,14 @@ const getTotalPages = () => {
     return pages.value.length;
 };
 
-const print = async () => {
+const render = async () => {
     let el = allPages.value?.[0];
-    if (!el) return;
+    if (!el) return null;
 
-    const showPage = currentPage.value;
     const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: 'a4'
+        orientation: "portrait",
+        unit: "px",
+        format: "a4"
     });
 
     const ratio = el.clientHeight / el.clientWidth;
@@ -98,18 +95,27 @@ const print = async () => {
         var height = pdf.internal.pageSize.getHeight();
         height = ratio * width;
 
-        pdf.addImage(dataUrl, 'PNG', 0, 0, width, height);
+        pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
 
         if (i + 1 < pages.value.length) {
             pdf.addPage();
         }
     }
 
-    //pdf.save(`${props.song.title}.pdf`);
-    pdf.autoPrint();
-    window.open(pdf.output('bloburl'), '_blank');
+    return pdf;
+};
 
-    currentPage.value = showPage;
+const print = async () => {
+    const pdf = await render();
+    if (!pdf) return;
+    pdf.autoPrint();
+    window.open(pdf.output("bloburl"), "_blank");
+};
+
+const download = async () => {
+    const pdf = await render();
+    if (!pdf) return;
+    pdf.save(`${props.song.title}.pdf`);
 };
 
 defineExpose({
@@ -117,6 +123,7 @@ defineExpose({
     prevPage,
     getCurrentPage,
     getTotalPages,
+    download,
     print
 });
 </script>
@@ -252,7 +259,7 @@ defineExpose({
                 padding-right: 1em;
 
                 &:after {
-                    content: ' ';
+                    content: " ";
                     width: 1px;
                     height: 100%;
                     display: block;
@@ -319,8 +326,20 @@ defineExpose({
     .progression .w-5 {
         grid-column: span 5;
     }
+    .progression .w-6 {
+        grid-column: span 6;
+    }
     .progression .w-8 {
         grid-column: span 8;
+    }
+    .progression .w-10 {
+        grid-column: span 10;
+    }
+    .progression .w-12 {
+        grid-column: span 12;
+    }
+    .progression .w-14 {
+        grid-column: span 14;
     }
     .progression .w-16 {
         grid-column: span 16;

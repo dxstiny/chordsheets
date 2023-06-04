@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ISong, ISection } from '@/types';
-import { type PropType, ref } from 'vue';
+import type { ISong, ISection } from "@/types";
+import { type PropType, ref } from "vue";
 
 defineProps({
     currentPage: {
@@ -44,6 +44,24 @@ defineExpose({
                 <span class="material-symbols-rounded">piano</span>
                 {{ song.key }}
             </div>
+            <div
+                class="info"
+                v-if="song.transpose"
+            >
+                <span class="material-symbols-rounded">{{
+                    song.transpose > 0 ? "arrow_upward" : "arrow_downward"
+                }}</span>
+                {{ song.transpose }}
+            </div>
+            <div
+                class="info"
+                v-if="song.octave"
+            >
+                <span class="material-symbols-rounded">{{
+                    song.octave > 0 ? "arrow_upward" : "arrow_downward"
+                }}</span>
+                {{ song.octave }} octave
+            </div>
             <template v-for="(active, name) in song.options">
                 <div
                     class="info"
@@ -81,6 +99,12 @@ defineExpose({
             </div>
         </div>
         <hr />
+        <div class="structure">
+            <span v-for="section in song.structure">
+                {{ section }}
+            </span>
+        </div>
+        <hr />
     </div>
     <div
         class="section"
@@ -99,3 +123,9 @@ defineExpose({
         </div>
     </div>
 </template>
+
+<style scoped>
+.structure span:not(:last-child)::after {
+    content: " | ";
+}
+</style>
