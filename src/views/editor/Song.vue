@@ -1,134 +1,337 @@
 <script lang="ts" setup>
-import type { ISong } from '@/types';
-import type { PropType } from 'vue';
+import type { ISong, ISection } from '@/types';
+import Page from './Page.vue';
+import { ref, type PropType, onMounted } from 'vue';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
-defineProps({
+const props = defineProps({
     song: {
         required: true,
         type: Object as PropType<ISong>
     }
-})
+});
+
+const allPages = ref<HTMLElement[]>();
+const mainPage = ref<InstanceType<typeof Page>>();
+const element = ref<HTMLDivElement>();
+const pages = ref<ISection[][]>([props.song.sections]);
+const currentPage = ref(0);
+
+onMounted(() => {
+    if (!element.value) return;
+    const newPages = [];
+
+    const sections = mainPage.value?.getSections().value;
+    if (!sections) return;
+
+    for (let i = 0; i < sections.length; i++) {
+        const sectionElement = sections[i];
+        const section = props.song.sections[i];
+
+        // height + y-position
+        const bottom = sectionElement.getBoundingClientRect().bottom;
+
+        // of parent
+        const parentBottom: number =
+            element.value?.getBoundingClientRect().bottom ?? 0;
+
+        console.log(bottom, parentBottom);
+
+        // get page
+        const page = Math.ceil(bottom / parentBottom) - 1;
+        // if page is not in pages
+        if (!newPages[page]) {
+            // add page
+            newPages[page] = [section];
+            continue;
+        }
+        // add section to page
+        newPages[page].push(section);
+    }
+
+    pages.value = newPages;
+});
+
+const nextPage = () => {
+    if (currentPage.value + 1 >= pages.value.length) return;
+    currentPage.value++;
+};
+
+const prevPage = () => {
+    if (currentPage.value - 1 < 0) return;
+    currentPage.value--;
+};
+
+const getCurrentPage = () => {
+    return currentPage.value + 1;
+};
+
+const getTotalPages = () => {
+    return pages.value.length;
+};
+
+const print = async () => {
+    let el = allPages.value?.[0];
+    if (!el) return;
+
+    const showPage = currentPage.value;
+    const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: 'a4'
+    });
+
+    const ratio = el.clientHeight / el.clientWidth;
+
+    for (let i = 0; i < pages.value.length; i++) {
+        el = allPages.value?.[i];
+        if (!el) continue;
+
+        const dataUrl = (
+            await html2canvas(el, {
+                scale: 5
+            })
+        ).toDataURL();
+
+        var width = pdf.internal.pageSize.getWidth();
+        var height = pdf.internal.pageSize.getHeight();
+        height = ratio * width;
+
+        pdf.addImage(dataUrl, 'PNG', 0, 0, width, height);
+
+        if (i + 1 < pages.value.length) {
+            pdf.addPage();
+        }
+    }
+
+    //pdf.save(`${props.song.title}.pdf`);
+    pdf.autoPrint();
+    window.open(pdf.output('bloburl'), '_blank');
+
+    currentPage.value = showPage;
+};
+
+defineExpose({
+    nextPage,
+    prevPage,
+    getCurrentPage,
+    getTotalPages,
+    print
+});
 </script>
 <template>
-    <div class="song">
-        <h2>{{ song.artist }}</h2>
-        <h1>{{ song.title }}</h1>
-        <div class="wrap-to-line">
-            <div class="info">
-                <span class="material-symbols-rounded">music_note</span> {{ song.bpm }} BPM
-            </div>
-            <div class="info">
-                <span class="material-symbols-rounded">piano</span> {{ song.key }}
-            </div>
-            <div class="info">
-                <span class="material-symbols-rounded">schedule</span> {{ song.timeSignature }}
+    <div
+        class="parent"
+        ref="element"
+    >
+        <div class="song printable">
+            <div class="wrap">
+                <Page
+                    ref="mainPage"
+                    :song="song"
+                    :pages="pages"
+                    :currentPage="currentPage"
+                />
             </div>
         </div>
-        <hr />
-        <div
-            class="section"
-            v-for="section in song.sections"
-        >
-            <span>{{ section.type }}</span>
-            <div class="progression">
-                <div
-                    class="chord"
-                    v-for="chord in section.progression"
-                    :class="`w-${chord.duration}`"
-                >
-                    {{ chord.chord }}
+
+        <div class="void">
+            <div
+                class="print a4"
+                v-for="(_, i) in pages"
+                ref="allPages"
+            >
+                <div class="wrap">
+                    <Page
+                        :song="song"
+                        :pages="pages"
+                        :currentPage="i"
+                    />
                 </div>
             </div>
         </div>
     </div>
 </template>
-<style scoped>
-.song h1 {
-    font-size: 1.5rem;
-}
+<style>
+.parent {
+    width: 100%;
 
-.song h2 {
-    font-size: .8rem;
-    text-transform: uppercase;
-}
+    .void {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: red;
+        z-index: -100;
 
-.material-symbols-rounded {
-    font-size: 1em;
-}
+        .preview {
+            border-radius: 0 2rem 2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1em;
+            padding: 0 10em;
 
-.wrap-to-line {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    .info:not(:last-child) {
-        margin-right: 1em;
-        padding-right: 1em;
-        
-        &:after {
-            content: ' ';
-            width: 1px;
-            height: 100%;
-            display: block;
-            position: absolute;
-            right: 0;
-            top: 0;
-            background: var(--color-border);
+            margin-bottom: 1em;
         }
     }
-}
 
-hr {
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin: 1em 0;
-}
-
-.section {
-    &:not(:last-child) {
-        margin-bottom: 1em;
+    .song {
+        width: 100%;
     }
 
-    & span {
+    .capitalise {
+        text-transform: capitalize;
+    }
+
+    .instruments {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1em;
+
+        .instrument {
+            border: 1px solid var(--color-border);
+            border-radius: 0.5em;
+            padding: 0.5em;
+
+            & h3 {
+                font-weight: 900;
+            }
+
+            .muted {
+                font-style: italic;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.1em;
+            }
+
+            .flex {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                text-transform: uppercase;
+
+                &.space-between {
+                    justify-content: space-between;
+                }
+
+                &.gap-2 {
+                    gap: 0.5em;
+                }
+            }
+        }
+    }
+
+    .song h1 {
+        font-size: 1.5rem;
+    }
+
+    .song h2 {
+        font-size: 0.8rem;
         text-transform: uppercase;
-        font-size: .8rem;
-        font-weight: bold;
+    }
+
+    .material-symbols-rounded {
+        font-size: 1em;
+    }
+
+    .wrap-to-line {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .info {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+
+            &:not(:last-child) {
+                margin-right: 1em;
+                padding-right: 1em;
+
+                &:after {
+                    content: ' ';
+                    width: 1px;
+                    height: 100%;
+                    display: block;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    background: var(--color-border);
+                }
+            }
+
+            &.option {
+                &.active {
+                    color: var(--color-primary);
+                }
+            }
+        }
+    }
+
+    & hr {
+        border: none;
+        border-top: 1px solid var(--color-border);
+        margin: 1em 0;
+    }
+
+    .section {
+        &:not(:last-child) {
+            margin-bottom: 1em;
+        }
+
+        & span {
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    }
+
+    .progression {
+        display: grid;
+        grid-template-columns: repeat(16, 1fr);
+        grid-gap: 1em;
+        align-items: center;
+        grid-template-rows: auto;
+    }
+
+    .progression > div {
+        display: flex;
+        justify-content: center;
+        border: 1px solid var(--color-border);
+        border-radius: 0.5em;
+    }
+
+    .progression .w-1 {
+        grid-column: span 1;
+    }
+    .progression .w-2 {
+        grid-column: span 2;
+    }
+    .progression .w-3 {
+        grid-column: span 3;
+    }
+    .progression .w-4 {
+        grid-column: span 4;
+    }
+    .progression .w-5 {
+        grid-column: span 5;
+    }
+    .progression .w-8 {
+        grid-column: span 8;
+    }
+    .progression .w-16 {
+        grid-column: span 16;
     }
 }
+</style>
 
-.progression {
-    display: grid;
-    grid-template-columns: repeat(16, 1fr);
-    grid-gap: 1em;
-    align-items: center;
-    grid-template-rows: auto;
-}
-
-.progression > div {
-    display: flex;
-    justify-content: center;
-    border: 1px solid var(--color-border);
-}
-
-.progression .w-1 {
-    grid-column: span 1;
-}
-.progression .w-2 {
-    grid-column: span 2;
-}
-.progression .w-3 {
-    grid-column: span 3;
-}
-.progression .w-4 {
-    grid-column: span 4;
-}
-.progression .w-5 {
-    grid-column: span 5;
-}
-.progression .w-8 {
-    grid-column: span 8;
-}
-.progression .w-16 {
-    grid-column: span 16;
+<style>
+@media print {
+    *:not(.printable, .printable *) {
+        display: none;
+    }
 }
 </style>

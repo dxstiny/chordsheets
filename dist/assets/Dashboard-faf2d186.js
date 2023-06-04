@@ -1,0 +1,1 @@
+import{_ as o}from"./_plugin-vue_export-helper-c27b6911.js";import{r as t,o as r,c as a,a as s,w as n,F as c,b as _,d}from"./index-956abd6f.js";const l={},i=_("h1",null,"Dashboard",-1);function m(f,u){const e=t("router-link");return r(),a(c,null,[i,s(e,{to:"/editor"},{default:n(()=>[d("Editor")]),_:1})],64)}const x=o(l,[["render",m]]);export{x as default};
