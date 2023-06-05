@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
+import AllPages from "./editor/AllPages.vue";
+import { ref } from "vue";
+import { jsPDF } from "jspdf";
 
 const store = useSongStore();
+const allPages = ref<InstanceType<typeof AllPages>[]>();
 
 const exportLib = async () => {
     await store.prepareRender();
@@ -32,6 +36,35 @@ const importLib = () => {
     };
     input.click();
 };
+
+const renderAll = async () => {
+    let pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: "a4"
+    });
+
+    for (const page of allPages.value ?? []) {
+        await page.renderTo(pdf);
+
+        if (page.song !== store.songs[store.songs.length - 1]) {
+            pdf.addPage();
+        }
+    }
+
+    return pdf;
+};
+
+const printAll = async () => {
+    const pdf = await renderAll();
+    pdf.autoPrint();
+    pdf.output("dataurlnewwindow");
+};
+
+const exportAll = async () => {
+    const pdf = await renderAll();
+    pdf.save("chordsheets.pdf");
+};
 </script>
 <template>
     <div class="dashboard">
@@ -47,13 +80,23 @@ const importLib = () => {
                 />
                 <IconButton
                     icon="file_download"
-                    label="Export"
+                    label="Save Library"
                     @click="exportLib"
                 />
                 <IconButton
                     icon="file_upload"
-                    label="Import"
+                    label="Import Library"
                     @click="importLib"
+                />
+                <IconButton
+                    label="Export all as PDF"
+                    icon="picture_as_pdf"
+                    @click="exportAll"
+                />
+                <IconButton
+                    label="Print All"
+                    icon="print"
+                    @click="printAll"
                 />
             </div>
             <hr />
@@ -65,6 +108,15 @@ const importLib = () => {
                     <li>{{ song.artist }} - {{ song.title }}</li>
                 </router-link>
             </ul>
+        </div>
+    </div>
+    <div class="void">
+        <div class="parent">
+            <AllPages
+                ref="allPages"
+                v-for="song in store.songs"
+                :song="song"
+            />
         </div>
     </div>
 </template>
@@ -83,6 +135,7 @@ const importLib = () => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 
     .wrap {
         min-width: 100%;

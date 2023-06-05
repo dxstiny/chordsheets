@@ -40,100 +40,105 @@ defineExpose({
 </script>
 
 <template>
-    <div
-        class="meta"
-        v-if="currentPage == 0"
-    >
-        <h2>{{ song.artist }}</h2>
-        <h1>{{ song.title }}</h1>
-        <div class="wrap-to-line">
-            <div class="info">
-                <span class="material-symbols-rounded">music_note</span>
-                {{ song.bpm }} BPM
-            </div>
-            <div class="info">
-                <span class="material-symbols-rounded">piano</span>
-                {{ song.key }}
-            </div>
-            <div
-                class="info"
-                v-if="song.transpose"
-            >
-                <span class="material-symbols-rounded">{{
-                    song.transpose > 0 ? "arrow_upward" : "arrow_downward"
-                }}</span>
-                {{ song.transpose }}
-            </div>
-            <div
-                class="info"
-                v-if="song.octave"
-            >
-                <span class="material-symbols-rounded">{{
-                    song.octave > 0 ? "arrow_upward" : "arrow_downward"
-                }}</span>
-                {{ song.octave }} octave
-            </div>
-            <template v-for="(active, name) in song.options">
+    <div class="page">
+        <div
+            class="meta"
+            v-if="currentPage == 0"
+        >
+            <h2>{{ song.artist }}</h2>
+            <h1>{{ song.title }}</h1>
+            <div class="wrap-to-line">
+                <div class="info">
+                    <span class="material-symbols-rounded">music_note</span>
+                    {{ song.bpm }} BPM
+                </div>
+                <div class="info">
+                    <span class="material-symbols-rounded">piano</span>
+                    {{ song.key }}
+                </div>
                 <div
                     class="info"
-                    v-if="active"
+                    v-if="song.transpose"
                 >
-                    <span class="material-symbols-rounded"> check </span>
-                    <span class="capitalise">{{ name }}</span>
+                    <span class="material-symbols-rounded">{{
+                        song.transpose > 0 ? "arrow_upward" : "arrow_downward"
+                    }}</span>
+                    {{ song.transpose }}
                 </div>
-            </template>
-        </div>
-        <hr v-if="Object.keys(song.instruments).length" />
-        <div class="instruments">
-            <div
-                v-for="(instrument, name) in song.instruments"
-                class="instrument"
-            >
-                <div class="flex space-between">
-                    <span>{{ name }}</span>
-                    <span class="flex gap-2">
-                        <span class="material-symbols-rounded">volume_up</span>
-                        {{ instrument?.volume }}
-                    </span>
+                <div
+                    class="info"
+                    v-if="song.octave"
+                >
+                    <span class="material-symbols-rounded">{{
+                        song.octave > 0 ? "arrow_upward" : "arrow_downward"
+                    }}</span>
+                    {{ song.octave }} octave
                 </div>
-                <div class="settings">
-                    <h3>
-                        {{ instrument?.name }}
-                    </h3>
-                    <span class="muted">
-                        {{ instrument?.type }}
-                        <template v-if="instrument?.page">
-                            | P{{ instrument?.page }}
-                        </template>
-                    </span>
+                <template v-for="(active, name) in song.options">
+                    <div
+                        class="info"
+                        v-if="active"
+                    >
+                        <span class="material-symbols-rounded"> check </span>
+                        <span class="capitalise">{{ name }}</span>
+                    </div>
+                </template>
+            </div>
+            <hr v-if="Object.keys(song.instruments).length" />
+            <div class="instruments">
+                <div
+                    v-for="(instrument, name) in song.instruments"
+                    class="instrument"
+                >
+                    <div class="flex space-between">
+                        <span>{{ name }}</span>
+                        <span class="flex gap-2">
+                            <span class="material-symbols-rounded"
+                                >volume_up</span
+                            >
+                            {{ instrument?.volume }}
+                        </span>
+                    </div>
+                    <div class="settings">
+                        <h3>
+                            {{ instrument?.name }}
+                        </h3>
+                        <span class="muted">
+                            {{ instrument?.type }}
+                            <template v-if="instrument?.page">
+                                | P{{ instrument?.page }}
+                            </template>
+                        </span>
+                    </div>
                 </div>
             </div>
+            <hr v-if="song.structure.length" />
+            <div class="structure">
+                <span v-for="section in song.structure">
+                    {{ section }}
+                </span>
+            </div>
+            <hr />
         </div>
-        <hr v-if="song.structure.length" />
-        <div class="structure">
-            <span v-for="section in song.structure">
-                {{ section }}
-            </span>
-        </div>
-        <hr />
-    </div>
-    <div
-        class="section"
-        v-for="(section, index) in pages[currentPage]"
-        ref="sections"
-        :id="String(index)"
-    >
-        <span>{{ section.type }}</span>
-        <div class="progression">
-            <div
-                class="chord"
-                v-for="(chord, chIndex) in section.progression"
-                @click="onChordClick(index, chIndex)"
-                :class="
-                    `w-${chord.duration}` + (chord.selected ? ' selected' : '')
-                "
-            >
-                {{ chord.chord }}
+        <div
+            class="section"
+            v-for="(section, index) in pages[currentPage]"
+            ref="sections"
+            :id="String(index)"
+        >
+            <span>{{ section.type }}</span>
+            <div class="progression">
+                <div
+                    class="chord"
+                    v-for="(chord, chIndex) in section.progression"
+                    @click="onChordClick(index, chIndex)"
+                    :class="
+                        `w-${chord.duration}` +
+                        (chord.selected ? ' selected' : '')
+                    "
+                >
+                    {{ chord.chord }}
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,125 @@
+<script setup lang="ts">
+import { type PropType, ref, onMounted } from "vue";
+import type { ISong, ISection } from "@/types";
+import Page from "./Page.vue";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+
+const props = defineProps({
+    song: {
+        required: true,
+        type: Object as PropType<ISong>
+    }
+});
+
+const allpageselement = ref<HTMLElement>();
+const parent = ref<HTMLElement[]>();
+const element = ref<InstanceType<typeof Page>[]>();
+onMounted(() => {
+    const firstParent = parent.value?.[0];
+    if (!firstParent) return;
+    const newPages = [];
+
+    const sections = element.value?.[0]?.getSections().value;
+    if (!sections) return;
+
+    for (let i = 0; i < sections.length; i++) {
+        const sectionElement = sections[i];
+        const section = props.song.sections[i];
+
+        // height + y-position
+        const bottom = sectionElement.getBoundingClientRect().bottom;
+
+        // of parent
+        const parentBottom: number =
+            firstParent?.getBoundingClientRect().bottom ?? 0;
+
+        // get page
+        const page = Math.ceil(bottom / parentBottom) - 1;
+        // if page is not in pages
+        if (!newPages[page]) {
+            // add page
+            newPages[page] = [section];
+            continue;
+        }
+        // add section to page
+        newPages[page].push(section);
+    }
+
+    pages.value = newPages;
+});
+
+const renderTo = async (pdf: jsPDF) => {
+    if (!allpageselement.value) return pdf;
+    const elements = allpageselement.value.querySelectorAll(
+        ".parent__element"
+    ) as NodeListOf<HTMLElement>;
+    let el = elements[0];
+
+    const ratio = el.clientHeight / el.clientWidth;
+
+    for (let i = 0; i < pages.value.length; i++) {
+        el = elements[i];
+        if (!el) continue;
+
+        const dataUrl = (
+            await html2canvas(el, {
+                scale: 3
+            })
+        ).toDataURL();
+
+        var width = pdf.internal.pageSize.getWidth();
+        var height = pdf.internal.pageSize.getHeight();
+        height = ratio * width;
+
+        pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
+
+        if (i + 1 < pages.value.length) {
+            pdf.addPage();
+        }
+    }
+
+    console.log(pdf.getNumberOfPages());
+
+    return pdf;
+};
+
+const render = async () => {
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: "a4"
+    });
+
+    await renderTo(pdf);
+
+    return pdf;
+};
+
+const pages = ref<ISection[][]>([props.song.sections]);
+
+defineExpose({
+    render,
+    renderTo,
+    song: props.song
+});
+</script>
+<template>
+    <div ref="allpageselement">
+        <div
+            class="print a4 parent__element"
+            ref="parent"
+            v-for="(_, i) in pages"
+        >
+            <div class="wrap">
+                <Page
+                    class="page__element"
+                    ref="element"
+                    :song="song"
+                    :pages="pages"
+                    :currentPage="i"
+                />
+            </div>
+        </div>
+    </div>
+</template>
