@@ -32,7 +32,7 @@ const emitInput = (event: Event) => {
             class="dropdown"
         >
             <option
-                v-for="option in options.sort()"
+                v-for="option in options"
                 :key="option"
                 :value="option"
             >

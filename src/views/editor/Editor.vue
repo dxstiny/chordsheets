@@ -12,7 +12,7 @@ import { watch, ref, type PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
 import IconButton from "@/components/IconButton.vue";
-import { nextTick } from "process";
+import draggable from "vuedraggable";
 
 const store = useSongStore();
 
@@ -246,65 +246,91 @@ window.addEventListener("chord-click", (e: Event) => {
                 </span>
             </div>
             <template v-if="expanded.sections">
-                <div class="content">
-                    <div
-                        class="group section"
-                        v-for="(section, index) in eSong.sections"
-                    >
-                        <div class="flex space-between">
-                            <Dropdown
-                                v-model="section.type"
-                                :options="SECTION_TYPES"
-                                label="type"
-                            />
-                            <span
-                                @click="eSong.sections.splice(index, 1)"
-                                class="material-symbols-rounded"
-                            >
-                                delete
-                            </span>
-                        </div>
-                        <div class="content">
-                            <div
-                                class="group chord"
-                                v-for="(chord, i) in section.progression"
-                                @click="chord.selected = true"
-                                :id="index + '.' + i"
-                            >
-                                <div class="flex end">
-                                    <span
-                                        @click="
-                                            section.progression.splice(i, 1)
-                                        "
-                                        class="material-symbols-rounded"
-                                        >-</span
-                                    >
-                                </div>
-                                <div class="content">
-                                    <TextInput
-                                        v-model="chord.chord"
-                                        label="name"
-                                    />
-                                    <NumberInput
-                                        v-model="chord.duration"
-                                        :min="1"
-                                        label="duration"
-                                    />
-                                </div>
+                <draggable
+                    v-model="eSong.sections"
+                    class="content"
+                >
+                    <template #item="{ element }">
+                        <div class="group section">
+                            <div class="flex space-between">
+                                <Dropdown
+                                    v-model="element.type"
+                                    :options="SECTION_TYPES"
+                                    label="type"
+                                />
+                                <span
+                                    @click="
+                                        eSong.sections.splice(
+                                            eSong.sections.indexOf(element),
+                                            1
+                                        )
+                                    "
+                                    class="material-symbols-rounded"
+                                >
+                                    delete
+                                </span>
                             </div>
+                            <div class="content">
+                                <draggable
+                                    v-model="element.progression"
+                                    class="content"
+                                >
+                                    <template #item="{ element: chord }">
+                                        <div
+                                            class="group chord"
+                                            @click="chord.selected = true"
+                                            :id="
+                                                eSong.sections.indexOf(
+                                                    element
+                                                ) +
+                                                '.' +
+                                                element.progression.indexOf(
+                                                    chord
+                                                )
+                                            "
+                                        >
+                                            <div class="flex end">
+                                                <span
+                                                    @click="
+                                                        element.progression.splice(
+                                                            element.progression.indexOf(
+                                                                chord
+                                                            ),
+                                                            1
+                                                        )
+                                                    "
+                                                    class="material-symbols-rounded"
+                                                    >-</span
+                                                >
+                                            </div>
+                                            <div class="content">
+                                                <TextInput
+                                                    v-model="chord.chord"
+                                                    label="name"
+                                                />
+                                                <NumberInput
+                                                    v-model="chord.duration"
+                                                    :min="1"
+                                                    label="duration"
+                                                />
+                                            </div>
+                                        </div>
+                                    </template>
+                                </draggable>
+                            </div>
+                            <IconButton
+                                @click="
+                                    element.progression.push({
+                                        chord: 'C',
+                                        duration: 4
+                                    })
+                                "
+                                icon="add"
+                                label="add chord"
+                            />
                         </div>
-                        <IconButton
-                            @click="
-                                eSong.sections[index].progression.push({
-                                    chord: 'C',
-                                    duration: 4
-                                })
-                            "
-                            icon="add"
-                            label="add chord"
-                        />
-                    </div>
-                </div>
+                    </template>
+                </draggable>
                 <IconButton
                     @click="
                         eSong.sections.push({ type: 'chorus', progression: [] })

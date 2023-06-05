@@ -78,8 +78,11 @@ export const SECTION_TYPES = [
     "pre-chorus",
     "chorus",
     "bridge",
-    "outro",
-    "solo"
+    "break",
+    "fill",
+    "solo",
+    "interlude",
+    "outro"
 ];
 
 export interface IInstrument {
@@ -118,7 +121,7 @@ export const INSTRUMENT_TYPES = [
     "Accordion",
     "Woodwind",
     "Percussion"
-];
+].sort();
 
 export interface IInstruments {
     l?: IInstrument;
