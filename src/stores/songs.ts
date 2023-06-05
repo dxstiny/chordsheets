@@ -43,11 +43,29 @@ export const useSongStore = defineStore("songs", () => {
         songs.value[index] = song;
     }
 
+    const prepareRender = () => {
+        for (const song of songs.value) {
+            for (const section of song.sections) {
+                for (const chord of section.progression) {
+                    delete chord.selected;
+                }
+            }
+        }
+
+        // return promise that resolves in 50ms
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 50);
+        });
+    };
+
     return {
         songs,
         addSong,
         removeSong,
         updateSong,
-        addEmptySong
+        addEmptySong,
+        prepareRender
     };
 });

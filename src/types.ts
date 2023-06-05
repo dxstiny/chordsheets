@@ -57,6 +57,7 @@ type Chord = MajorChord | MinorChord;
 export interface IChord {
     chord: Chord;
     duration: number;
+    selected?: boolean;
 }
 
 export interface ISection {

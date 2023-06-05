@@ -4,6 +4,9 @@ import Page from "./Page.vue";
 import { ref, type PropType, onMounted } from "vue";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { useSongStore } from "@/stores/songs";
+
+const store = useSongStore();
 
 const props = defineProps({
     song: {
@@ -106,6 +109,7 @@ const render = async () => {
 };
 
 const print = async () => {
+    await store.prepareRender();
     const pdf = await render();
     if (!pdf) return;
     pdf.autoPrint();
@@ -113,6 +117,7 @@ const print = async () => {
 };
 
 const download = async () => {
+    await store.prepareRender();
     const pdf = await render();
     if (!pdf) return;
     pdf.save(`${props.song.title}.pdf`);
@@ -343,6 +348,12 @@ defineExpose({
     }
     .progression .w-16 {
         grid-column: span 16;
+    }
+
+    .progression .selected {
+        font-weight: 900;
+        color: var(--accent);
+        border-color: var(--accent);
     }
 }
 </style>

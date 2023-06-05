@@ -72,7 +72,7 @@ defineExpose({
                 </div>
             </template>
         </div>
-        <hr />
+        <hr v-if="Object.keys(song.instruments).length" />
         <div class="instruments">
             <div
                 v-for="(instrument, name) in song.instruments"
@@ -98,7 +98,7 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <hr />
+        <hr v-if="song.structure.length" />
         <div class="structure">
             <span v-for="section in song.structure">
                 {{ section }}
@@ -108,7 +108,7 @@ defineExpose({
     </div>
     <div
         class="section"
-        v-for="section in pages[currentPage]"
+        v-for="(section, name) in pages[currentPage]"
         ref="sections"
     >
         <span>{{ section.type }}</span>
@@ -116,7 +116,9 @@ defineExpose({
             <div
                 class="chord"
                 v-for="chord in section.progression"
-                :class="`w-${chord.duration}`"
+                :class="
+                    `w-${chord.duration}` + (chord.selected ? ' selected' : '')
+                "
             >
                 {{ chord.chord }}
             </div>

@@ -11,6 +11,7 @@ import {
 import { watch, ref, type PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
+import IconButton from "@/components/IconButton.vue";
 
 const store = useSongStore();
 
@@ -31,19 +32,17 @@ watch(
 
 const eSong = ref<ISong>(props.song);
 
-const addInstrument = () => {
+const addInstrument = (slot: string) => {
     const slots = ["l", "r1", "r2"];
-
-    for (const slot of slots) {
-        if (!eSong.value.instruments[slot]) {
-            eSong.value.instruments[slot] = {
-                type: INSTRUMENT_TYPES[0],
-                name: INSTRUMENT_TYPES[0],
-                volume: 100,
-                page: 1
-            } as IInstrument;
-            return;
-        }
+    if (!slots.includes(slot)) return;
+    if (!eSong.value.instruments[slot]) {
+        eSong.value.instruments[slot] = {
+            type: INSTRUMENT_TYPES[0],
+            name: INSTRUMENT_TYPES[0],
+            volume: 100,
+            page: 1
+        } as IInstrument;
+        return;
     }
 };
 
@@ -55,6 +54,37 @@ watch(
     }
 ),
     { deep: true };
+
+const expanded = ref<Record<string, boolean>>({});
+
+window.addEventListener("click", (e) => {
+    let target = e.target as HTMLElement | null;
+    for (let i = 0; i < 5; i++) {
+        console.log(target);
+
+        if (!target) return;
+        if (target.classList.contains("group")) break;
+        if (!target.parentElement) break;
+        target = target.parentElement;
+    }
+
+    if (!target) return;
+
+    const [sectionI, index] = target.id.split(".");
+
+    for (let i = 0; i < eSong.value.sections.length; i++) {
+        const section = eSong.value.sections[i];
+        for (let j = 0; j < section.progression.length; j++) {
+            if (i === Number(sectionI) && j === Number(index)) {
+                console.log("found");
+                continue;
+            }
+
+            const chord = section.progression[j];
+            chord.selected = false;
+        }
+    }
+});
 </script>
 <template>
     <div class="configuration">
@@ -98,136 +128,7 @@ watch(
             </div>
         </div>
         <div class="group">
-            <h2>Instruments</h2>
-            <div class="flex end">
-                <span
-                    @click="addInstrument"
-                    class="material-symbols-rounded"
-                >
-                    +
-                </span>
-            </div>
-            <div class="content">
-                <div
-                    class="group"
-                    v-for="name in Object.keys(eSong.instruments)"
-                >
-                    <h2>{{ name }}</h2>
-                    <div class="flex end">
-                        <span
-                            @click="delete eSong.instruments[name]"
-                            class="material-symbols-rounded"
-                        >
-                            -
-                        </span>
-                    </div>
-                    <div class="content">
-                        <TextInput
-                            v-model="eSong.instruments[name].name"
-                            label="name"
-                        />
-                        <NumberInput
-                            v-model="eSong.instruments[name].volume"
-                            :min="0"
-                            :max="127"
-                            label="volume"
-                        />
-                        <NumberInput
-                            v-model="eSong.instruments[name].page"
-                            label="page"
-                        />
-                        <Dropdown
-                            v-model="eSong.instruments[name].type"
-                            :options="INSTRUMENT_TYPES"
-                            label="type"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="group">
-            <h2>Sections</h2>
-            <div class="flex end">
-                <span
-                    @click="
-                        eSong.sections.push({ type: 'chorus', progression: [] })
-                    "
-                    class="material-symbols-rounded"
-                >
-                    +
-                </span>
-            </div>
-            <div class="content">
-                <div
-                    class="group"
-                    v-for="(section, index) in eSong.sections"
-                >
-                    <div class="flex end">
-                        <span
-                            @click="eSong.sections.splice(index, 1)"
-                            class="material-symbols-rounded"
-                        >
-                            -
-                        </span>
-                    </div>
-                    <Dropdown
-                        v-model="section.type"
-                        :options="SECTION_TYPES"
-                        label="type"
-                    />
-                    <div class="flex end">
-                        <span
-                            @click="
-                                eSong.sections[index].progression.push({
-                                    chord: 'C',
-                                    duration: 4
-                                })
-                            "
-                            class="material-symbols-rounded"
-                        >
-                            +
-                        </span>
-                    </div>
-                    <div class="content">
-                        <div
-                            class="group"
-                            v-for="(chord, index) in section.progression"
-                        >
-                            <div class="flex end">
-                                <span
-                                    @click="
-                                        section.progression.splice(index, 1)
-                                    "
-                                    class="material-symbols-rounded"
-                                    >-</span
-                                >
-                            </div>
-                            <div class="content">
-                                <TextInput
-                                    v-model="chord.chord"
-                                    label="name"
-                                />
-                                <NumberInput
-                                    v-model="chord.duration"
-                                    :min="1"
-                                    label="duration"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="group">
             <h2>Structure</h2>
-            <div class="flex end">
-                <span
-                    @click="eSong.structure.push('')"
-                    class="material-symbols-rounded"
-                >
-                    +
-                </span>
-            </div>
             <div class="content">
                 <Dropdown
                     v-for="(_, index) in eSong.structure"
@@ -245,6 +146,149 @@ watch(
                     label="section"
                 />
             </div>
+            <IconButton
+                @click="eSong.structure.push('')"
+                icon="add"
+                label="add section"
+            />
+        </div>
+        <div class="group">
+            <div class="flex space-between">
+                <h2>Instruments</h2>
+                <span
+                    class="material-symbols-rounded"
+                    @click="expanded.instruments = !expanded.instruments"
+                >
+                    {{ expanded.instruments ? "expand_less" : "expand_more" }}
+                </span>
+            </div>
+            <template v-if="expanded.instruments">
+                <div class="content">
+                    <div
+                        class="group"
+                        v-for="name in Object.keys(eSong.instruments)"
+                    >
+                        <h2>{{ name }}</h2>
+                        <div class="flex end">
+                            <span
+                                @click="delete eSong.instruments[name]"
+                                class="material-symbols-rounded"
+                            >
+                                -
+                            </span>
+                        </div>
+                        <div class="content">
+                            <TextInput
+                                v-model="eSong.instruments[name].name"
+                                label="name"
+                            />
+                            <NumberInput
+                                v-model="eSong.instruments[name].volume"
+                                :min="0"
+                                :max="127"
+                                label="volume"
+                            />
+                            <NumberInput
+                                v-model="eSong.instruments[name].page"
+                                label="page"
+                            />
+                            <Dropdown
+                                v-model="eSong.instruments[name].type"
+                                :options="INSTRUMENT_TYPES"
+                                label="type"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex">
+                    <IconButton
+                        v-for="slot in ['l', 'r1', 'r2']"
+                        v-show="!eSong.instruments[slot]"
+                        @click="addInstrument(slot)"
+                        icon="add"
+                        :label="'Add ' + slot"
+                    />
+                </div>
+            </template>
+        </div>
+        <div class="group">
+            <div class="flex space-between">
+                <h2>Sections</h2>
+                <span
+                    class="material-symbols-rounded"
+                    @click="expanded.sections = !expanded.sections"
+                >
+                    {{ expanded.sections ? "expand_less" : "expand_more" }}
+                </span>
+            </div>
+            <template v-if="expanded.sections">
+                <div class="content">
+                    <div
+                        class="group"
+                        v-for="(section, index) in eSong.sections"
+                    >
+                        <div class="flex space-between">
+                            <Dropdown
+                                v-model="section.type"
+                                :options="SECTION_TYPES"
+                                label="type"
+                            />
+                            <span
+                                @click="eSong.sections.splice(index, 1)"
+                                class="material-symbols-rounded"
+                            >
+                                delete
+                            </span>
+                        </div>
+                        <div class="content">
+                            <div
+                                class="group"
+                                v-for="(chord, i) in section.progression"
+                                @click="chord.selected = true"
+                                :id="index + '.' + i"
+                            >
+                                <div class="flex end">
+                                    <span
+                                        @click="
+                                            section.progression.splice(i, 1)
+                                        "
+                                        class="material-symbols-rounded"
+                                        >-</span
+                                    >
+                                </div>
+                                <div class="content">
+                                    <TextInput
+                                        v-model="chord.chord"
+                                        label="name"
+                                    />
+                                    <NumberInput
+                                        v-model="chord.duration"
+                                        :min="1"
+                                        label="duration"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <IconButton
+                            @click="
+                                eSong.sections[index].progression.push({
+                                    chord: 'C',
+                                    duration: 4
+                                })
+                            "
+                            icon="add"
+                            label="add chord"
+                        />
+                    </div>
+                </div>
+                <IconButton
+                    @click="
+                        eSong.sections.push({ type: 'chorus', progression: [] })
+                    "
+                    icon="add"
+                    label="add section"
+                />
+            </template>
         </div>
     </div>
 </template>
@@ -279,9 +323,15 @@ h2 {
 .flex {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
+    gap: 1em;
 
     &.end {
         justify-content: flex-end;
+    }
+
+    &.space-between {
+        justify-content: space-between;
     }
 }
 
