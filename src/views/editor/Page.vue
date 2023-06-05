@@ -23,6 +23,17 @@ const getSections = () => {
     return sections;
 };
 
+const onChordClick = (sectionIndex: number, chordIndex: number) => {
+    // window event
+    const event = new CustomEvent("chord-click", {
+        detail: {
+            sectionIndex,
+            chordIndex
+        }
+    });
+    window.dispatchEvent(event);
+};
+
 defineExpose({
     getSections
 });
@@ -108,14 +119,16 @@ defineExpose({
     </div>
     <div
         class="section"
-        v-for="(section, name) in pages[currentPage]"
+        v-for="(section, index) in pages[currentPage]"
         ref="sections"
+        :id="String(index)"
     >
         <span>{{ section.type }}</span>
         <div class="progression">
             <div
                 class="chord"
-                v-for="chord in section.progression"
+                v-for="(chord, chIndex) in section.progression"
+                @click="onChordClick(index, chIndex)"
                 :class="
                     `w-${chord.duration}` + (chord.selected ? ' selected' : '')
                 "
@@ -129,5 +142,14 @@ defineExpose({
 <style scoped>
 .structure span:not(:last-child)::after {
     content: " | ";
+}
+
+.progression .chord {
+    cursor: pointer;
+
+    &:hover {
+        color: white;
+        background: var(--accent);
+    }
 }
 </style>

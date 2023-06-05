@@ -12,6 +12,7 @@ import { watch, ref, type PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
 import IconButton from "@/components/IconButton.vue";
+import { nextTick } from "process";
 
 const store = useSongStore();
 
@@ -60,8 +61,6 @@ const expanded = ref<Record<string, boolean>>({});
 window.addEventListener("click", (e) => {
     let target = e.target as HTMLElement | null;
     for (let i = 0; i < 5; i++) {
-        console.log(target);
-
         if (!target) return;
         if (target.classList.contains("group")) break;
         if (!target.parentElement) break;
@@ -81,9 +80,34 @@ window.addEventListener("click", (e) => {
             }
 
             const chord = section.progression[j];
-            chord.selected = false;
+            delete chord.selected;
         }
     }
+});
+
+interface IChordClickEvent extends Event {
+    detail: {
+        sectionIndex: number;
+        chordIndex: number;
+    };
+}
+window.addEventListener("chord-click", (e: Event) => {
+    const { sectionIndex, chordIndex } = (e as IChordClickEvent).detail;
+    const id = `${sectionIndex}.${chordIndex}`;
+
+    const scrollIntoView = () => {
+        document.getElementById(id)?.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    };
+
+    if (!expanded.value["sections"]) {
+        expanded.value["sections"] = true;
+        setTimeout(scrollIntoView, 10);
+        return;
+    }
+    scrollIntoView();
 });
 </script>
 <template>
@@ -224,7 +248,7 @@ window.addEventListener("click", (e) => {
             <template v-if="expanded.sections">
                 <div class="content">
                     <div
-                        class="group"
+                        class="group section"
                         v-for="(section, index) in eSong.sections"
                     >
                         <div class="flex space-between">
@@ -242,7 +266,7 @@ window.addEventListener("click", (e) => {
                         </div>
                         <div class="content">
                             <div
-                                class="group"
+                                class="group chord"
                                 v-for="(chord, i) in section.progression"
                                 @click="chord.selected = true"
                                 :id="index + '.' + i"

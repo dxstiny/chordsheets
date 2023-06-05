@@ -122,8 +122,6 @@ if (!songs.songs.length) songs.addSong(mock);
 const route = useRoute();
 const router = useRouter();
 let textIndex = route.query.s;
-console.log(textIndex);
-console.log(route.query);
 
 if (!textIndex) {
     const id = songs.addEmptySong();
