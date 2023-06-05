@@ -15,7 +15,7 @@ const store = useSongStore();
             <ul>
                 <router-link
                     v-for="(song, index) in store.songs"
-                    :to="`/editor/${index}`"
+                    :to="`/editor?s=${index}`"
                 >
                     <li>{{ song.artist }} - {{ song.title }}</li>
                 </router-link>

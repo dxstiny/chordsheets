@@ -121,13 +121,14 @@ if (!songs.songs.length) songs.addSong(mock);
 
 const route = useRoute();
 const router = useRouter();
-let textIndex = route.params.index;
+let textIndex = route.query.s;
+console.log(textIndex);
+console.log(route.query);
 
 if (!textIndex) {
-    console.log("No index");
     const id = songs.addEmptySong();
-    console.log("New song id", id);
-    router.push(`/editor/${id}`);
+    console.log(id);
+    router.push(`/editor?s=${id}`);
     textIndex = String(id);
 }
 
