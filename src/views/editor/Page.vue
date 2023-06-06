@@ -37,6 +37,14 @@ const onChordClick = (sectionIndex: number, chordIndex: number) => {
 defineExpose({
     getSections
 });
+
+const formatSectionName = (section: ISection) => {
+    let { type, name } = section;
+    if (type === "(other)") {
+        return name;
+    }
+    return type + (name ? `: ${name}` : "");
+};
 </script>
 
 <template>
@@ -126,7 +134,7 @@ defineExpose({
             ref="sections"
             :id="String(index)"
         >
-            <span>{{ section.type }}</span>
+            <span>{{ formatSectionName(section) }}</span>
             <div class="progression">
                 <div
                     class="chord"

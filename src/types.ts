@@ -60,18 +60,6 @@ export interface IChord {
     selected?: boolean;
 }
 
-export interface ISection {
-    type:
-        | "intro"
-        | "verse"
-        | "pre-chorus"
-        | "chorus"
-        | "bridge"
-        | "outro"
-        | "solo";
-    progression: IChord[];
-}
-
 export const SECTION_TYPES = [
     "intro",
     "verse",
@@ -82,8 +70,15 @@ export const SECTION_TYPES = [
     "fill",
     "solo",
     "interlude",
-    "outro"
+    "outro",
+    "(other)"
 ];
+
+export interface ISection {
+    type: (typeof SECTION_TYPES)[number];
+    name?: string;
+    progression: IChord[];
+}
 
 export interface IInstrument {
     type:

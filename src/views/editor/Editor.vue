@@ -253,11 +253,17 @@ window.addEventListener("chord-click", (e: Event) => {
                     <template #item="{ element }">
                         <div class="group section">
                             <div class="flex space-between">
-                                <Dropdown
-                                    v-model="element.type"
-                                    :options="SECTION_TYPES"
-                                    label="type"
-                                />
+                                <div class="flex">
+                                    <Dropdown
+                                        v-model="element.type"
+                                        :options="SECTION_TYPES"
+                                        label="type"
+                                    />
+                                    <TextInput
+                                        v-model="element.name"
+                                        label="name"
+                                    />
+                                </div>
                                 <span
                                     @click="
                                         eSong.sections.splice(
