@@ -2,8 +2,11 @@
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
 import AllPages from "./editor/AllPages.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { jsPDF } from "jspdf";
+import Dropdown from "@/components/Dropdown.vue";
+import TextInput from "@/components/TextInput.vue";
+import { type ISong } from "@/types";
 
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof AllPages>[]>();
@@ -65,6 +68,36 @@ const exportAll = async () => {
     const pdf = await renderAll();
     pdf.save("chordsheets.pdf");
 };
+
+const filters = ref({
+    artist: "",
+    query: ""
+});
+
+const filteredSongs = computed(() => {
+    return store.songs.filter((song) => {
+        if (
+            filters.value.artist &&
+            filters.value.artist !== "(any)" &&
+            !song.artist
+                .toLowerCase()
+                .includes(filters.value.artist.toLowerCase())
+        ) {
+            return false;
+        }
+
+        const queryCouldMatch = `${song.title} ${song.artist}`.toLowerCase();
+
+        if (
+            filters.value.query &&
+            !queryCouldMatch.includes(filters.value.query.toLowerCase())
+        ) {
+            return false;
+        }
+
+        return true;
+    });
+});
 </script>
 <template>
     <div class="dashboard">
@@ -100,14 +133,43 @@ const exportAll = async () => {
                 />
             </div>
             <hr />
-            <ul>
+            <div class="filters">
+                <TextInput
+                    label="Search"
+                    v-model="filters.query"
+                    placeholder="Search for a song"
+                />
+                <Dropdown
+                    label="Artist"
+                    v-model="filters.artist"
+                    :options="[
+                        '(any)',
+                        ...new Set(store.songs.map((song) => song.artist))
+                    ]"
+                />
+            </div>
+            <hr />
+            <div class="songs">
                 <router-link
-                    v-for="(song, index) in store.songs"
                     :to="`/editor?s=${index}`"
+                    v-for="(song, index) in filteredSongs"
                 >
-                    <li>{{ song.artist }} - {{ song.title }}</li>
+                    <div class="song">
+                        <div class="header">
+                            <div class="info">
+                                <h2>{{ song.title }}</h2>
+                                <span>{{ song.artist }}</span>
+                            </div>
+                            <span
+                                class="material-symbols-rounded"
+                                @click.prevent="store.removeSong(song)"
+                            >
+                                delete
+                            </span>
+                        </div>
+                    </div>
                 </router-link>
-            </ul>
+            </div>
         </div>
     </div>
     <div class="void">
@@ -130,6 +192,52 @@ const exportAll = async () => {
     gap: 1em;
 }
 
+.filters {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.songs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.song {
+    color: var(--color-text);
+    display: flex;
+    gap: 1em;
+    background: var(--color-background-soft);
+    border: 1px solid var(--color-border);
+    border-radius: 1em;
+    padding: 1em;
+
+    &:hover {
+        background: var(--color-background);
+    }
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 3em;
+    }
+
+    .material-symbols-rounded {
+        font-size: 1.5rem;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--color-heading);
+        }
+    }
+}
+
 .dashboard {
     padding: 1em;
     display: flex;
@@ -141,6 +249,7 @@ const exportAll = async () => {
         min-width: 100%;
 
         @media (min-width: 1200px) {
+            max-width: 1200px;
             min-width: 1200px;
         }
     }

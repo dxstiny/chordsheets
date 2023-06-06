@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
-
 defineProps({
     modelValue: {
         required: true,
@@ -61,7 +59,7 @@ select {
     border: 1px solid var(--color-border);
     border-radius: 0.5em;
     padding: 0.5em;
-    color: #d2d2d2;
+    color: var(--color-text);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
     &:focus {
@@ -72,6 +70,6 @@ select {
 
 option {
     background: var(--color-background);
-    color: #d2d2d2;
+    color: var(--color-text);
 }
 </style>

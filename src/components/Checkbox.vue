@@ -11,8 +11,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from "vue";
-
 defineProps({
     modelValue: {
         required: true,
@@ -51,7 +49,7 @@ input {
     border: 1px solid var(--color-border);
     border-radius: 0.5em;
     padding: 0.5em;
-    color: #d2d2d2;
+    color: var(--color-text);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
     &:focus {
