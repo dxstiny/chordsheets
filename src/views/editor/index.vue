@@ -5,6 +5,7 @@ import { ref, onMounted } from "vue";
 import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import Editor from "./Editor.vue";
+import MinWidth from "../MinWidth.vue";
 
 const mock: ISong = {
     title: "Livin' On A Prayer",
@@ -138,59 +139,62 @@ const song = ref<ISong>(songs.songs[id]);
 const preview = ref<InstanceType<typeof Song>>();
 </script>
 <template>
-    <div
-        class="editor"
-        v-if="song"
-    >
-        <router-link
-            to="/"
-            class="back-button"
+    <MinWidth :minWidth="1100">
+        <div
+            class="editor"
+            v-if="song"
         >
-            <span class="material-symbols-rounded">arrow_back</span>
-        </router-link>
-
-        <div class="preview">
-            <div
-                class="pages"
-                v-if="preview"
+            <router-link
+                to="/"
+                class="back-button"
             >
-                <span
-                    @click="preview.prevPage"
-                    class="material-symbols-rounded"
+                <span class="material-symbols-rounded">arrow_back</span>
+            </router-link>
+
+            <div class="preview">
+                <div
+                    class="pages"
+                    v-if="preview"
                 >
-                    chevron_left
-                </span>
-                {{ preview.getCurrentPage() }} / {{ preview.getTotalPages() }}
-                <span
-                    @click="preview.nextPage"
-                    class="material-symbols-rounded"
-                >
-                    chevron_right
-                </span>
-                <span
-                    class="material-symbols-rounded"
-                    @click="preview.print"
-                >
-                    print
-                </span>
-                <span
-                    class="material-symbols-rounded"
-                    @click="preview.download"
-                >
-                    file_download
-                </span>
+                    <span
+                        @click="preview.prevPage"
+                        class="material-symbols-rounded"
+                    >
+                        chevron_left
+                    </span>
+                    {{ preview.getCurrentPage() }} /
+                    {{ preview.getTotalPages() }}
+                    <span
+                        @click="preview.nextPage"
+                        class="material-symbols-rounded"
+                    >
+                        chevron_right
+                    </span>
+                    <span
+                        class="material-symbols-rounded"
+                        @click="preview.print"
+                    >
+                        print
+                    </span>
+                    <span
+                        class="material-symbols-rounded"
+                        @click="preview.download"
+                    >
+                        file_download
+                    </span>
+                </div>
+                <div class="print a4">
+                    <Song
+                        :song="song"
+                        ref="preview"
+                    />
+                </div>
             </div>
-            <div class="print a4">
-                <Song
-                    :song="song"
-                    ref="preview"
-                />
+            <div class="config">
+                <Editor :song="song" />
             </div>
         </div>
-        <div class="config">
-            <Editor :song="song" />
-        </div>
-    </div>
+    </MinWidth>
 </template>
 
 <style scoped>
