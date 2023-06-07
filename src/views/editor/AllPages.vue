@@ -3,7 +3,8 @@ import { type PropType, ref, onMounted } from "vue";
 import type { ISong, IPageContent } from "@/types";
 import Page from "./Page.vue";
 import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import "svg2pdf.js";
+import domToImage from "dom-to-image";
 
 const props = defineProps({
     song: {
@@ -63,17 +64,34 @@ const renderTo = async (pdf: jsPDF) => {
         el = elements[i];
         if (!el) continue;
 
-        const dataUrl = (
-            await html2canvas(el, {
-                scale: 3
-            })
-        ).toDataURL();
-
         var width = pdf.internal.pageSize.getWidth();
         var height = pdf.internal.pageSize.getHeight();
-        height = ratio * width;
 
-        pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
+        const scale = 2;
+        const dataUrl = await domToImage.toJpeg(el, {
+            height: el.offsetHeight * scale,
+            width: el.offsetWidth * scale,
+            style: {
+                transform: `scale(${scale}) translate(${
+                    el.offsetWidth / 2 / scale
+                }px, ${el.offsetHeight / 2 / scale}px)`
+            }
+        });
+
+        height = ratio * width;
+        /*
+        const svg = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+        );
+        svg.innerHTML = dataUrl;
+        await pdf.svg(svg, {
+            x: 0,
+            y: 0,
+            width,
+            height
+        });*/
+        pdf.addImage(dataUrl, "JPG", 0, 0, width, height);
 
         if (i + 1 < pages.value.length) {
             pdf.addPage();

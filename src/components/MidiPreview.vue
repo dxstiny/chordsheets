@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const TARGET_SIZE = computed(() => ({
-    width: props.width,
+    width: props.width - 20,
     height: props.height
 }));
 
@@ -98,8 +98,8 @@ const getBackStyle = () => {
     for (let i = y.min; i <= y.max; i++) {
         const isBlackKey = [1, 3, 6, 8, 10].includes(i % 12);
         const backgroundColor = isBlackKey
-            ? "var(--color-background)"
-            : "var(--color-background-soft)";
+            ? "var(--color-background-soft)"
+            : "var(--color-background)";
 
         const ticksPerMetronome = props.track.signature.clocksPerTick;
         const ticksPerBeat =
@@ -154,7 +154,7 @@ const getKeyStyle = () => {
             backgroundColor: background,
             position: "absolute",
             height: `${stretch.value.y}px`,
-            width: `${100 * blackKeyPercentage * stretch.value.x}px`,
+            width: `${20 * blackKeyPercentage}px`,
             bottom: `${(i - y.min) * stretch.value.y}px`,
             left: `${0}px`
         });
@@ -164,9 +164,7 @@ const getKeyStyle = () => {
                 backgroundColor: "white",
                 position: "absolute",
                 height: `${stretch.value.y}px`,
-                width: `${
-                    (100 - 100 * blackKeyPercentage) * stretch.value.x
-                }px`,
+                width: `${20 * (1 - blackKeyPercentage)}px`,
                 bottom: `${(i - y.min) * stretch.value.y}px`,
                 left: `${blackKeyPercentage * 100 * stretch.value.x}px`
             });
@@ -184,7 +182,7 @@ const getKeyboardStyle = () => {
 
     return {
         height: `${(1 + y.max - y.min) * stretch.value.y}px`,
-        width: `${100 * stretch.value.x}px`
+        width: `${20}px`
     };
 };
 </script>
