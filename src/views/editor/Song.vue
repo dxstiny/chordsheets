@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ISong, ISection } from "@/types";
+import type { ISong, ISection, IPageContent } from "@/types";
 import Page from "./Page.vue";
 import { ref, type PropType, onMounted } from "vue";
 import html2canvas from "html2canvas";
@@ -19,19 +19,23 @@ const props = defineProps({
 const allPages = ref<InstanceType<typeof AllPages>>();
 const mainPage = ref<InstanceType<typeof Page>>();
 const element = ref<HTMLDivElement>();
-const pages = ref<ISection[][]>([props.song.sections]);
+const pages = ref<IPageContent[][]>([
+    [...props.song.sections, ...(props.song.midi ?? [])]
+]);
 const currentPage = ref(0);
 
 onMounted(() => {
     if (!element.value) return;
     const newPages = [];
 
-    const sections = mainPage.value?.getSections().value;
+    const sections = mainPage.value?.getSections();
     if (!sections) return;
+
+    const lookup = [...props.song.sections, ...(props.song.midi ?? [])];
 
     for (let i = 0; i < sections.length; i++) {
         const sectionElement = sections[i];
-        const section = props.song.sections[i];
+        const section = lookup[i];
 
         // height + y-position
         const bottom = sectionElement.getBoundingClientRect().bottom;

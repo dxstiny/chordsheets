@@ -13,6 +13,7 @@ import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
 import IconButton from "@/components/IconButton.vue";
 import draggable from "vuedraggable";
+import { IMidiTrack, midiFromFile } from "@/importMidi";
 
 const store = useSongStore();
 
@@ -109,6 +110,50 @@ window.addEventListener("chord-click", (e: Event) => {
     }
     scrollIntoView();
 });
+
+const deleteMidi = (index: number) => {
+    if (!eSong.value.midi) return;
+
+    eSong.value.midi.splice(index, 1);
+};
+
+const uploadMidi = async () => {
+    return new Promise<IMidiTrack>((resolve, reject) => {
+        const file = document.createElement("input");
+        file.type = "file";
+        file.accept = ".mid";
+        file.onchange = async () => {
+            if (!file.files) {
+                reject();
+                return;
+            }
+            const midiFile = file.files[0];
+            const midiData = await midiFromFile(midiFile);
+            if (!midiData) {
+                reject();
+                return;
+            }
+            resolve(midiData);
+        };
+        file.click();
+    });
+};
+
+const replaceMidi = async (index: number) => {
+    const file = await uploadMidi();
+    if (!file) return;
+    if (!eSong.value.midi) return;
+    eSong.value.midi[index] = file;
+};
+
+const addMidi = async () => {
+    if (!eSong.value.midi) {
+        eSong.value.midi = [];
+    }
+    const file = await uploadMidi();
+    if (!file) return;
+    eSong.value.midi.push(file);
+};
 </script>
 <template>
     <div class="configuration">
@@ -345,6 +390,37 @@ window.addEventListener("chord-click", (e: Event) => {
                     label="add section"
                 />
             </template>
+        </div>
+        <div class="group">
+            <h2>Melodies</h2>
+            <div class="content">
+                <div
+                    class="group"
+                    v-for="(track, index) in song.midi"
+                >
+                    <TextInput
+                        v-model="track.name"
+                        label="name"
+                    />
+                    <div class="flex">
+                        <IconButton
+                            @click="deleteMidi(index)"
+                            icon="delete"
+                            label="delete"
+                        />
+                        <IconButton
+                            @click="replaceMidi(index)"
+                            icon="sync"
+                            label="replace"
+                        />
+                    </div>
+                </div>
+            </div>
+            <IconButton
+                @click="addMidi"
+                icon="add"
+                label="add"
+            />
         </div>
     </div>
 </template>

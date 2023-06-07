@@ -54,7 +54,7 @@
 
 .print {
   --color-background: white;
-  --color-background-soft: white;
+  --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: white;
 
   --color-border: rgba(0, 0, 0, 0.12);
@@ -75,7 +75,8 @@
     --display-margin: calc(var(--display-height) * (20 / 297));
 
     height: var(--display-height);
-    aspect-ratio: 1 / 1.414;
+    width: calc(var(--display-height) * (210 / 297));
+
     padding: var(--display-margin);
     box-shadow: 0 0 0 1px var(--color-border), 0 0 0 2px var(--color-border-hover);
 

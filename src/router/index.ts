@@ -12,6 +12,11 @@ const router = createRouter({
             path: "/editor",
             name: "Editor",
             component: () => import("../views/editor/index.vue")
+        },
+        {
+            path: "/midi",
+            name: "Midi",
+            component: () => import("../views/midi/index.vue")
         }
     ]
 });

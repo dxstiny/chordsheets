@@ -1,3 +1,5 @@
+import type { IMidiTrack } from "./importMidi";
+
 type MajorChordSharp =
     | "C"
     | "C#"
@@ -143,6 +145,8 @@ export interface ISong {
         sustain: boolean;
         mono: boolean;
     };
+
+    midi?: IMidiTrack[];
 }
 
 export const empty: ISong = {
@@ -161,3 +165,5 @@ export const empty: ISong = {
     },
     structure: []
 };
+
+export type IPageContent = ISection | IMidiTrack;

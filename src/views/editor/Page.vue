@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import type { ISong, ISection } from "@/types";
-import { type PropType, ref } from "vue";
+import MidiPreview from "@/components/MidiPreview.vue";
+import type { IMidiTrack } from "@/importMidi";
+import type { ISong, IPageContent, ISection } from "@/types";
+import { type PropType, ref, computed } from "vue";
 
-defineProps({
+const props = defineProps({
     currentPage: {
         required: true,
         type: Number
     },
     pages: {
         required: true,
-        type: Array as PropType<ISection[][]>
+        type: Array as PropType<IPageContent[][]>
     },
     song: {
         required: true,
@@ -18,9 +20,11 @@ defineProps({
 });
 
 const sections = ref<HTMLDivElement[]>([]);
+const midiSections = ref<HTMLDivElement[]>([]);
+const page = ref<HTMLDivElement>();
 
 const getSections = () => {
-    return sections;
+    return [...sections.value, ...midiSections.value];
 };
 
 const onChordClick = (sectionIndex: number, chordIndex: number) => {
@@ -45,10 +49,25 @@ const formatSectionName = (section: ISection) => {
     }
     return type + (name ? `: ${name}` : "");
 };
+
+const sectionPages = computed(() => {
+    return props.pages[props.currentPage].filter(
+        (x) => (x as ISection | undefined)?.type
+    ) as ISection[];
+});
+
+const midiPages = computed(() => {
+    return props.pages[props.currentPage].filter(
+        (x) => (x as IMidiTrack | undefined)?.signature
+    ) as IMidiTrack[];
+});
 </script>
 
 <template>
-    <div class="page">
+    <div
+        class="page"
+        ref="page"
+    >
         <div
             class="meta"
             v-if="currentPage == 0"
@@ -130,7 +149,7 @@ const formatSectionName = (section: ISection) => {
         </div>
         <div
             class="section"
-            v-for="(section, index) in pages[currentPage]"
+            v-for="(section, index) in sectionPages"
             ref="sections"
             :id="String(index)"
         >
@@ -148,6 +167,18 @@ const formatSectionName = (section: ISection) => {
                     {{ chord.chord }}
                 </div>
             </div>
+        </div>
+        <div
+            class="section"
+            v-if="song.midi"
+            v-for="track in midiPages"
+            ref="midiSections"
+        >
+            <span>{{ track.name }}</span>
+            <MidiPreview
+                :track="track"
+                :width="page?.clientWidth ?? 400"
+            />
         </div>
     </div>
 </template>

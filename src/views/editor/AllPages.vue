@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type PropType, ref, onMounted } from "vue";
-import type { ISong, ISection } from "@/types";
+import type { ISong, IPageContent } from "@/types";
 import Page from "./Page.vue";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -20,12 +20,13 @@ onMounted(() => {
     if (!firstParent) return;
     const newPages = [];
 
-    const sections = element.value?.[0]?.getSections().value;
+    const sections = element.value?.[0]?.getSections();
     if (!sections) return;
+    const lookup = [...props.song.sections, ...(props.song.midi ?? [])];
 
     for (let i = 0; i < sections.length; i++) {
         const sectionElement = sections[i];
-        const section = props.song.sections[i];
+        const section = lookup[i];
 
         // height + y-position
         const bottom = sectionElement.getBoundingClientRect().bottom;
@@ -78,9 +79,6 @@ const renderTo = async (pdf: jsPDF) => {
             pdf.addPage();
         }
     }
-
-    console.log(pdf.getNumberOfPages());
-
     return pdf;
 };
 
@@ -96,7 +94,9 @@ const render = async () => {
     return pdf;
 };
 
-const pages = ref<ISection[][]>([props.song.sections]);
+const pages = ref<IPageContent[][]>([
+    [...props.song.sections, ...(props.song.midi ?? [])]
+]);
 
 defineExpose({
     render,
