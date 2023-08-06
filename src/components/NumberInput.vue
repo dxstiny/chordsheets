@@ -59,7 +59,7 @@ input {
     border-radius: 0.5em;
     padding: 0.5em;
     color: var(--color-text);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: inherit;
 
     &:focus {
         outline: none;

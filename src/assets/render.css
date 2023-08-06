@@ -6,9 +6,10 @@
 }
 
 @font-face {
-    font-family: 'Material Symbols Rounded';
+    font-family: "Material Symbols Rounded";
     font-style: normal;
-    src: url("https://fonts.gstatic.com/s/materialsymbolsrounded/v114/sykg-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190Fjzag.woff2") format("woff2");
+    src: url("https://fonts.gstatic.com/s/materialsymbolsrounded/v114/sykg-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190Fjzag.woff2")
+        format("woff2");
 }
 
 body {
@@ -19,6 +20,7 @@ body {
 
 .parent {
     width: 100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
     .song {
         width: 100%;
@@ -140,7 +142,7 @@ body {
         grid-template-rows: auto;
     }
 
-    .progression>div {
+    .progression > div {
         display: flex;
         justify-content: center;
         border: 1px solid var(--color-border);

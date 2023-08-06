@@ -102,7 +102,7 @@ const filteredSongs = computed(() => {
 <template>
     <div class="dashboard">
         <div class="wrap">
-            <h1>Chordsheets</h1>
+            <h1>Chord<span class="accent">Sheets</span></h1>
 
             <hr />
             <div class="flex">
@@ -259,5 +259,9 @@ hr {
     margin: 1em 0;
     border: none;
     border-bottom: 1px solid var(--color-border);
+}
+
+h1 .accent {
+    color: var(--accent);
 }
 </style>

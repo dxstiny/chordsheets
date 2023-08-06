@@ -51,7 +51,7 @@ const formatSectionName = (section: ISection) => {
 };
 
 const sectionPages = computed(() => {
-    return props.pages[props.currentPage].filter(
+    return props.pages[props.currentPage]?.filter(
         (x) => (x as ISection | undefined)?.type
     ) as ISection[];
 });

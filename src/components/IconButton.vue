@@ -31,6 +31,7 @@ defineProps({
     color: var(--color-background-soft);
     cursor: pointer;
     text-transform: capitalize;
+    font-family: inherit;
 
     &:hover {
         background: var(--accent);
