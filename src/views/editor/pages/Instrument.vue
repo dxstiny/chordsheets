@@ -12,7 +12,6 @@ import { watch, ref, type PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
 import IconButton from "@/components/IconButton.vue";
-import draggable from "vuedraggable";
 import { type IMidiTrack, midiFromFile } from "@/importMidi";
 
 const store = useSongStore();

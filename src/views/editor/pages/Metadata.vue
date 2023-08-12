@@ -1,18 +1,9 @@
 <script lang="ts" setup>
 import NumberInput from "@/components/NumberInput.vue";
 import TextInput from "@/components/TextInput.vue";
-import Checkbox from "@/components/Checkbox.vue";
-import {
-    INSTRUMENT_TYPES,
-    SECTION_TYPES,
-    type ISong,
-    type IInstrument
-} from "@/types";
+import { INSTRUMENT_TYPES, type ISong, type IInstrument } from "@/types";
 import { watch, ref, type PropType } from "vue";
-import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
-import IconButton from "@/components/IconButton.vue";
-import draggable from "vuedraggable";
 import { type IMidiTrack, midiFromFile } from "@/importMidi";
 
 const store = useSongStore();

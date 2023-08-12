@@ -6,7 +6,12 @@ const ITEM_NAME = "chordsheets.songs";
 
 export const useSongStore = defineStore("songs", () => {
     const fromLocalStorage = () =>
-        JSON.parse(localStorage.getItem(ITEM_NAME) || "[]");
+        JSON.parse(localStorage.getItem(ITEM_NAME) || "[]").map(
+            (song: ISong) => {
+                if (!song.id) song.id = Math.round(Math.random() * 1000000);
+                return song;
+            }
+        );
 
     const songs = ref<ISong[]>(fromLocalStorage());
 
@@ -60,12 +65,19 @@ export const useSongStore = defineStore("songs", () => {
         });
     };
 
+    const moveTo = (oldIndex: number, newIndex: number) => {
+        const song = songs.value[oldIndex];
+        songs.value.splice(oldIndex, 1);
+        songs.value.splice(newIndex, 0, song);
+    };
+
     return {
         songs,
         addSong,
         removeSong,
         updateSong,
         addEmptySong,
-        prepareRender
+        prepareRender,
+        moveTo
     };
 });

@@ -33,7 +33,12 @@
     --color-heading: var(--vt-c-text-light-1);
     --color-text: var(--vt-c-text-light-1);
 
-    --accent: hsla(160, 100%, 37%, 1);
+    --accent: #00bd7e;
+
+    --color-green: var(--accent);
+    --color-red: #e85454;
+    --color-yellow: #c7aa19;
+    --color-blue: #189de4;
 
     --section-gap: 160px;
 }
@@ -103,4 +108,20 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+a,
+.green {
+    text-decoration: none;
+    color: var(--accent);
+    transition: 0.4s;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--color-heading);
 }

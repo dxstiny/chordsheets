@@ -1,120 +1,12 @@
 <script lang="ts" setup>
-import { empty, type ISong } from "@/types";
+import { mock, type ISong } from "@/types";
 import Song from "./Song.vue";
 import { ref, onMounted } from "vue";
 import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import Editor from "./Editor.vue";
 import MinWidth from "../MinWidth.vue";
-
-const mock: ISong = {
-    title: "Livin' On A Prayer",
-    artist: "Bon Jovi",
-    bpm: 123,
-    key: "C",
-    structure: [
-        "intro",
-        "verse",
-        "chorus",
-        "verse",
-        "chorus",
-        "solo",
-        "chorus"
-    ],
-    sections: [
-        {
-            type: "intro",
-            progression: [
-                { chord: "Em", duration: 16 },
-                { chord: "Em", duration: 16 },
-                { chord: "Em", duration: 16 },
-                { chord: "Em", duration: 16 },
-                { chord: "C", duration: 4 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 8 },
-                { chord: "C", duration: 4 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 8 }
-            ]
-        },
-        {
-            type: "verse",
-            progression: [
-                { chord: "Em", duration: 16 },
-                { chord: "C", duration: 4 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 8 },
-                { chord: "Em", duration: 16 },
-                { chord: "C", duration: 4 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 8 }
-            ]
-        },
-        {
-            type: "chorus",
-            progression: [
-                { chord: "Em", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "G", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "G", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 8 }
-            ]
-        },
-        {
-            type: "solo",
-            progression: [
-                { chord: "Em", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "G", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "Em", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "D", duration: 4 },
-                { chord: "G", duration: 1 },
-                { chord: "C", duration: 3 },
-                { chord: "Em", duration: 4 },
-                { chord: "Em", duration: 4 }
-            ]
-        }
-    ],
-    transpose: 0,
-    octave: 0,
-    options: {
-        touch: true,
-        sustain: false,
-        mono: false
-    },
-    instruments: {
-        l: {
-            type: "Synth",
-            name: "PunchyChordz",
-            volume: 127,
-            page: 1
-        },
-        r1: {
-            type: "Synth",
-            name: "WildPWM",
-            volume: 100,
-            page: 2
-        },
-        r2: {
-            type: "Synth",
-            name: "DetunedVintage",
-            volume: 100,
-            page: 2
-        }
-    }
-};
+import { $ } from "vue/macros";
 
 const songs = useSongStore();
 
@@ -126,8 +18,12 @@ let textIndex = route.query.s;
 
 if (!textIndex) {
     const id = songs.addEmptySong();
-    console.log(id);
-    router.push(`/editor?s=${id}`);
+    router.push({
+        query: {
+            s: id
+        },
+        replace: true
+    });
     textIndex = String(id);
 }
 

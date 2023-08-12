@@ -2,11 +2,12 @@
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
 import AllPages from "./editor/AllPages.vue";
-import { ref, computed } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import { jsPDF } from "jspdf";
 import Dropdown from "@/components/Dropdown.vue";
 import TextInput from "@/components/TextInput.vue";
-import { type ISong } from "@/types";
+import draggable from "vuedraggable";
+import type { ISong } from "@/types";
 
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof AllPages>[]>();
@@ -74,8 +75,10 @@ const filters = ref({
     query: ""
 });
 
-const filteredSongs = computed(() => {
-    return store.songs.filter((song) => {
+const filteredSongs = ref<ISong[]>([]);
+
+watchEffect(() => {
+    filteredSongs.value = store.songs.filter((song) => {
         if (
             filters.value.artist &&
             filters.value.artist !== "(any)" &&
@@ -98,38 +101,61 @@ const filteredSongs = computed(() => {
         return true;
     });
 });
+
+const updateOrder = ({
+    moved
+}: {
+    moved: {
+        newIndex: number;
+        oldIndex: number;
+        element: ISong;
+    };
+}) => {
+    const from = store.songs.findIndex((song) => song.id === moved.element.id);
+    const prevElement =
+        filteredSongs.value[moved.newIndex - (1 % filteredSongs.value.length)];
+    const prev = prevElement
+        ? store.songs.findIndex((song) => song.id === prevElement.id)
+        : -1;
+    const to = moved.newIndex > moved.oldIndex ? prev : prev + 1;
+
+    store.moveTo(from, to);
+};
 </script>
 <template>
     <div class="dashboard">
         <div class="wrap">
             <h1>Chord<span class="accent">Sheets</span></h1>
-
-            <hr />
             <div class="flex">
                 <IconButton
                     icon="add"
                     label="New Song"
                     @click="$router.push('/editor')"
+                    :style="'green'"
                 />
                 <IconButton
                     icon="file_download"
                     label="Save Library"
                     @click="exportLib"
+                    :style="'yellow'"
                 />
                 <IconButton
                     icon="file_upload"
                     label="Import Library"
                     @click="importLib"
+                    :style="'yellow'"
                 />
                 <IconButton
                     label="Export all as PDF"
                     icon="picture_as_pdf"
                     @click="exportAll"
+                    :style="'blue'"
                 />
                 <IconButton
                     label="Print All"
                     icon="print"
                     @click="printAll"
+                    :style="'blue'"
                 />
             </div>
             <hr />
@@ -149,26 +175,36 @@ const filteredSongs = computed(() => {
                 />
             </div>
             <hr />
-            <div class="songs">
-                <router-link
-                    :to="`/editor?s=${index}`"
-                    v-for="(song, index) in filteredSongs"
-                >
-                    <div class="song">
-                        <div class="header">
-                            <div class="info">
-                                <h2>{{ song.title }}</h2>
-                                <span>{{ song.artist }}</span>
+            <draggable
+                v-model="filteredSongs"
+                class="songs"
+                @change="updateOrder"
+                item-key="id"
+            >
+                <template #item="{ element: song, index }">
+                    <router-link :to="`/editor?s=${index}`">
+                        <div class="card hover song">
+                            <div class="header">
+                                <div class="info">
+                                    <h2>{{ song.title }}</h2>
+                                    <span>{{ song.artist }}</span>
+                                </div>
+                                <span
+                                    class="material-symbols-rounded"
+                                    @click.prevent="store.removeSong(song)"
+                                >
+                                    delete
+                                </span>
                             </div>
-                            <span
-                                class="material-symbols-rounded"
-                                @click.prevent="store.removeSong(song)"
-                            >
-                                delete
-                            </span>
                         </div>
-                    </div>
-                </router-link>
+                    </router-link>
+                </template>
+            </draggable>
+        </div>
+        <div class="card min-h-screen sticky">
+            <div class="content">
+                <h2>Learn Music Theory</h2>
+                <p>Coming soon...</p>
             </div>
         </div>
     </div>
@@ -202,21 +238,31 @@ const filteredSongs = computed(() => {
 
 .songs {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1em;
+    padding: 0 1em;
 }
 
-.song {
+.card {
     color: var(--color-text);
     display: flex;
+    justify-content: space-between;
     gap: 1em;
     background: var(--color-background-soft);
     border: 1px solid var(--color-border);
     border-radius: 1em;
     padding: 1em;
 
-    &:hover {
+    &.min-h-screen {
+        min-height: calc(100vh - 2em);
+    }
+
+    &.sticky {
+        position: sticky;
+        top: 1em;
+    }
+
+    &.hover:hover {
         background: var(--color-background);
     }
 
@@ -225,6 +271,7 @@ const filteredSongs = computed(() => {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        width: 100%;
         gap: 3em;
     }
 
@@ -240,15 +287,16 @@ const filteredSongs = computed(() => {
 
 .dashboard {
     padding: 1em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    align-items: start;
     position: relative;
+    gap: 1em;
 
     .wrap {
         min-width: 100%;
 
-        @media (min-width: 1200px) {
+        @media (min-width: 1400px) {
             max-width: 1200px;
             min-width: 1200px;
         }
@@ -261,7 +309,17 @@ hr {
     border-bottom: 1px solid var(--color-border);
 }
 
+h1 {
+    margin: 0.25em 0 1em;
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
 h1 .accent {
     color: var(--accent);
+    font-weight: 900;
 }
 </style>

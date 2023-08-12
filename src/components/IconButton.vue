@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
+
 defineProps({
     icon: {
         required: true,
@@ -7,11 +9,18 @@ defineProps({
     label: {
         required: true,
         type: String
+    },
+    style: {
+        required: false,
+        type: String as PropType<"green" | "red" | "blue" | "yellow">
     }
 });
 </script>
 <template>
-    <button class="icon-button">
+    <button
+        class="icon-button"
+        :style="style ? `--accent: var(--color-${style})` : ''"
+    >
         <i class="material-symbols-rounded">{{ icon }}</i>
         <span>{{ label }}</span>
     </button>
@@ -32,6 +41,7 @@ defineProps({
     cursor: pointer;
     text-transform: capitalize;
     font-family: inherit;
+    background: var(--accent);
 
     &:hover {
         background: var(--accent);

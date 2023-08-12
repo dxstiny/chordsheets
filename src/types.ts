@@ -147,7 +147,10 @@ export interface ISong {
     };
 
     midi?: IMidiTrack[];
+    id: number;
 }
+
+export type IPageContent = ISection | IMidiTrack;
 
 export const empty: ISong = {
     title: "",
@@ -163,7 +166,116 @@ export const empty: ISong = {
         sustain: false,
         mono: false
     },
-    structure: []
+    structure: [],
+    id: 0
 };
 
-export type IPageContent = ISection | IMidiTrack;
+export const mock: ISong = {
+    title: "Livin' On A Prayer",
+    artist: "Bon Jovi",
+    bpm: 123,
+    key: "C",
+    structure: [
+        "intro",
+        "verse",
+        "chorus",
+        "verse",
+        "chorus",
+        "solo",
+        "chorus"
+    ],
+    sections: [
+        {
+            type: "intro",
+            progression: [
+                { chord: "Em", duration: 16 },
+                { chord: "Em", duration: 16 },
+                { chord: "Em", duration: 16 },
+                { chord: "Em", duration: 16 },
+                { chord: "C", duration: 4 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 8 },
+                { chord: "C", duration: 4 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 8 }
+            ]
+        },
+        {
+            type: "verse",
+            progression: [
+                { chord: "Em", duration: 16 },
+                { chord: "C", duration: 4 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 8 },
+                { chord: "Em", duration: 16 },
+                { chord: "C", duration: 4 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 8 }
+            ]
+        },
+        {
+            type: "chorus",
+            progression: [
+                { chord: "Em", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "G", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "G", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 8 }
+            ]
+        },
+        {
+            type: "solo",
+            progression: [
+                { chord: "Em", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "G", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "Em", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "D", duration: 4 },
+                { chord: "G", duration: 1 },
+                { chord: "C", duration: 3 },
+                { chord: "Em", duration: 4 },
+                { chord: "Em", duration: 4 }
+            ]
+        }
+    ],
+    transpose: 0,
+    octave: 0,
+    options: {
+        touch: true,
+        sustain: false,
+        mono: false
+    },
+    instruments: {
+        l: {
+            type: "Synth",
+            name: "PunchyChordz",
+            volume: 127,
+            page: 1
+        },
+        r1: {
+            type: "Synth",
+            name: "WildPWM",
+            volume: 100,
+            page: 2
+        },
+        r2: {
+            type: "Synth",
+            name: "DetunedVintage",
+            volume: 100,
+            page: 2
+        }
+    },
+    id: new Date().getTime()
+};
