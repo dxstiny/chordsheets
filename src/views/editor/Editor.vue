@@ -54,8 +54,9 @@ const tab = ref(tabs[0]);
                 width="100%"
                 height="80"
                 frameborder="0"
-                allowtransparency="true"
-                allow="encrypted-media"
+                allowfullscreen=""
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
             ></iframe>
         </div>
         <div class="tabs flex space-between">

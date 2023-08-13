@@ -186,9 +186,7 @@ const updateOrder = ({
                         <div class="song">
                             <div class="cover">
                                 <img
-                                    :src="
-                                        song.cover ?? '/placeholders/song.svg'
-                                    "
+                                    :src="song.cover ?? 'placeholders/song.svg'"
                                 />
                             </div>
                             <div class="info">
