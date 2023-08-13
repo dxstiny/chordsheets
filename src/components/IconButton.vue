@@ -3,11 +3,11 @@ import type { PropType } from "vue";
 
 defineProps({
     icon: {
-        required: true,
+        required: false,
         type: String
     },
     label: {
-        required: true,
+        required: false,
         type: String
     },
     style: {
@@ -21,8 +21,12 @@ defineProps({
         class="icon-button"
         :style="style ? `--accent: var(--color-${style})` : ''"
     >
-        <i class="material-symbols-rounded">{{ icon }}</i>
-        <span>{{ label }}</span>
+        <i
+            v-if="icon"
+            class="material-symbols-rounded"
+            >{{ icon }}</i
+        >
+        <span v-if="label">{{ label }}</span>
     </button>
 </template>
 
@@ -31,6 +35,7 @@ defineProps({
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 1em;
     padding: 0.5em 1em;
 

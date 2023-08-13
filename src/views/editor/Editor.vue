@@ -43,6 +43,21 @@ const tab = ref(tabs[0]);
 </script>
 <template>
     <div class="settings">
+        <div
+            class="spotify"
+            v-if="eSong.spotify"
+        >
+            <iframe
+                :src="`https://open.spotify.com/embed/track/${eSong.spotify
+                    .split('/')
+                    .pop()}`"
+                width="100%"
+                height="80"
+                frameborder="0"
+                allowtransparency="true"
+                allow="encrypted-media"
+            ></iframe>
+        </div>
         <div class="tabs flex space-between">
             <label
                 v-for="t in tabs"
@@ -137,5 +152,9 @@ const tab = ref(tabs[0]);
     border-bottom: 1px solid var(--color-border);
     padding: 1em;
     text-transform: uppercase;
+}
+
+.spotify {
+    padding: 1em;
 }
 </style>

@@ -1,17 +1,28 @@
 <template>
     <div class="input">
         <h2 v-if="label">{{ label }}</h2>
-        <input
-            :value="modelValue"
-            @input="emitInput"
-            class="textinput"
-            type="text"
-            :placeholder="placeholder"
-        />
+        <div class="items">
+            <input
+                :value="modelValue"
+                @input="emitInput"
+                class="textinput"
+                type="text"
+                :placeholder="placeholder"
+                @change="$emit('change')"
+            />
+            <IconButton
+                v-if="buttonLabel || buttonIcon"
+                :label="buttonLabel"
+                :icon="buttonIcon"
+                @click="$emit('buttonClick')"
+            />
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import IconButton from "./IconButton.vue";
+
 defineProps({
     modelValue: {
         required: true,
@@ -24,9 +35,17 @@ defineProps({
     placeholder: {
         required: false,
         type: String
+    },
+    buttonLabel: {
+        required: false,
+        type: String
+    },
+    buttonIcon: {
+        required: false,
+        type: String
     }
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "change", "buttonClick"]);
 
 const emitInput = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
@@ -60,5 +79,11 @@ input {
         outline: none;
         border-color: #d2d2d2;
     }
+}
+
+.items {
+    display: grid;
+    grid-template-columns: 1fr 50px;
+    gap: 0.5em;
 }
 </style>

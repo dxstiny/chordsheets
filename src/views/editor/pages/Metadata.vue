@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 import NumberInput from "@/components/NumberInput.vue";
 import TextInput from "@/components/TextInput.vue";
-import { INSTRUMENT_TYPES, type ISong, type IInstrument } from "@/types";
+import {
+    INSTRUMENT_TYPES,
+    type ISong,
+    type IInstrument,
+    type Chord
+} from "@/types";
 import { watch, ref, type PropType } from "vue";
 import { useSongStore } from "@/stores/songs";
-import { type IMidiTrack, midiFromFile } from "@/importMidi";
 
 const store = useSongStore();
 
@@ -48,112 +52,74 @@ watch(
 ),
     { deep: true };
 
-const expanded = ref<Record<string, boolean>>({});
+const searchSpotify = async () => {
+    // http://localhost:1234/api/search
+    // query: `artist:${eSong.value.artist} track:${eSong.value.title}`
 
-window.addEventListener("click", (e) => {
-    let target = e.target as HTMLElement | null;
-    for (let i = 0; i < 5; i++) {
-        if (!target) return;
-        if (target.classList.contains("group")) break;
-        if (!target.parentElement) break;
-        target = target.parentElement;
-    }
+    if (!eSong.value.artist || !eSong.value.title) return;
 
-    if (!target) return;
-
-    const [sectionI, index] = target.id.split(".");
-
-    for (let i = 0; i < eSong.value.sections.length; i++) {
-        const section = eSong.value.sections[i];
-        for (let j = 0; j < section.progression.length; j++) {
-            if (i === Number(sectionI) && j === Number(index)) {
-                console.log("found");
-                continue;
-            }
-
-            const chord = section.progression[j];
-            delete chord.selected;
-        }
-    }
-});
-
-interface IChordClickEvent extends Event {
-    detail: {
-        sectionIndex: number;
-        chordIndex: number;
-    };
-}
-window.addEventListener("chord-click", (e: Event) => {
-    const { sectionIndex, chordIndex } = (e as IChordClickEvent).detail;
-    const id = `${sectionIndex}.${chordIndex}`;
-
-    const scrollIntoView = () => {
-        document.getElementById(id)?.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-    };
-
-    if (!expanded.value["sections"]) {
-        expanded.value["sections"] = true;
-        setTimeout(scrollIntoView, 10);
-        return;
-    }
-    scrollIntoView();
-});
-
-const deleteMidi = (index: number) => {
-    if (!eSong.value.midi) return;
-
-    eSong.value.midi.splice(index, 1);
-};
-
-const uploadMidi = async () => {
-    return new Promise<IMidiTrack>((resolve, reject) => {
-        const file = document.createElement("input");
-        file.type = "file";
-        file.accept = ".mid";
-        file.onchange = async () => {
-            if (!file.files) {
-                reject();
-                return;
-            }
-            const midiFile = file.files[0];
-            const midiData = await midiFromFile(midiFile);
-            if (!midiData) {
-                reject();
-                return;
-            }
-            resolve(midiData);
-        };
-        file.click();
+    const query = `artist:${eSong.value.artist} track:${eSong.value.title}`;
+    const res = await fetch("http://localhost:1234/api/search", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query, scope: ["spotify"] })
     });
+    const data = await res.json();
+    const track = data.spotifyTracks?.[0];
+    if (!track) return;
+    eSong.value.spotify = track.url;
+    eSong.value.cover = track.cover;
+    getMetadata();
 };
 
-const replaceMidi = async (index: number) => {
-    const file = await uploadMidi();
-    if (!file) return;
-    if (!eSong.value.midi) return;
-    eSong.value.midi[index] = file;
-};
+const getMetadata = async () => {
+    console.log("getMetadata");
 
-const addMidi = async () => {
-    if (!eSong.value.midi) {
-        eSong.value.midi = [];
+    // http://localhost:1234/api/spotify/meta
+    // forceFetch: true
+    // spotifyId: 6y0igZArWVi6Iz0rj35c1Y
+
+    if (!eSong.value.spotify) return;
+
+    if (eSong.value.spotify.includes("?")) {
+        eSong.value.spotify = eSong.value.spotify.split("?")[0];
     }
-    const file = await uploadMidi();
-    if (!file) return;
-    eSong.value.midi.push(file);
+
+    const res = await fetch("http://localhost:1234/api/spotify/meta", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            forceFetch: true,
+            spotifyId: eSong.value.spotify.split("/").pop()
+        })
+    });
+    const data = await res.json();
+    eSong.value.bpm = Math.round(data.spotify.features.tempo);
+    eSong.value.key = (data.spotify.features.key +
+        (data.spotify.features.mode === "Minor" ? "m" : "")) as Chord;
 };
 </script>
 <template>
     <TextInput
         v-model="eSong.title"
         label="title"
+        @change="searchSpotify"
     />
     <TextInput
         v-model="eSong.artist"
         label="artist"
+        @change="searchSpotify"
+    />
+    <TextInput
+        v-model="eSong.spotify"
+        label="Spotify Link"
+        @change="getMetadata"
+        buttonIcon="search"
+        @buttonClick="searchSpotify"
     />
     <TextInput
         v-model="eSong.key"

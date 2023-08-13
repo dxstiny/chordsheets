@@ -183,19 +183,28 @@ const updateOrder = ({
             >
                 <template #item="{ element: song, index }">
                     <router-link :to="`/editor?s=${index}`">
-                        <div class="card hover song">
-                            <div class="header">
-                                <div class="info">
-                                    <h2>{{ song.title }}</h2>
-                                    <span>{{ song.artist }}</span>
-                                </div>
-                                <span
-                                    class="material-symbols-rounded"
-                                    @click.prevent="store.removeSong(song)"
-                                >
-                                    delete
-                                </span>
+                        <div class="song">
+                            <div class="cover">
+                                <img
+                                    :src="
+                                        song.cover ?? '/placeholders/song.svg'
+                                    "
+                                />
                             </div>
+                            <div class="info">
+                                <h2>{{ song.title }}</h2>
+                                <span>{{ song.artist }}</span>
+                            </div>
+                            <span class="bpm"> {{ song.bpm }} BPM </span>
+                            <span class="key">
+                                {{ song.key }}
+                            </span>
+                            <span
+                                class="material-symbols-rounded delete"
+                                @click.prevent="store.removeSong(song)"
+                            >
+                                delete
+                            </span>
                         </div>
                     </router-link>
                 </template>
@@ -236,17 +245,9 @@ const updateOrder = ({
     gap: 1em;
 }
 
-.songs {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    padding: 0 1em;
-}
-
 .card {
     color: var(--color-text);
     display: flex;
-    justify-content: space-between;
     gap: 1em;
     background: var(--color-background-soft);
     border: 1px solid var(--color-border);
@@ -261,26 +262,48 @@ const updateOrder = ({
         position: sticky;
         top: 1em;
     }
+}
 
-    &.hover:hover {
-        background: var(--color-background);
+.song {
+    display: grid;
+    grid-template-columns: max-content 1fr 100px 30px max-content;
+    align-items: center;
+    gap: 1em;
+    color: var(--color-text);
+    border-radius: 1em;
+    padding: 0.5em 1em;
+    border: 1px solid transparent;
+
+    & span {
+        text-align: center;
     }
 
-    .header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        gap: 3em;
+    .delete {
+        padding-left: 1em;
     }
 
+    &:hover {
+        background: var(--color-background-soft);
+        border: 1px solid var(--color-border);
+    }
     .material-symbols-rounded {
         font-size: 1.5rem;
         cursor: pointer;
 
         &:hover {
             color: var(--color-heading);
+        }
+    }
+
+    .cover {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+
+        & img {
+            width: 50px;
+            aspect-ratio: 1/1;
+            border-radius: 0.5em;
         }
     }
 }

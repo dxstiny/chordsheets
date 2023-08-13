@@ -268,7 +268,7 @@ const addMidi = async () => {
                         <IconButton
                             @click="
                                 element.progression.push({
-                                    chord: 'C',
+                                    chord: eSong.key,
                                     duration: 4
                                 })
                             "

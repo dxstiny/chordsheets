@@ -54,7 +54,7 @@ type MinorChordFlat =
     | "Bm";
 type MajorChord = MajorChordSharp | MajorChordFlat;
 type MinorChord = MinorChordSharp | MinorChordFlat;
-type Chord = MajorChord | MinorChord;
+export type Chord = MajorChord | MinorChord;
 
 export interface IChord {
     chord: Chord;
@@ -135,6 +135,9 @@ export interface ISong {
 
     bpm: number;
     key: Chord;
+
+    spotify: string;
+    cover: string;
 
     transpose: number;
     octave: number;
