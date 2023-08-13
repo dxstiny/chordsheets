@@ -17,6 +17,11 @@ const router = createRouter({
             path: "/midi",
             name: "Midi",
             component: () => import("../views/midi/index.vue")
+        },
+        {
+            path: "/learn",
+            name: "Learn",
+            component: () => import("../views/learn/Scales.vue")
         }
     ]
 });

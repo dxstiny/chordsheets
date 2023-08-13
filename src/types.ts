@@ -1,57 +1,62 @@
 import type { IMidiTrack } from "./importMidi";
 
-type MajorChordSharp =
-    | "C"
-    | "C#"
-    | "D"
-    | "D#"
-    | "E"
-    | "F"
-    | "F#"
-    | "G"
-    | "G#"
-    | "A"
-    | "A#"
-    | "B";
-type MinorChordSharp =
-    | "Cm"
-    | "C#m"
-    | "Dm"
-    | "D#m"
-    | "Em"
-    | "Fm"
-    | "F#m"
-    | "Gm"
-    | "G#m"
-    | "Am"
-    | "A#m"
-    | "Bm";
-type MajorChordFlat =
-    | "C"
-    | "Db"
-    | "D"
-    | "Eb"
-    | "E"
-    | "F"
-    | "Gb"
-    | "G"
-    | "Ab"
-    | "A"
-    | "Bb"
-    | "B";
-type MinorChordFlat =
-    | "Cm"
-    | "Dbm"
-    | "Dm"
-    | "Ebm"
-    | "Em"
-    | "Fm"
-    | "Gbm"
-    | "Gm"
-    | "Abm"
-    | "Am"
-    | "Bbm"
-    | "Bm";
+export const SCALES = [
+    "Major",
+    "Major Pentatonic",
+    "Minor",
+    "Minor Pentatonic",
+    "Blues Major",
+    "Blues Minor",
+    "Dorian",
+    "Phrygian",
+    "Lydian",
+    "Mixolydian",
+    "Locrian",
+    "Harmonic Minor",
+    "Melodic Minor",
+    "Super Locrian",
+    "Hungarian Minor",
+    "Minor Gypsy",
+    "Double Harmonic"
+] as const;
+export type Scale = (typeof SCALES)[number];
+
+export const SHARP_KEYS = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+] as const;
+export const FLAT_KEYS = [
+    "C",
+    "Db",
+    "D",
+    "Eb",
+    "E",
+    "F",
+    "Gb",
+    "G",
+    "Ab",
+    "A",
+    "Bb",
+    "B"
+] as const;
+
+type MajorChordSharp = (typeof SHARP_KEYS)[number];
+
+export type Key = MajorChordSharp;
+
+type MinorChordSharp = `${MajorChordSharp}m`;
+type MajorChordFlat = (typeof FLAT_KEYS)[number];
+type MinorChordFlat = `${MajorChordFlat}m`;
 type MajorChord = MajorChordSharp | MajorChordFlat;
 type MinorChord = MinorChordSharp | MinorChordFlat;
 export type Chord = MajorChord | MinorChord;
@@ -158,6 +163,8 @@ export type IPageContent = ISection | IMidiTrack;
 export const empty: ISong = {
     title: "",
     artist: "",
+    spotify: "",
+    cover: "",
     bpm: 120,
     key: "C",
     transpose: 0,
@@ -176,6 +183,8 @@ export const empty: ISong = {
 export const mock: ISong = {
     title: "Livin' On A Prayer",
     artist: "Bon Jovi",
+    spotify: "https://open.spotify.com/track/0X1sqQ652p1sceKM2nJlIJ",
+    cover: "https://i.scdn.co/image/ab67616d0000b273ede118b5f0e159dd18d42b90",
     bpm: 123,
     key: "C",
     structure: [

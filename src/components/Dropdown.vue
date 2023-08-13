@@ -10,7 +10,7 @@ defineProps({
     },
     options: {
         required: true,
-        type: Array as () => string[]
+        type: Array as () => readonly string[]
     }
 });
 
