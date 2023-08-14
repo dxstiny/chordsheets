@@ -272,6 +272,16 @@ const updateOrder = ({
     padding: 0.5em 1em;
     border: 1px solid transparent;
 
+    @media screen and (max-width: 400px) {
+        grid-template-columns: max-content 1fr max-content;
+        font-size: 0.8em;
+
+        .bpm,
+        .key {
+            display: none;
+        }
+    }
+
     & span {
         text-align: center;
     }
@@ -302,6 +312,10 @@ const updateOrder = ({
             width: 50px;
             aspect-ratio: 1/1;
             border-radius: 0.5em;
+
+            @media screen and (max-width: 400px) {
+                width: 30px;
+            }
         }
     }
 }
@@ -339,7 +353,7 @@ h1 {
 }
 
 h2 {
-    font-size: 1.25rem;
+    font-size: 1.25em;
     font-weight: 500;
 }
 
