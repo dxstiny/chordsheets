@@ -314,6 +314,10 @@ const updateOrder = ({
     position: relative;
     gap: 1em;
 
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr;
+    }
+
     .wrap {
         min-width: 100%;
 

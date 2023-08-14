@@ -35,7 +35,7 @@ const song = ref<ISong>(songs.songs[id]);
 const preview = ref<InstanceType<typeof Song>>();
 </script>
 <template>
-    <MinWidth :minWidth="1100">
+    <MinWidth :minWidth="300">
         <div
             class="editor"
             v-if="song"
@@ -86,12 +86,49 @@ const preview = ref<InstanceType<typeof Song>>();
                     />
                 </div>
             </div>
-            <div class="config">
-                <Editor :song="song" />
-            </div>
+            <MinWidth
+                :minWidth="1100"
+                error=""
+            >
+                <div class="config">
+                    <Editor :song="song" />
+                </div>
+            </MinWidth>
         </div>
     </MinWidth>
 </template>
+
+<style>
+.preview {
+    .print {
+        display: flex;
+
+        @media screen and (max-width: 600px) {
+            transform: scale(0.8);
+
+            .void {
+                transform: scale(1);
+            }
+        }
+
+        @media screen and (max-width: 500px) {
+            transform: scale(0.6);
+
+            .void {
+                transform: scale(1);
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            transform: scale(0.5);
+
+            .void {
+                transform: scale(1);
+            }
+        }
+    }
+}
+</style>
 
 <style scoped>
 .back-button {
@@ -105,10 +142,15 @@ const preview = ref<InstanceType<typeof Song>>();
     display: grid;
     grid-template-columns: max-content 1fr;
     height: 100vh;
+    height: 100svh;
     width: 100vw;
     overflow: hidden;
     position: relative;
     z-index: 0;
+
+    @media screen and (max-width: 1100px) {
+        grid-template-columns: 1fr;
+    }
 }
 
 .preview {
@@ -121,8 +163,12 @@ const preview = ref<InstanceType<typeof Song>>();
     gap: 1em;
     padding: 0 10em;
 
-    .print {
-        display: flex;
+    @media screen and (max-width: 1100px) {
+        border-radius: 0;
+        height: 100vh;
+        height: 100svh;
+        width: 100vw;
+        padding: 1em;
     }
 
     .pages {
