@@ -10,7 +10,7 @@
         "type-check": "vue-tsc --noEmit",
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
         "format": "prettier --write src/",
-        "pages:update": "npm run build && git add -A && git commit -m 'new: build update' && git push"
+        "pages:update": "npm run build && git add -A && git commit -m \"new: build update\" && git push"
     },
     "dependencies": {
         "jspdf": "^2.5.1",
