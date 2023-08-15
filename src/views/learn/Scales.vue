@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
     SCALES,
     SHARP_KEYS,
@@ -11,6 +11,13 @@ import { SCALE } from "../../scales";
 import Dropdown from "../../components/Dropdown.vue";
 import * as Tone from "tone";
 import IconButton from "@/components/IconButton.vue";
+import {
+    start,
+    inputDevices,
+    currentChord,
+    activeMidiNotes
+} from "./inputListener";
+import Keyboard from "./Keyboard.vue";
 
 const synth = new Tone.Synth().toDestination();
 
@@ -18,27 +25,19 @@ const scale = ref<Scale>(SCALES[0]);
 const key = ref<Key>(SHARP_KEYS[0]);
 
 const keys = ref<readonly string[]>(SHARP_KEYS);
-const isBlackKey = (key: Key) => {
-    return key.includes("#") || key.includes("b");
-};
-const blackKeyPosition = (key: Key) => {
-    // index of white key to the left, * 50px - 15px
-    if (!isBlackKey(key)) return 0;
-    const whiteKeyLeft =
-        ["C", "D", "E", "F", "G", "A", "B"].indexOf(key[0]) + 1;
-    return whiteKeyLeft * 50 - 15 + "px";
-};
 
-const activeNotes = computed(() =>
-    SCALE[scale.value].keys.map(
-        (note) => note + (keys.value.indexOf(key.value) % 12)
-    )
-);
-
-const keyInScale = (thisKey: Key) => {
-    const thisKeyIndex = keys.value.indexOf(thisKey);
-    return activeNotes.value.includes(thisKeyIndex);
-};
+const activeNotes = computed(() => {
+    //SCALE[scale.value].keys.map((note) => note + keys.value.indexOf(key.value));
+    const notes = [];
+    for (
+        let offset = keys.value.indexOf(key.value);
+        offset < 88;
+        offset += 12
+    ) {
+        notes.push(SCALE[scale.value].keys.map((note) => note + offset));
+    }
+    return notes.flat();
+});
 
 const playScale = () => {
     const allNotes = activeNotes.value.map((note) => keys.value[note] + "4");
@@ -50,6 +49,10 @@ const playScale = () => {
         synth.triggerAttackRelease(note, "8n", now + index / 2);
     });
 };
+
+onMounted(() => {
+    start();
+});
 </script>
 <template>
     <div class="learn-scales">
@@ -71,20 +74,41 @@ const playScale = () => {
             />
         </div>
         <div class="body">
-            <div class="keyboard">
-                <div
-                    v-for="key in keys"
-                    :class="{
-                        black: isBlackKey(key as Key),
-                        inScale: keyInScale(key as Key)
-                    }"
-                    :style="{
-                        left: blackKeyPosition(key as Key)
-                    }"
-                    class="key"
-                >
-                    {{ key }}
+            <div class="scale">
+                <Keyboard :highlight="activeNotes" />
+            </div>
+            <hr />
+            <div class="chord-finder">
+                <h2>Chord Finder</h2>
+                <p>Connected Midi Devices:</p>
+                <ul>
+                    <li
+                        v-for="device in inputDevices"
+                        :key="device.id"
+                        class="device"
+                        :class="{
+                            active: Object.values(activeMidiNotes).some(
+                                (x) => x.device === device.name
+                            )
+                        }"
+                    >
+                        {{ device.name }}
+                    </li>
+                </ul>
+                <br />
+                <div class="row">
+                    <span>Playing:</span>
+                    <h3>{{ currentChord }}</h3>
                 </div>
+                <br />
+                <Keyboard
+                    :highlight="
+                        Object.keys(activeMidiNotes).map((x) => parseInt(x))
+                    "
+                    :min="48"
+                    :max="72"
+                >
+                </Keyboard>
             </div>
         </div>
     </div>
@@ -109,44 +133,23 @@ const playScale = () => {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
     gap: 1em;
 }
 
-.keyboard {
+.row {
     display: flex;
-    height: 100px;
-    border-radius: 1em;
-    overflow: hidden;
+    align-items: center;
+    gap: 1em;
 }
 
-.key {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: 50px;
-    background: #fff;
-    color: #000;
+.device.active {
+    color: var(--accent);
+}
 
-    &:not(:last-child) {
-        border-right: 1px solid var(--color-border);
-    }
-
-    &.black {
-        background: #000;
-        color: #fff;
-        position: absolute;
-        height: 70%;
-        width: 30px;
-        z-index: 1;
-    }
-
-    &.inScale {
-        background: var(--accent);
-        color: #fff;
-
-        &.black {
-            background: color-mix(in srgb, var(--accent) 60%, #000);
-        }
-    }
+hr {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
 }
 </style>
