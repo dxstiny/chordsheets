@@ -21,7 +21,22 @@ const router = createRouter({
         {
             path: "/learn",
             name: "Learn",
-            component: () => import("../views/learn/Scales.vue")
+            component: () => import("../views/learn/index.vue")
+        },
+        {
+            path: "/learn/scale-finder",
+            name: "Learn - Scale Finder",
+            component: () => import("../views/learn/index.vue")
+        },
+        {
+            path: "/learn/chord-finder",
+            name: "Learn - Chord Finder",
+            component: () => import("../views/learn/index.vue")
+        },
+        {
+            path: "/learn/chord-progressions",
+            name: "Learn - Chord Progressions",
+            component: () => import("../views/learn/index.vue")
         }
     ]
 });

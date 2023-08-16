@@ -64,6 +64,7 @@ const doHighlight = (key: number) => {
 .keyboard {
     display: flex;
     height: 100px;
+    width: max-content;
     border-radius: 1em;
     overflow: hidden;
 }

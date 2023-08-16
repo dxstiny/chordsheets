@@ -1,5 +1,5 @@
 import { computed, ref } from "vue";
-import { getNoteChord } from "./chord-finder/getNoteChord.js";
+import { getNoteChord } from "./chord-finder/getNoteChord";
 import { Chord } from "tonal";
 
 let midi: MIDIAccess;
@@ -46,6 +46,8 @@ function onMIDISuccess(midiAccess: MIDIAccess) {
 function onMIDIFailure(msg: any) {}
 
 export const start = () => {
+    if (midi) return;
+
     navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 };
 
@@ -53,7 +55,11 @@ export const currentChord = computed(() => {
     const noteIds = Object.keys(activeMidiNotes.value)
         .sort()
         .map((note) => parseInt(note) % 12);
-    const notes = getNoteChord(noteIds);
+    return getChordName(noteIds);
+});
+
+export const getChordName = (noteIds: number[]) => {
+    const notes = getNoteChord(noteIds as any);
     const chords = Chord.detect(notes);
 
     if (chords.length === 0) return "No chord detected";
@@ -65,4 +71,4 @@ export const currentChord = computed(() => {
     const shortest = shorter[0];
     //return `${shortest} (${full})`;
     return shortest;
-});
+};

@@ -125,94 +125,99 @@ const updateOrder = ({
 <template>
     <div class="dashboard">
         <div class="wrap">
-            <h1>Chord<span class="accent">Sheets</span></h1>
-            <div class="flex">
-                <IconButton
-                    icon="add"
-                    label="New Song"
-                    @click="$router.push('/editor')"
-                    :style="'green'"
-                />
-                <IconButton
-                    icon="file_download"
-                    label="Save Library"
-                    @click="exportLib"
-                    :style="'yellow'"
-                />
-                <IconButton
-                    icon="file_upload"
-                    label="Import Library"
-                    @click="importLib"
-                    :style="'yellow'"
-                />
-                <IconButton
-                    label="Export all as PDF"
-                    icon="picture_as_pdf"
-                    @click="exportAll"
-                    :style="'blue'"
-                />
-                <IconButton
-                    label="Print All"
-                    icon="print"
-                    @click="printAll"
-                    :style="'blue'"
-                />
-            </div>
-            <hr />
-            <div class="filters">
-                <TextInput
-                    label="Search"
-                    v-model="filters.query"
-                    placeholder="Search for a song"
-                />
-                <Dropdown
-                    label="Artist"
-                    v-model="filters.artist"
-                    :options="[
-                        '(any)',
-                        ...new Set(store.songs.map((song) => song.artist))
-                    ]"
-                />
-            </div>
-            <hr />
-            <draggable
-                v-model="filteredSongs"
-                class="songs"
-                @change="updateOrder"
-                item-key="id"
-            >
-                <template #item="{ element: song, index }">
-                    <router-link :to="`/editor?s=${index}`">
-                        <div class="song">
-                            <div class="cover">
-                                <img
-                                    :src="song.cover ?? 'placeholders/song.svg'"
-                                />
+            <main>
+                <h1>Chord<span class="accent">Sheets</span></h1>
+                <div class="flex">
+                    <IconButton
+                        icon="add"
+                        label="New Song"
+                        @click="$router.push('/editor')"
+                        :style="'green'"
+                    />
+                    <IconButton
+                        icon="file_download"
+                        label="Save Library"
+                        @click="exportLib"
+                        :style="'yellow'"
+                    />
+                    <IconButton
+                        icon="file_upload"
+                        label="Import Library"
+                        @click="importLib"
+                        :style="'yellow'"
+                    />
+                    <IconButton
+                        label="Export all as PDF"
+                        icon="picture_as_pdf"
+                        @click="exportAll"
+                        :style="'blue'"
+                    />
+                    <IconButton
+                        label="Print All"
+                        icon="print"
+                        @click="printAll"
+                        :style="'blue'"
+                    />
+                </div>
+                <hr />
+                <div class="filters">
+                    <TextInput
+                        label="Search"
+                        v-model="filters.query"
+                        placeholder="Search for a song"
+                    />
+                    <Dropdown
+                        label="Artist"
+                        v-model="filters.artist"
+                        :options="[
+                            '(any)',
+                            ...new Set(store.songs.map((song) => song.artist))
+                        ]"
+                    />
+                </div>
+                <hr />
+                <draggable
+                    v-model="filteredSongs"
+                    class="songs"
+                    @change="updateOrder"
+                    item-key="id"
+                >
+                    <template #item="{ element: song, index }">
+                        <router-link :to="`/editor?s=${index}`">
+                            <div class="song">
+                                <div class="cover">
+                                    <img
+                                        :src="
+                                            song.cover ??
+                                            'placeholders/song.svg'
+                                        "
+                                    />
+                                </div>
+                                <div class="info">
+                                    <h2>{{ song.title }}</h2>
+                                    <span>{{ song.artist }}</span>
+                                </div>
+                                <span class="bpm"> {{ song.bpm }} BPM </span>
+                                <span class="key">
+                                    {{ song.key }}
+                                </span>
+                                <span
+                                    class="material-symbols-rounded delete"
+                                    @click.prevent="store.removeSong(song)"
+                                >
+                                    delete
+                                </span>
                             </div>
-                            <div class="info">
-                                <h2>{{ song.title }}</h2>
-                                <span>{{ song.artist }}</span>
-                            </div>
-                            <span class="bpm"> {{ song.bpm }} BPM </span>
-                            <span class="key">
-                                {{ song.key }}
-                            </span>
-                            <span
-                                class="material-symbols-rounded delete"
-                                @click.prevent="store.removeSong(song)"
-                            >
-                                delete
-                            </span>
-                        </div>
-                    </router-link>
-                </template>
-            </draggable>
-        </div>
-        <div class="card min-h-screen sticky">
-            <div class="content">
-                <h2>Learn Music Theory</h2>
-                <p>Coming soon...</p>
-            </div>
+                        </router-link>
+                    </template>
+                </draggable>
+            </main>
+            <aside class="card min-h-screen sticky">
+                <div class="content">
+                    <h2>Learn Music Theory</h2>
+                    <p>Coming soon...</p>
+                </div>
+            </aside>
         </div>
     </div>
     <div class="void">
@@ -233,6 +238,10 @@ const updateOrder = ({
     align-items: center;
     flex-wrap: wrap;
     gap: 1em;
+
+    & button {
+        flex: 1;
+    }
 }
 
 .filters {
@@ -254,6 +263,7 @@ const updateOrder = ({
 
     &.min-h-screen {
         min-height: calc(100vh - 2em);
+        min-height: calc(100svh - 2em);
     }
 
     &.sticky {
@@ -321,23 +331,26 @@ const updateOrder = ({
 }
 
 .dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 1em;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    align-items: start;
-    position: relative;
-    gap: 1em;
 
     @media (max-width: 800px) {
         grid-template-columns: 1fr;
     }
 
     .wrap {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        align-items: center;
+        position: relative;
+        gap: 1em;
         min-width: 100%;
 
         @media (min-width: 1400px) {
-            max-width: 1200px;
-            min-width: 1200px;
+            max-width: 1400px;
+            min-width: 1400px;
         }
     }
 }
