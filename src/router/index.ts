@@ -9,8 +9,13 @@ const router = createRouter({
             component: () => import("../views/Dashboard.vue")
         },
         {
+            path: "/editor/:id",
+            name: "EditorId",
+            component: () => import("../views/editor/index.vue")
+        },
+        {
             path: "/editor",
-            name: "Editor",
+            name: "EditorNew",
             component: () => import("../views/editor/index.vue")
         },
         {

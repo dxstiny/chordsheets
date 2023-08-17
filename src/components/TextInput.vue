@@ -83,7 +83,11 @@ input {
 
 .items {
     display: grid;
-    grid-template-columns: 1fr 50px;
     gap: 0.5em;
+    grid-template-columns: 1fr;
+
+    &:has(button) {
+        grid-template-columns: 1fr 50px;
+    }
 }
 </style>

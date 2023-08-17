@@ -32,8 +32,11 @@ export const useSongStore = defineStore("songs", () => {
     }
 
     function addEmptySong() {
-        songs.value.push(empty);
-        return songs.value.length - 1;
+        songs.value.push({
+            ...empty,
+            id: Math.round(Math.random() * 1000000)
+        });
+        return songs.value[songs.value.length - 1].id;
     }
 
     function removeSong(song: ISong) {
@@ -71,6 +74,10 @@ export const useSongStore = defineStore("songs", () => {
         songs.value.splice(newIndex, 0, song);
     };
 
+    const song = (id: any) => {
+        return songs.value.find((song) => song.id == id);
+    };
+
     return {
         songs,
         addSong,
@@ -78,6 +85,7 @@ export const useSongStore = defineStore("songs", () => {
         updateSong,
         addEmptySong,
         prepareRender,
-        moveTo
+        moveTo,
+        song
     };
 });

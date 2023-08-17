@@ -112,20 +112,28 @@ defineExpose({
     >
         <div class="song printable">
             <div class="wrap">
-                <Page
-                    ref="mainPage"
+                <AllPages
+                    ref="allPages"
                     :song="song"
-                    :pages="pages"
-                    :currentPage="currentPage"
                 />
             </div>
         </div>
 
         <div class="void">
-            <AllPages
-                ref="allPages"
+            <Page
+                ref="mainPage"
                 :song="song"
+                :pages="pages"
+                :currentPage="currentPage"
             />
         </div>
     </div>
 </template>
+
+<style scoped>
+.wrap {
+    overflow: auto;
+    height: 80vh;
+    padding: 1em;
+}
+</style>

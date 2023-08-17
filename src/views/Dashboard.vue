@@ -182,13 +182,13 @@ const updateOrder = ({
                     @change="updateOrder"
                     item-key="id"
                 >
-                    <template #item="{ element: song, index }">
-                        <router-link :to="`/editor?s=${index}`">
+                    <template #item="{ element: song }">
+                        <router-link :to="`/editor/${song.id}`">
                             <div class="song">
                                 <div class="cover">
                                     <img
                                         :src="
-                                            song.cover ??
+                                            song.cover ||
                                             'placeholders/song.svg'
                                         "
                                     />
@@ -212,7 +212,7 @@ const updateOrder = ({
                     </template>
                 </draggable>
             </main>
-            <aside class="card min-h-screen sticky">
+            <aside class="card min-h-screen sticky learn">
                 <div class="content">
                     <h2>Learn Music Theory</h2>
                     <p>Coming soon...</p>
@@ -264,6 +264,12 @@ const updateOrder = ({
     &.min-h-screen {
         min-height: calc(100vh - 2em);
         min-height: calc(100svh - 2em);
+    }
+
+    &.learn {
+        @media (max-width: 800px) {
+            min-height: 0;
+        }
     }
 
     &.sticky {
@@ -336,17 +342,16 @@ const updateOrder = ({
     align-items: center;
     padding: 1em;
 
-    @media (max-width: 800px) {
-        grid-template-columns: 1fr;
-    }
-
     .wrap {
         display: grid;
         grid-template-columns: 1fr 300px;
-        align-items: center;
         position: relative;
         gap: 1em;
         min-width: 100%;
+
+        @media (max-width: 800px) {
+            grid-template-columns: 1fr;
+        }
 
         @media (min-width: 1400px) {
             max-width: 1400px;

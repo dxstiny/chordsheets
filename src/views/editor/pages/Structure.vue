@@ -1,19 +1,20 @@
 <script lang="ts" setup>
 import NumberInput from "@/components/NumberInput.vue";
 import TextInput from "@/components/TextInput.vue";
-import Checkbox from "@/components/Checkbox.vue";
 import {
     INSTRUMENT_TYPES,
     SECTION_TYPES,
     type ISong,
-    type IInstrument
+    type IInstrument,
+    type Chord
 } from "@/types";
-import { watch, ref, type PropType } from "vue";
+import { watch, ref, onMounted, type PropType } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useSongStore } from "@/stores/songs";
 import IconButton from "@/components/IconButton.vue";
 import draggable from "vuedraggable";
 import { type IMidiTrack, midiFromFile } from "@/importMidi";
+import { start, currentChord } from "../../learn/inputListener";
 
 const store = useSongStore();
 
@@ -154,6 +155,21 @@ const addMidi = async () => {
     if (!file) return;
     eSong.value.midi.push(file);
 };
+
+const addChord = (element: ISong["sections"][0]) => {
+    const chord = currentChord.value.includes("detected")
+        ? eSong.value.key
+        : currentChord.value;
+
+    element.progression.push({
+        chord: chord as Chord,
+        duration: 4
+    });
+};
+
+onMounted(() => {
+    start();
+});
 </script>
 <template>
     <div class="group">
@@ -266,12 +282,7 @@ const addMidi = async () => {
                             </draggable>
                         </div>
                         <IconButton
-                            @click="
-                                element.progression.push({
-                                    chord: eSong.key,
-                                    duration: 4
-                                })
-                            "
+                            @click="addChord(element)"
                             icon="add"
                             label="add chord"
                         />

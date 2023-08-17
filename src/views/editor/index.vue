@@ -10,28 +10,24 @@ import { $ } from "vue/macros";
 
 const songs = useSongStore();
 
-if (!songs.songs.length) songs.addSong(mock);
+//if (!songs.songs.length) songs.addSong(mock);
 
 const route = useRoute();
 const router = useRouter();
-let textIndex = route.query.s;
+let textId = route.params.id as string;
 
-if (!textIndex) {
+if (!textId) {
     const id = songs.addEmptySong();
     router.push({
-        query: {
-            s: id
-        },
+        path: `/editor/${id}`,
         replace: true
     });
-    textIndex = String(id);
+    textId = String(id);
 }
 
-const id = Number(textIndex);
-
-if (isNaN(id)) router.push("/");
-if (!songs.songs[id]) router.push("/");
-const song = ref<ISong>(songs.songs[id]);
+const s = songs.song(textId);
+if (!s) router.push("/");
+const song = ref<ISong>(s as ISong);
 const preview = ref<InstanceType<typeof Song>>();
 </script>
 <template>
@@ -52,20 +48,22 @@ const preview = ref<InstanceType<typeof Song>>();
                     class="pages"
                     v-if="preview"
                 >
-                    <span
-                        @click="preview.prevPage"
-                        class="material-symbols-rounded"
-                    >
-                        chevron_left
-                    </span>
-                    {{ preview.getCurrentPage() }} /
-                    {{ preview.getTotalPages() }}
-                    <span
-                        @click="preview.nextPage"
-                        class="material-symbols-rounded"
-                    >
-                        chevron_right
-                    </span>
+                    <template v-if="false">
+                        <span
+                            @click="preview.prevPage"
+                            class="material-symbols-rounded"
+                        >
+                            chevron_left
+                        </span>
+                        {{ preview.getCurrentPage() }} /
+                        {{ preview.getTotalPages() }}
+                        <span
+                            @click="preview.nextPage"
+                            class="material-symbols-rounded"
+                        >
+                            chevron_right
+                        </span>
+                    </template>
                     <span
                         class="material-symbols-rounded"
                         @click="preview.print"
@@ -79,7 +77,7 @@ const preview = ref<InstanceType<typeof Song>>();
                         file_download
                     </span>
                 </div>
-                <div class="print a4">
+                <div class="">
                     <Song
                         :song="song"
                         ref="preview"
@@ -102,30 +100,6 @@ const preview = ref<InstanceType<typeof Song>>();
 .preview {
     .print {
         display: flex;
-
-        @media screen and (max-width: 600px) {
-            transform: scale(0.8);
-
-            .void {
-                transform: scale(1);
-            }
-        }
-
-        @media screen and (max-width: 500px) {
-            transform: scale(0.6);
-
-            .void {
-                transform: scale(1);
-            }
-        }
-
-        @media screen and (max-width: 400px) {
-            transform: scale(0.5);
-
-            .void {
-                transform: scale(1);
-            }
-        }
     }
 }
 </style>

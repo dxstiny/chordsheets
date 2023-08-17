@@ -81,12 +81,24 @@
 
         height: var(--display-height);
         width: calc(var(--display-height) * (210 / 297));
+        max-width: calc(90vw - 2em);
+        max-height: calc((90vw - 2em) * (297 / 210));
+
+        aspect-ratio: 210 / 297;
 
         padding: var(--display-margin);
         box-shadow: 0 0 0 1px var(--color-border),
             0 0 0 2px var(--color-border-hover);
 
         font-size: 12px;
+
+        @media screen and (max-width: 600px) {
+            font-size: 10px;
+        }
+
+        @media screen and (max-width: 400px) {
+            font-size: 8px;
+        }
     }
 }
 

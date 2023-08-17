@@ -141,3 +141,8 @@ defineExpose({
         </div>
     </div>
 </template>
+<style scoped>
+.wrap {
+    width: 100%;
+}
+</style>
