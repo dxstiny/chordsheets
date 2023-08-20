@@ -58,7 +58,7 @@ const sectionPages = computed(() => {
 
 const midiPages = computed(() => {
     return props.pages[props.currentPage].filter(
-        (x) => (x as IMidiTrack | undefined)?.signature ?? []
+        (x) => (x as IMidiTrack | undefined)?.signature
     ) as IMidiTrack[];
 });
 </script>

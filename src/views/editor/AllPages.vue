@@ -38,6 +38,7 @@ onMounted(() => {
 
         // get page
         const page = Math.ceil(bottom / parentBottom) - 1;
+
         // if page is not in pages
         if (!newPages[page]) {
             // add page
@@ -49,6 +50,7 @@ onMounted(() => {
     }
 
     pages.value = newPages;
+
     if (!pages.value.length) {
         pages.value.push([null]);
     }
