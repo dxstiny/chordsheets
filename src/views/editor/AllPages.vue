@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type PropType, ref, onMounted } from "vue";
-import type { ISong, IPageContent } from "@/types";
+import type { ISong, PageContent } from "@/types";
 import Page from "./Page.vue";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
@@ -49,6 +49,9 @@ onMounted(() => {
     }
 
     pages.value = newPages;
+    if (!pages.value.length) {
+        pages.value.push([null]);
+    }
 });
 
 const renderTo = async (pdf: jsPDF) => {
@@ -112,9 +115,13 @@ const render = async () => {
     return pdf;
 };
 
-const pages = ref<IPageContent[][]>([
+const pages = ref<PageContent[][]>([
     [...props.song.sections, ...(props.song.midi ?? [])]
 ]);
+
+if (pages.value[0].length === 0) {
+    pages.value = [[null]];
+}
 
 defineExpose({
     render,
@@ -123,7 +130,10 @@ defineExpose({
 });
 </script>
 <template>
-    <div ref="allpageselement">
+    <div
+        ref="allpageselement"
+        id="allPages"
+    >
         <div
             class="print a4 parent__element"
             ref="parent"

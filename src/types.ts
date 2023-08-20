@@ -158,7 +158,7 @@ export interface ISong {
     id: number;
 }
 
-export type IPageContent = ISection | IMidiTrack;
+export type PageContent = ISection | IMidiTrack | null;
 
 export const empty: ISong = {
     title: "",

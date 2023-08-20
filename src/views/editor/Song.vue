@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ISong, ISection, IPageContent } from "@/types";
+import type { ISong, ISection, PageContent } from "@/types";
 import Page from "./Page.vue";
 import { ref, type PropType, onMounted } from "vue";
 import html2canvas from "html2canvas";
@@ -19,7 +19,7 @@ const props = defineProps({
 const allPages = ref<InstanceType<typeof AllPages>>();
 const mainPage = ref<InstanceType<typeof Page>>();
 const element = ref<HTMLDivElement>();
-const pages = ref<IPageContent[][]>([
+const pages = ref<PageContent[][]>([
     [...props.song.sections, ...(props.song.midi ?? [])]
 ]);
 const currentPage = ref(0);
@@ -57,6 +57,9 @@ onMounted(() => {
     }
 
     pages.value = newPages;
+    if (!pages.value.length) {
+        pages.value.push([null]);
+    }
 });
 
 const nextPage = () => {
@@ -134,6 +137,6 @@ defineExpose({
 .wrap {
     overflow: auto;
     height: 80vh;
-    padding: 1em;
+    padding: 0 1em;
 }
 </style>

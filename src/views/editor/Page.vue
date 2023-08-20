@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MidiPreview from "@/components/MidiPreview.vue";
 import type { IMidiTrack } from "@/importMidi";
-import type { ISong, IPageContent, ISection } from "@/types";
+import type { ISong, PageContent, ISection } from "@/types";
 import { type PropType, ref, computed } from "vue";
 
 const props = defineProps({
@@ -11,7 +11,7 @@ const props = defineProps({
     },
     pages: {
         required: true,
-        type: Array as PropType<IPageContent[][]>
+        type: Array as PropType<PageContent[][]>
     },
     song: {
         required: true,
@@ -58,7 +58,7 @@ const sectionPages = computed(() => {
 
 const midiPages = computed(() => {
     return props.pages[props.currentPage].filter(
-        (x) => (x as IMidiTrack | undefined)?.signature
+        (x) => (x as IMidiTrack | undefined)?.signature ?? []
     ) as IMidiTrack[];
 });
 </script>
@@ -139,12 +139,14 @@ const midiPages = computed(() => {
                     </div>
                 </div>
             </div>
-            <hr v-if="song.structure.length" />
-            <div class="structure">
-                <span v-for="section in song.structure">
-                    {{ section }}
-                </span>
-            </div>
+            <template v-if="song.structure">
+                <hr v-if="song.structure.length" />
+                <div class="structure">
+                    <span v-for="section in song.structure">
+                        {{ section }}
+                    </span>
+                </div>
+            </template>
             <hr />
         </div>
         <div
@@ -174,7 +176,7 @@ const midiPages = computed(() => {
             v-for="track in midiPages"
             ref="midiSections"
         >
-            <span>{{ track.name }}</span>
+            <span>{{ track?.name }}</span>
             <MidiPreview
                 :track="track"
                 :width="page?.clientWidth ?? 400"
