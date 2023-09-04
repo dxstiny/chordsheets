@@ -17,6 +17,8 @@ export const activeMidiNotes = ref<ActiveNote>({});
 function onMIDIMessage(evt: Event) {
     const event = evt as MIDIMessageEvent;
 
+    console.log(event.data);
+
     if ([144, 128].includes(event.data[0])) {
         const note = event.data[1];
         const velocity = event.data[2];
