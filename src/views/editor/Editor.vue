@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { type ISong } from "@/types";
-import { watch, ref, type PropType } from "vue";
+import { watch, ref, shallowRef, type PropType } from "vue";
 import { useSongStore } from "@/stores/songs";
 import Instrument from "./pages/Instrument.vue";
 import Metadata from "./pages/Metadata.vue";
@@ -28,15 +28,15 @@ const eSong = ref<ISong>(props.song);
 const tabs = [
     {
         name: "metadata",
-        component: Metadata
+        component: shallowRef(Metadata)
     },
     {
         name: "instrument",
-        component: Instrument
+        component: shallowRef(Instrument)
     },
     {
         name: "sections",
-        component: Structure
+        component: shallowRef(Structure)
     }
 ];
 const tab = ref(tabs[0]);

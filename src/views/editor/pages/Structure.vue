@@ -163,7 +163,8 @@ const addChord = (element: ISong["sections"][0]) => {
 
     element.progression.push({
         chord: chord as Chord,
-        duration: 4
+        duration: 4,
+        id: Math.random().toString(36)
     });
 };
 
@@ -210,6 +211,7 @@ onMounted(() => {
             <draggable
                 v-model="eSong.sections"
                 class="content"
+                item-key="id"
             >
                 <template #item="{ element }">
                     <div class="group section">
@@ -241,6 +243,7 @@ onMounted(() => {
                             <draggable
                                 v-model="element.progression"
                                 class="content"
+                                :item-key="element.id"
                             >
                                 <template #item="{ element: chord }">
                                     <div
@@ -291,7 +294,11 @@ onMounted(() => {
             </draggable>
             <IconButton
                 @click="
-                    eSong.sections.push({ type: 'chorus', progression: [] })
+                    eSong.sections.push({
+                        type: 'chorus',
+                        progression: [],
+                        id: Math.random().toString(36)
+                    })
                 "
                 icon="add"
                 label="add section"

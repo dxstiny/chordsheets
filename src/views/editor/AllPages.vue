@@ -39,8 +39,6 @@ onMounted(() => {
         // get page
         const page = Math.ceil(bottom / parentBottom) - 1;
 
-        console.log(page, bottom, parentBottom);
-
         // if page is not in pages
         if (!newPages[page]) {
             // add page

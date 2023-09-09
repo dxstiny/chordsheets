@@ -65,6 +65,7 @@ export interface IChord {
     chord: Chord;
     duration: number;
     selected?: boolean;
+    id?: string;
 }
 
 export const SECTION_TYPES = [
@@ -85,6 +86,7 @@ export interface ISection {
     type: (typeof SECTION_TYPES)[number];
     name?: string;
     progression: IChord[];
+    id?: string;
 }
 
 export interface IInstrument {

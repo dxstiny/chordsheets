@@ -1,16 +1,13 @@
 <script lang="ts" setup>
-import { mock, type ISong } from "@/types";
+import { type ISong } from "@/types";
 import Song from "./Song.vue";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import Editor from "./Editor.vue";
 import MinWidth from "../MinWidth.vue";
-import { $ } from "vue/macros";
 
 const songs = useSongStore();
-
-//if (!songs.songs.length) songs.addSong(mock);
 
 const route = useRoute();
 const router = useRouter();
