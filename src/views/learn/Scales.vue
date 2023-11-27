@@ -75,40 +75,10 @@ onMounted(() => {
         </div>
         <div class="body">
             <div class="scale">
-                <Keyboard :highlight="activeNotes" />
-            </div>
-            <hr />
-            <div class="chord-finder">
-                <h2>Chord Finder</h2>
-                <p>Connected Midi Devices:</p>
-                <ul>
-                    <li
-                        v-for="device in inputDevices"
-                        :key="device.id"
-                        class="device"
-                        :class="{
-                            active: Object.values(activeMidiNotes).some(
-                                (x) => x.device === device.name
-                            )
-                        }"
-                    >
-                        {{ device.name }}
-                    </li>
-                </ul>
-                <br />
-                <div class="row">
-                    <span>Playing:</span>
-                    <h3>{{ currentChord }}</h3>
-                </div>
-                <br />
                 <Keyboard
-                    :highlight="
-                        Object.keys(activeMidiNotes).map((x) => parseInt(x))
-                    "
+                    :highlight="activeNotes"
                     :min="48"
-                    :max="72"
-                >
-                </Keyboard>
+                />
             </div>
         </div>
     </div>

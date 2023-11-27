@@ -34,6 +34,11 @@ const router = createRouter({
             component: () => import("../views/learn/index.vue")
         },
         {
+            path: "/learn/scales",
+            name: "Learn - Scales",
+            component: () => import("../views/learn/index.vue")
+        },
+        {
             path: "/learn/chord-finder",
             name: "Learn - Chord Finder",
             component: () => import("../views/learn/index.vue")

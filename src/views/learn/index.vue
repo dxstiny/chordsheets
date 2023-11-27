@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ChordFinder from "./ChordFinder.vue";
 import ScaleFinder from "./ScaleFinder.vue";
+import Scales from "./Scales.vue";
 import ChordProgressions from "./ChordProgressions.vue";
 
 import { useRoute } from "vue-router";
@@ -10,6 +11,7 @@ const route = useRoute();
 
 const tabs = {
     "scale-finder": ScaleFinder,
+    scales: Scales,
     "chord-finder": ChordFinder,
     "chord-progressions": ChordProgressions
 };
@@ -61,6 +63,8 @@ const onClick = async () => {
         <div class="main limit-width">
             <aside class="sidebar">
                 <router-link to="/learn/scale-finder">Scale Finder</router-link>
+                <router-link to="/learn/scales">Scales</router-link>
+                <hr />
                 <router-link to="/learn/chord-finder">Chord Finder</router-link>
                 <router-link to="/learn/chord-progressions"
                     >Chord Progressions</router-link
@@ -72,8 +76,8 @@ const onClick = async () => {
                     :is="activeTab"
                 />
                 <div v-else>
-                    Somewhat else
-                    <button @click="onClick">Click me</button>
+                    <h1>Learn Music Theory</h1>
+                    <p>Choose a topic from the sidebar.</p>
                 </div>
             </main>
         </div>
@@ -147,6 +151,18 @@ header {
             &:hover {
                 color: var(--color-heading);
             }
+        }
+
+        & hr {
+            border: none;
+            border-bottom: 1px solid var(--color-border);
+            margin: 0.3rem 0;
+        }
+
+        @media screen and (max-width: 1400px) {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
     }
 }

@@ -214,7 +214,9 @@ const updateOrder = ({
             </main>
             <aside class="card min-h-screen sticky learn">
                 <div class="content">
-                    <h2>Learn Music Theory</h2>
+                    <router-link to="/learn">
+                        <h2>Learn Music Theory</h2>
+                    </router-link>
                     <p>Coming soon...</p>
                 </div>
             </aside>
@@ -232,6 +234,21 @@ const updateOrder = ({
 </template>
 
 <style scoped>
+.learn p {
+    color: var(--color-text-mute);
+}
+
+.learn a h2 {
+    cursor: pointer;
+    color: var(--color-heading);
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        text-decoration: underline;
+        color: var(--accent);
+    }
+}
+
 .flex {
     display: flex;
     flex-direction: row;
