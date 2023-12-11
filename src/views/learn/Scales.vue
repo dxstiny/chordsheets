@@ -40,12 +40,13 @@ const activeNotes = computed(() => {
 });
 
 const playScale = () => {
-    const allNotes = activeNotes.value.map((note) => keys.value[note] + "4");
-    allNotes.push(keys.value[activeNotes.value[0]] + "5");
+    const allNotes = activeNotes.value
+        .filter((note) => note < 12)
+        .map((note) => keys.value[note] + "4");
+    allNotes.push(keys.value[activeNotes.value[0]] + "5"); // root key an octave up
 
     const now = Tone.now();
     allNotes.forEach((note, index) => {
-        console.log(note, index);
         synth.triggerAttackRelease(note, "8n", now + index / 2);
     });
 };
@@ -56,6 +57,7 @@ onMounted(() => {
 </script>
 <template>
     <div class="learn-scales">
+        <h2>Scales</h2>
         <div class="header">
             <Dropdown
                 label="Key"

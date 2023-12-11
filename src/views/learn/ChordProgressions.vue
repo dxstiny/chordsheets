@@ -48,6 +48,7 @@ const chordName = (chord: number[]) => {
 </script>
 <template>
     <div class="progressions">
+        <h2>Chord Progressions</h2>
         <div class="options">
             <Dropdown
                 label="Key"

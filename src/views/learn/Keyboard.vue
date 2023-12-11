@@ -14,6 +14,10 @@ const props = defineProps({
     highlight: {
         type: Array as PropType<Number[]>,
         default: []
+    },
+    clickable: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -42,6 +46,8 @@ const blackKeyPosition = ({ name, i }: { name: Key; i: number }) => {
 const doHighlight = (key: number) => {
     return props.highlight.includes(key);
 };
+
+defineEmits(["keypress"]);
 </script>
 <template>
     <div class="keyboard">
@@ -49,12 +55,14 @@ const doHighlight = (key: number) => {
             v-for="key in keys"
             :class="{
                 black: isBlackKey(key.name),
-                highlight: doHighlight(key.i)
+                highlight: doHighlight(key.i),
+                clickable
             }"
             :style="{
                 left: blackKeyPosition(key)
             }"
             class="key"
+            @click="$emit('keypress', key.i)"
         >
             {{ key.name }}
         </div>
@@ -97,6 +105,14 @@ const doHighlight = (key: number) => {
         &.black {
             background: color-mix(in srgb, var(--accent) 60%, #000);
         }
+    }
+
+    &.clickable:hover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.2);
     }
 }
 </style>

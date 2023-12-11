@@ -2,6 +2,7 @@
 import ChordFinder from "./ChordFinder.vue";
 import ScaleFinder from "./ScaleFinder.vue";
 import Scales from "./Scales.vue";
+import ScaleQuiz from "./ScaleQuiz.vue";
 import ChordProgressions from "./ChordProgressions.vue";
 
 import { useRoute } from "vue-router";
@@ -12,6 +13,7 @@ const route = useRoute();
 const tabs = {
     "scale-finder": ScaleFinder,
     scales: Scales,
+    "scale-quiz": ScaleQuiz,
     "chord-finder": ChordFinder,
     "chord-progressions": ChordProgressions
 };
@@ -64,6 +66,7 @@ const onClick = async () => {
             <aside class="sidebar">
                 <router-link to="/learn/scale-finder">Scale Finder</router-link>
                 <router-link to="/learn/scales">Scales</router-link>
+                <router-link to="/learn/scale-quiz">Scale Quiz</router-link>
                 <hr />
                 <router-link to="/learn/chord-finder">Chord Finder</router-link>
                 <router-link to="/learn/chord-progressions"
@@ -128,6 +131,7 @@ header {
     grid-template-columns: 200px 1fr;
     padding: 1em 0;
     gap: 2em;
+    height: 100%;
 
     .sidebar {
         border: 1px solid var(--color-border);
@@ -165,5 +169,9 @@ header {
             border-bottom-left-radius: 0;
         }
     }
+}
+
+main {
+    height: 100%;
 }
 </style>
