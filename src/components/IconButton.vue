@@ -13,6 +13,11 @@ defineProps({
     style: {
         required: false,
         type: String as PropType<"green" | "red" | "blue" | "yellow">
+    },
+    disabled: {
+        required: false,
+        type: Boolean,
+        default: false
     }
 });
 </script>
@@ -20,6 +25,8 @@ defineProps({
     <button
         class="icon-button"
         :style="style ? `--accent: var(--color-${style})` : ''"
+        :disabled="disabled"
+        :class="{ disabled }"
     >
         <i
             v-if="icon"
@@ -51,6 +58,12 @@ defineProps({
     &:hover {
         background: var(--accent);
         color: var(--color-heading);
+    }
+
+    &.disabled {
+        background: var(--color-border);
+        color: var(--color-text-mute);
+        cursor: not-allowed;
     }
 }
 </style>

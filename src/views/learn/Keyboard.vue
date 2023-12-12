@@ -75,6 +75,7 @@ defineEmits(["keypress"]);
     width: max-content;
     border-radius: 1em;
     overflow: hidden;
+    border: 2px solid var(--color-border);
 }
 
 .key {

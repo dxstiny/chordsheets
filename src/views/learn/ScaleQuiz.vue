@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import {
     SCALES,
     SHARP_KEYS,
@@ -8,10 +8,10 @@ import {
     type Scale
 } from "../../types";
 import { SCALE } from "../../scales";
-import Dropdown from "../../components/Dropdown.vue";
 import * as Tone from "tone";
 import IconButton from "@/components/IconButton.vue";
 import Keyboard from "./Keyboard.vue";
+import { start, activeMidiNotes } from "./inputListener";
 
 const synth = new Tone.Synth().toDestination();
 
@@ -19,9 +19,19 @@ const randomElement = <T>(arr: readonly T[]): T => {
     return arr[Math.floor(Math.random() * arr.length)];
 };
 
-const scale = ref<Scale>(randomElement(SCALES));
 const keys = [...SHARP_KEYS, ...FLAT_KEYS] as Chord[];
-const key = ref<Chord>(randomElement(keys));
+const key = ref<Chord>("C");
+const scale = ref<Scale>("Major");
+const correctNotes = ref<number[]>([]);
+const attempts = ref(0);
+
+const reset = () => {
+    key.value = randomElement(keys);
+    scale.value = randomElement(SCALES);
+    correctNotes.value = [];
+    attempts.value = 0;
+};
+reset();
 
 const activeNotes = computed(() => {
     const offset = keys.indexOf(key.value);
@@ -39,9 +49,6 @@ const playScale = () => {
         synth.triggerAttackRelease(note, "8n", now + index / 2);
     });
 };
-
-const correctNotes = ref<number[]>([]);
-const attempts = ref(0);
 
 const clickNote = (note: number) => {
     if (correctNotes.value.includes(note)) return;
@@ -68,6 +75,17 @@ const score = computed(() => {
     const penalty = (attempts.value - correctNotes.value.length) * 5;
     const score = clamp(correctness - penalty, 0, 100);
     return round(score, 1);
+});
+
+onMounted(() => {
+    start();
+});
+
+watch(activeMidiNotes.value, (notes) => {
+    for (let note of Object.keys(notes)) {
+        const noteNumber = parseInt(note) % 12;
+        clickNote(noteNumber);
+    }
 });
 </script>
 <template>
@@ -103,6 +121,12 @@ const score = computed(() => {
                     :max="11"
                 />
             </div>
+            <IconButton
+                icon="arrow_forward"
+                label="Continue"
+                @click="reset"
+                :disabled="correctNotes.length < activeNotes.length"
+            />
         </div>
     </div>
 </template>

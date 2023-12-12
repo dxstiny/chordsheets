@@ -33,7 +33,7 @@ const allScaleCombinations = computed(() => {
         for (let scale of SCALES) {
             const notes = SCALE[scale];
             const name = `${SHARP_KEYS[root]} ${scale}`;
-            combinations[name] = notes.keys.map((x) => x + root);
+            combinations[name] = notes.keys.map((x) => (x + root) % 12);
         }
     }
 
@@ -57,6 +57,14 @@ const possibleScales = computed(() => {
 
     return possibleScales;
 });
+
+const clickNote = (note: number) => {
+    if (pressedNotes.value.includes(note)) {
+        pressedNotes.value.splice(pressedNotes.value.indexOf(note), 1);
+    } else {
+        pressedNotes.value.push(note);
+    }
+};
 </script>
 <template>
     <div class="chord-finder">
@@ -85,7 +93,9 @@ const possibleScales = computed(() => {
         <Keyboard
             :min="48"
             :max="72"
-            :highlight="Object.keys(activeMidiNotes).map((x) => parseInt(x))"
+            :highlight="pressedNotes"
+            clickable
+            @keypress="clickNote"
         >
         </Keyboard>
         <br />
