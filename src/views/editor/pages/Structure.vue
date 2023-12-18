@@ -211,6 +211,7 @@ onMounted(() => {
                 v-model="eSong.sections"
                 class="content"
                 item-key="id"
+                @dragover.stop
             >
                 <template #item="{ element }">
                     <div class="group section">
@@ -243,6 +244,7 @@ onMounted(() => {
                                 v-model="element.progression"
                                 class="content"
                                 :item-key="element.id"
+                                @dragover.stop
                             >
                                 <template #item="{ element: chord }">
                                     <div

@@ -181,6 +181,7 @@ const updateOrder = ({
                     class="songs"
                     @change="updateOrder"
                     item-key="id"
+                    @dragover.stop
                 >
                     <template #item="{ element: song }">
                         <router-link :to="`/editor/${song.id}`">
