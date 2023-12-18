@@ -77,7 +77,6 @@ window.addEventListener("click", (e) => {
         const section = eSong.value.sections[i];
         for (let j = 0; j < section.progression.length; j++) {
             if (i === Number(sectionI) && j === Number(index)) {
-                console.log("found");
                 continue;
             }
 

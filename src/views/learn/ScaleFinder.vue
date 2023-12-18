@@ -8,7 +8,7 @@ import IconButton from "@/components/IconButton.vue";
 import {
     start,
     inputDevices,
-    currentChord,
+    getChordName,
     activeMidiNotes
 } from "./inputListener";
 import Keyboard from "./Keyboard.vue";
@@ -87,7 +87,7 @@ const clickNote = (note: number) => {
         <br />
         <div class="row">
             <span>Playing:</span>
-            <h3>{{ currentChord }}</h3>
+            <h3>{{ getChordName(pressedNotes) }}</h3>
         </div>
         <br />
         <Keyboard

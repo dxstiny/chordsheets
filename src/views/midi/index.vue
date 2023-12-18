@@ -11,8 +11,6 @@ const parse = async () => {
     const file = (source as HTMLInputElement).files?.[0];
     if (!file) return;
     track.value = await midiFromFile(file);
-
-    console.log(JSON.stringify(track.value));
 };
 </script>
 <template>

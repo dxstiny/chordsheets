@@ -26,6 +26,23 @@ const s = songs.song(textId);
 if (!s) router.push("/");
 const song = ref<ISong>(s as ISong);
 const preview = ref<InstanceType<typeof Song>>();
+
+const save = () => {
+    if (!song.value) return;
+    // download 'song' as json
+    const dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(song.value));
+    const downloadAnchorNode = document.createElement("a");
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute(
+        "download",
+        `${song.value.title}.chordsheets.json`
+    );
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+};
 </script>
 <template>
     <MinWidth :minWidth="300">
@@ -70,6 +87,12 @@ const preview = ref<InstanceType<typeof Song>>();
                     <span
                         class="material-symbols-rounded"
                         @click="preview.download"
+                    >
+                        picture_as_pdf
+                    </span>
+                    <span
+                        class="material-symbols-rounded"
+                        @click="save"
                     >
                         file_download
                     </span>

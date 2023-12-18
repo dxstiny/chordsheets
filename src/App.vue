@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView } from "vue-router";
+import DropImport from "./views/DropImport.vue";
 </script>
 
 <template>
-  <RouterView />
+    <DropImport>
+        <RouterView />
+    </DropImport>
 </template>

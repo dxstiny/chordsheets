@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import {
-    SCALES,
-    SHARP_KEYS,
-    FLAT_KEYS,
-    type Key,
-    type Scale
-} from "../../types";
-import { SCALE } from "../../scales";
-import Dropdown from "../../components/Dropdown.vue";
-import * as Tone from "tone";
-import IconButton from "@/components/IconButton.vue";
+import { ref, onMounted, watch } from "vue";
 import {
     start,
     inputDevices,
-    currentChord,
+    getChordName,
     activeMidiNotes
 } from "./inputListener";
 import Keyboard from "./Keyboard.vue";
+
+const pressedNotes = ref<number[]>([]);
+
+watch(activeMidiNotes.value, (notes) => {
+    pressedNotes.value.push(...Object.keys(notes).map((x) => parseInt(x)));
+});
+
+const clickNote = (note: number) => {
+    if (pressedNotes.value.includes(note)) {
+        pressedNotes.value.splice(pressedNotes.value.indexOf(note), 1);
+    } else {
+        pressedNotes.value.push(note);
+    }
+};
 
 onMounted(() => {
     start();
@@ -44,13 +47,15 @@ onMounted(() => {
         <br />
         <div class="row">
             <span>Playing:</span>
-            <h3>{{ currentChord }}</h3>
+            <h3>{{ getChordName(pressedNotes) }}</h3>
         </div>
         <br />
         <Keyboard
-            :highlight="Object.keys(activeMidiNotes).map((x) => parseInt(x))"
+            :highlight="pressedNotes"
             :min="48"
             :max="72"
+            clickable
+            @keypress="clickNote"
         >
         </Keyboard>
     </div>
