@@ -3,6 +3,10 @@
     top: 0;
     left: 1000vw;
     z-index: -1;
+
+    &.show {
+        left: 0;
+    }
 }
 
 @font-face {
@@ -20,6 +24,7 @@ body {
 
 .parent {
     width: 100%;
+    position: relative;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
     .song {
