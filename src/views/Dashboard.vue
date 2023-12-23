@@ -130,6 +130,8 @@ const updateOrder = ({
 
     store.moveTo(from, to);
 };
+
+const isMobile = window.innerWidth < 800;
 </script>
 <template>
     <div class="dashboard">
@@ -191,6 +193,7 @@ const updateOrder = ({
                     @change="updateOrder"
                     item-key="id"
                     @dragover.stop
+                    :disabled="isMobile"
                 >
                     <template #item="{ element: song }">
                         <router-link :to="`/editor/${song.id}`">
