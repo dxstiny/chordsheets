@@ -11,6 +11,8 @@ import type { ISong } from "@/types";
 
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof AllPages>[]>();
+const renderDialog = ref<HTMLDialogElement>();
+const renderProgress = ref(-1);
 
 const exportLib = async () => {
     await store.prepareRender();
@@ -48,19 +50,26 @@ const importLib = () => {
 };
 
 const renderAll = async () => {
+    renderDialog.value?.showModal();
     let pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
         format: "a4"
     });
 
+    renderProgress.value = 0;
+
     for (const page of allPages.value ?? []) {
         await page.renderTo(pdf);
+        renderProgress.value++;
 
         if (page.song !== store.songs[store.songs.length - 1]) {
             pdf.addPage();
         }
     }
+
+    renderDialog.value?.close();
+    renderProgress.value = -1;
 
     return pdf;
 };
@@ -127,6 +136,8 @@ const updateOrder = ({
 
     store.moveTo(from, to);
 };
+
+const isMobile = window.innerWidth < 800;
 </script>
 <template>
     <div class="dashboard">
@@ -188,6 +199,7 @@ const updateOrder = ({
                     @change="updateOrder"
                     item-key="id"
                     @dragover.stop
+                    :disabled="isMobile"
                 >
                     <template #item="{ element: song }">
                         <router-link :to="`/editor/${song.id}`">
@@ -229,6 +241,36 @@ const updateOrder = ({
             </aside>
         </div>
     </div>
+    <dialog
+        ref="renderDialog"
+        class="card"
+    >
+        <div class="content">
+            <div class="preview-container">
+                <div class="preview scale-sm">
+                    <AllPages
+                        v-if="renderProgress >= 0"
+                        ref="allPages"
+                        :song="store.songs[renderProgress]"
+                    />
+                </div>
+            </div>
+            <h2>Rendering...</h2>
+            <p>
+                Please wait while we render your chord sheets. This may take a
+                while.
+            </p>
+            <div class="row">
+                <progress
+                    :value="renderProgress"
+                    :max="allPages?.length"
+                />
+                <p>
+                    <span>{{ renderProgress }}</span> / {{ allPages?.length }}
+                </p>
+            </div>
+        </div>
+    </dialog>
     <div class="void">
         <div class="parent">
             <AllPages
@@ -241,10 +283,6 @@ const updateOrder = ({
 </template>
 
 <style scoped>
-.learn p {
-    color: var(--color-text-mute);
-}
-
 .learn a h2 {
     cursor: pointer;
     color: var(--color-heading);
@@ -253,6 +291,24 @@ const updateOrder = ({
     &:hover {
         text-decoration: underline;
         color: var(--accent);
+    }
+}
+
+progress {
+    width: 100%;
+    height: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    appearance: none;
+
+    &::-webkit-progress-bar {
+        border-radius: 0.5rem;
+        background-color: var(--color-background);
+    }
+
+    &::-webkit-progress-value {
+        border-radius: 0.5rem;
+        background-color: var(--accent);
     }
 }
 
@@ -265,6 +321,55 @@ const updateOrder = ({
 
     & button {
         flex: 1;
+    }
+}
+
+dialog {
+    position: fixed;
+    margin: auto;
+    outline: none;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+
+        max-width: 60ch;
+        width: 100%;
+
+        .preview-container {
+            position: relative;
+            height: 25vh;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+
+        .preview.scale-sm {
+            position: absolute;
+            margin: auto;
+            overflow: auto;
+            justify-self: center;
+            align-self: center;
+            max-height: 50vh;
+            scale: 0.5;
+            transform-origin: top;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr max-content;
+            align-items: center;
+            gap: 1em;
+        }
     }
 }
 
@@ -402,5 +507,17 @@ h2 {
 h1 .accent {
     color: var(--accent);
     font-weight: 900;
+}
+
+.parent {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    & > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
 }
 </style>
