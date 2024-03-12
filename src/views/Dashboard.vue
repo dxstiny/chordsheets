@@ -34,6 +34,12 @@ const importLib = () => {
         reader.onload = (e) => {
             const text = e.target?.result as string;
             const songs = JSON.parse(text);
+
+            if (!Array.isArray(songs)) {
+                store.songs.push(songs);
+                return;
+            }
+
             store.songs = songs;
         };
         reader.readAsText(file);
