@@ -8,3 +8,10 @@ import DropImport from "./views/DropImport.vue";
         <RouterView />
     </DropImport>
 </template>
+
+<style>
+#app {
+    min-height: 100vh;
+    min-height: 100svh;
+}
+</style>

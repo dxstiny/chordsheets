@@ -39,10 +39,12 @@ const activeNotes = computed(() => {
 });
 
 const playScale = () => {
-    const allNotes = activeNotes.value
-        .filter((note) => note < 12)
-        .map((note) => keys[note] + "4");
-    allNotes.push(keys[activeNotes.value[0]] + "5"); // root key an octave up
+    const root = activeNotes.value[0];
+
+    const octave = (note: number) => (note >= root ? "4" : "5");
+    const allNotes = activeNotes.value.map((note) => keys[note] + octave(note));
+
+    allNotes.push(keys[root] + "5"); // root key an octave up
 
     const now = Tone.now();
     allNotes.forEach((note, index) => {

@@ -15,8 +15,17 @@ const addFiles = async (files: FileList) => {
         promises.push(file.text());
     }
     const texts: string[] = await Promise.all(promises);
-    const items: ISong[] = texts.map((x) => JSON.parse(x));
-    items.map(songs.addSong);
+    const items: (ISong | ISong[])[] = texts.map((x) => JSON.parse(x));
+
+    for (const item of items) {
+        if (Array.isArray(item)) {
+            for (const song of item) {
+                songs.addSong(song);
+            }
+        } else {
+            songs.addSong(item);
+        }
+    }
 };
 
 const onDrop = (e: DragEvent) => {
@@ -50,6 +59,11 @@ const onDragleave = (e: any) => {
 <style scoped>
 .dropzone * {
     pointer-events: none;
+}
+
+.dropzone {
+    min-height: 100vh;
+    min-height: 100svh;
 }
 
 .dropzone.drophover::after {

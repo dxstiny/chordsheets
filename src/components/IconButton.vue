@@ -43,7 +43,7 @@ defineProps({
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 1em;
+    gap: 0.5em;
     padding: 0.5em 1em;
 
     background: var(--color-heading);

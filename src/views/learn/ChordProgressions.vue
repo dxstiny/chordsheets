@@ -5,9 +5,9 @@ import Keyboard from "./Keyboard.vue";
 import { SHARP_KEYS, SCALES, type Scale, type Key } from "@/types";
 import { SCALE } from "@/scales";
 import { getChordName } from "./inputListener";
+import { useLearnSessionStore } from "@/stores/learnSession";
 
-const scale = ref<Scale>(SCALES[0]);
-const key = ref<Key>(SHARP_KEYS[0]);
+const learnSession = useLearnSessionStore();
 
 const roman = {
     1: "I",
@@ -52,12 +52,12 @@ const chordName = (chord: number[]) => {
         <div class="options">
             <Dropdown
                 label="Key"
-                v-model="key"
+                v-model="learnSession.key"
                 :options="SHARP_KEYS"
             />
             <Dropdown
                 label="Scale"
-                v-model="scale"
+                v-model="learnSession.scale"
                 :options="SCALES"
             />
         </div>
@@ -67,11 +67,17 @@ const chordName = (chord: number[]) => {
                 v-for="(name, degree) in roman"
             >
                 <h3>{{ name }}</h3>
-                {{ chordName(chord(scale, key, degree)) }}
+                {{
+                    chordName(
+                        chord(learnSession.scale, learnSession.key, degree)
+                    )
+                }}
                 <Keyboard
                     :min="0"
                     :max="12"
-                    :highlight="chord(scale, key, degree)"
+                    :highlight="
+                        chord(learnSession.scale, learnSession.key, degree)
+                    "
                 />
             </div>
         </div>

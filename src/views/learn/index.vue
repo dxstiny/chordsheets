@@ -59,7 +59,7 @@ const onClick = async () => {
                 <router-link to="/">
                     <h1>Chord<span class="accent">Sheets</span></h1>
                 </router-link>
-                <p>LEARN</p>
+                <p class="material-symbols-rounded">school</p>
             </div>
         </header>
         <div class="main limit-width">
@@ -111,8 +111,8 @@ header {
 
     .content {
         display: flex;
-        gap: 1em;
-        align-items: flex-end;
+        gap: 0.5em;
+        align-items: flex-start;
     }
 }
 
@@ -153,7 +153,7 @@ header {
             }
 
             &:hover {
-                color: var(--color-heading);
+                text-decoration: underline;
             }
         }
 

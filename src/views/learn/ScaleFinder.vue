@@ -58,6 +58,18 @@ const possibleScales = computed(() => {
     return possibleScales;
 });
 
+const possibleScalesByRoot = computed(() => {
+    const rootNotes = possibleScales.value.map((x) => x.name.split(" ")[0]);
+    const scales = {} as Record<string, string[]>;
+    for (let root of rootNotes) {
+        scales[root] = possibleScales.value
+            .filter((x) => x.name.startsWith(root))
+            .map((x) => x.name.split(" ")[1]);
+    }
+
+    return scales;
+});
+
 const clickNote = (note: number) => {
     if (pressedNotes.value.includes(note)) {
         pressedNotes.value.splice(pressedNotes.value.indexOf(note), 1);
@@ -98,20 +110,29 @@ const clickNote = (note: number) => {
             @keypress="clickNote"
         >
         </Keyboard>
-        <br />
-        <hr />
-        <br />
-        <div class="scales">
-            <ul>
-                <li
-                    v-for="scale in possibleScales"
-                    :key="scale.name"
-                    class="scale"
+        <template v-if="pressedNotes.length">
+            <br />
+            <hr />
+            <br />
+            <div class="scales">
+                <details
+                    v-for="(scales, root) in possibleScalesByRoot"
+                    :key="root"
+                    class="root"
+                    :open="scales.length < 3"
                 >
-                    {{ scale.name }}
-                </li>
-            </ul>
-        </div>
+                    <summary>{{ root }}</summary>
+                    <div class="scales">
+                        <span
+                            v-for="scale in scales"
+                            :key="scale"
+                        >
+                            {{ scale }}
+                        </span>
+                    </div>
+                </details>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -122,6 +143,21 @@ const clickNote = (note: number) => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+}
+
+.root {
+    cursor: pointer;
+
+    summary {
+        font-weight: bold;
+    }
+
+    .scales {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        margin-left: 1em;
+    }
 }
 
 .header {

@@ -6,6 +6,7 @@ import { ref, watch, watchEffect } from "vue";
 import { jsPDF } from "jspdf";
 import Dropdown from "@/components/Dropdown.vue";
 import TextInput from "@/components/TextInput.vue";
+import Import from "@/components/modals/Import.vue";
 import draggable from "vuedraggable";
 import type { ISong } from "@/types";
 
@@ -13,6 +14,7 @@ const store = useSongStore();
 const allPages = ref<InstanceType<typeof AllPages>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
+const importDialog = ref<typeof Import>();
 
 const exportLib = async () => {
     await store.prepareRender();
@@ -26,21 +28,7 @@ const exportLib = async () => {
 };
 
 const importLib = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const text = e.target?.result as string;
-            const songs = JSON.parse(text);
-            store.songs = songs;
-        };
-        reader.readAsText(file);
-    };
-    input.click();
+    importDialog.value?.show();
 };
 
 const renderAll = async () => {
@@ -153,7 +141,7 @@ const isMobile = window.innerWidth < 800;
                     />
                     <IconButton
                         icon="file_upload"
-                        label="Import Library"
+                        label="Import"
                         @click="importLib"
                         :style="'yellow'"
                     />
@@ -225,20 +213,17 @@ const isMobile = window.innerWidth < 800;
                     </template>
                 </draggable>
             </main>
-            <aside class="card min-h-screen sticky learn">
+            <aside class="card sticky learn">
                 <div class="content">
                     <router-link to="/learn">
                         <h2>Learn Music Theory</h2>
                     </router-link>
-                    <p>Coming soon...</p>
+                    <p>Now in beta!</p>
                 </div>
             </aside>
         </div>
     </div>
-    <dialog
-        ref="renderDialog"
-        class="card"
-    >
+    <dialog ref="renderDialog">
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
@@ -265,6 +250,7 @@ const isMobile = window.innerWidth < 800;
             </div>
         </div>
     </dialog>
+    <Import ref="importDialog" />
     <div class="void">
         <div class="parent">
             <AllPages
@@ -319,27 +305,23 @@ progress {
 }
 
 dialog {
-    position: fixed;
-    margin: auto;
+    color: var(--color-text);
+    gap: 1em;
+    background: var(--color-background-soft);
+    border: 1px solid var(--color-border);
+    border-radius: 1em;
+    padding: 1em;
     outline: none;
-    width: 100vw;
-    height: 100vh;
-    height: 100svh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+    inset: 0;
+    margin: auto;
+    position: fixed;
 
     &::backdrop {
         background: rgba(0, 0, 0, 0.5);
     }
 
     .content {
-        display: flex;
-        flex-direction: column;
-
-        max-width: 60ch;
-        width: 100%;
-
         .preview-container {
             position: relative;
             height: 25vh;
@@ -471,6 +453,7 @@ dialog {
         position: relative;
         gap: 1em;
         min-width: 100%;
+        align-items: start;
 
         @media (max-width: 800px) {
             grid-template-columns: 1fr;

@@ -1,40 +1,28 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import {
-    SCALES,
-    SHARP_KEYS,
-    FLAT_KEYS,
-    type Key,
-    type Scale
-} from "../../types";
+import { SCALES, SHARP_KEYS, type Key, type Scale } from "../../types";
 import { SCALE } from "../../scales";
 import Dropdown from "../../components/Dropdown.vue";
 import * as Tone from "tone";
 import IconButton from "@/components/IconButton.vue";
-import {
-    start,
-    inputDevices,
-    currentChord,
-    activeMidiNotes
-} from "./inputListener";
+import { start } from "./inputListener";
 import Keyboard from "./Keyboard.vue";
+import { useLearnSessionStore } from "@/stores/learnSession";
 
 const synth = new Tone.Synth().toDestination();
 
-const scale = ref<Scale>(SCALES[0]);
-const key = ref<Key>(SHARP_KEYS[0]);
-
+const learnSession = useLearnSessionStore();
 const keys = ref<readonly string[]>(SHARP_KEYS);
 
 const activeNotes = computed(() => {
     //SCALE[scale.value].keys.map((note) => note + keys.value.indexOf(key.value));
     const notes = [];
     for (
-        let offset = keys.value.indexOf(key.value);
+        let offset = keys.value.indexOf(learnSession.key);
         offset < 88;
         offset += 12
     ) {
-        notes.push(SCALE[scale.value].keys.map((note) => note + offset));
+        notes.push(SCALE[learnSession.scale].keys.map((note) => note + offset));
     }
     return notes.flat();
 });
@@ -61,12 +49,12 @@ onMounted(() => {
         <div class="header">
             <Dropdown
                 label="Key"
-                v-model="key"
+                v-model="learnSession.key"
                 :options="SHARP_KEYS"
             />
             <Dropdown
                 label="Scale"
-                v-model="scale"
+                v-model="learnSession.scale"
                 :options="SCALES"
             />
             <IconButton
