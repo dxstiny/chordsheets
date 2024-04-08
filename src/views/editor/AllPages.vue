@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type PropType, ref, onMounted } from "vue";
+import { type PropType, ref, onMounted, watch, nextTick } from "vue";
 import type { ISong, PageContent } from "@/types";
 import Page from "./Page.vue";
 import { jsPDF } from "jspdf";
@@ -16,7 +16,8 @@ const props = defineProps({
 const allpageselement = ref<HTMLElement>();
 const parent = ref<HTMLElement[]>();
 const element = ref<InstanceType<typeof Page>[]>();
-onMounted(() => {
+
+const rerenderPreview = () => {
     const firstParent = parent.value?.[0];
     if (!firstParent) return;
     const newPages = [];
@@ -54,7 +55,16 @@ onMounted(() => {
     if (!pages.value.length) {
         pages.value.push([null]);
     }
-});
+};
+
+onMounted(rerenderPreview);
+watch(
+    () => props.song.sections.length,
+    () => {
+        pages.value = [[...props.song.sections, ...(props.song.midi ?? [])]];
+        nextTick(rerenderPreview);
+    }
+);
 
 const renderTo = async (pdf: jsPDF) => {
     if (!allpageselement.value) return pdf;
