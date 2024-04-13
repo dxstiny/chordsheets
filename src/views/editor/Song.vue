@@ -136,7 +136,7 @@ defineExpose({
 <style scoped>
 .wrap {
     overflow: auto;
-    height: 80vh;
-    padding: 0 1em;
+    height: 90vh;
+    padding: 1em;
 }
 </style>

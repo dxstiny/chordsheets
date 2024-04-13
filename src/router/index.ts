@@ -9,6 +9,11 @@ const router = createRouter({
             component: () => import("../views/Dashboard.vue")
         },
         {
+            path: "/editor/v2/:id",
+            name: "EditorNext",
+            component: () => import("../views/editor2/index.vue")
+        },
+        {
             path: "/editor/:id",
             name: "EditorId",
             component: () => import("../views/editor/index.vue")

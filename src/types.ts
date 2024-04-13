@@ -83,10 +83,10 @@ export const SECTION_TYPES = [
 ];
 
 export interface ISection {
-    type: (typeof SECTION_TYPES)[number];
-    name?: string;
+    type: string;
     progression: IChord[];
     id?: string;
+    page?: number;
 }
 
 export interface IInstrument {
@@ -105,6 +105,7 @@ export interface IInstrument {
         | "Accordion"
         | "Woodwind"
         | "Percussion";
+    for: string;
     name: string;
     page?: number;
     volume: number;
@@ -149,12 +150,16 @@ export interface ISong {
     transpose: number;
     octave: number;
 
-    instruments: IInstruments;
-    options: {
-        touch: boolean;
-        sustain: boolean;
-        mono: boolean;
+    legacy?: {
+        instruments: IInstruments;
+        options: {
+            touch: boolean;
+            sustain: boolean;
+            mono: boolean;
+        };
     };
+    options?: string[];
+    instruments: IInstrument[];
 
     midi?: IMidiTrack[];
     id: number;
@@ -172,12 +177,8 @@ export const empty: ISong = {
     transpose: 0,
     octave: 0,
     sections: [],
-    instruments: {} as IInstruments,
-    options: {
-        touch: false,
-        sustain: false,
-        mono: false
-    },
+    instruments: [],
+    options: [],
     structure: [],
     id: 0
 };
@@ -266,30 +267,60 @@ export const mock: ISong = {
     ],
     transpose: 0,
     octave: 0,
-    options: {
-        touch: true,
-        sustain: false,
-        mono: false
-    },
-    instruments: {
-        l: {
+    options: ["touch"],
+    instruments: [
+        {
+            for: "l",
             type: "Synth",
             name: "PunchyChordz",
             volume: 127,
             page: 1
         },
-        r1: {
+        {
+            for: "r1",
             type: "Synth",
             name: "WildPWM",
             volume: 100,
             page: 2
         },
-        r2: {
+        {
+            for: "r2",
             type: "Synth",
             name: "DetunedVintage",
             volume: 100,
             page: 2
         }
-    },
+    ],
     id: new Date().getTime()
+};
+
+export const convertLegacySong = (legacySong: any): ISong => {
+    legacySong.legacy = {};
+
+    if (legacySong.options && !Array.isArray(legacySong.options)) {
+        legacySong.legacy.options = legacySong.options;
+        legacySong.options = Object.entries(
+            legacySong.legacy.options as { [key: string]: boolean }
+        )
+            .filter(([k, value]) => value)
+            .map(([k]) => k);
+    }
+    if (legacySong.instruments && !Array.isArray(legacySong.instruments)) {
+        legacySong.legacy.instruments = legacySong.instruments;
+        legacySong.instruments = Object.entries(
+            legacySong.legacy.instruments as { [key: string]: object }
+        ).map(([k, v]) => ({
+            for: k,
+            ...v
+        }));
+    }
+    for (const section of legacySong.sections) {
+        // if name is set, set the type to {type} ({name})
+        if (section.name) {
+            section.type = `${section.type} (${section.name})`;
+            delete section.name;
+        }
+    }
+    if (!legacySong.id) legacySong.id = Math.round(Math.random() * 1000000);
+    return legacySong;
 };

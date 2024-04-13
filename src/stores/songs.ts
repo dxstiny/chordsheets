@@ -1,19 +1,18 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
-import { empty, type ISong } from "@/types";
+import { empty, convertLegacySong, type ISong } from "@/types";
 
 const ITEM_NAME = "chordsheets.songs";
 
 export const useSongStore = defineStore("songs", () => {
     const fromLocalStorage = () =>
         JSON.parse(localStorage.getItem(ITEM_NAME) || "[]").map(
-            (song: ISong) => {
-                if (!song.id) song.id = Math.round(Math.random() * 1000000);
-                return song;
-            }
+            convertLegacySong
         );
 
     const songs = ref<ISong[]>(fromLocalStorage());
+
+    console.log(songs.value);
 
     window.addEventListener("storage", () => {
         songs.value = JSON.parse(localStorage.getItem(ITEM_NAME) || "[]");

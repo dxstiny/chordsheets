@@ -88,8 +88,7 @@
         aspect-ratio: 210 / 297;
 
         padding: var(--display-margin);
-        box-shadow: 0 0 0 1px var(--color-border),
-            0 0 0 2px var(--color-border-hover);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 
         font-size: 12px;
 

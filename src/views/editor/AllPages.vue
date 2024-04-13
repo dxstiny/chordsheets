@@ -94,18 +94,6 @@ const renderTo = async (pdf: jsPDF) => {
         });
 
         height = ratio * width;
-        /*
-        const svg = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg"
-        );
-        svg.innerHTML = dataUrl;
-        await pdf.svg(svg, {
-            x: 0,
-            y: 0,
-            width,
-            height
-        });*/
         pdf.addImage(dataUrl, "JPG", 0, 0, width, height);
 
         if (i + 1 < pages.value.length) {
@@ -166,5 +154,11 @@ defineExpose({
 <style scoped>
 .wrap {
     width: 100%;
+}
+
+#allPages {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 }
 </style>

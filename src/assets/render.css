@@ -138,69 +138,70 @@ body {
             font-weight: bold;
         }
     }
+}
 
-    .progression {
-        display: grid;
-        grid-template-columns: repeat(16, 1fr);
-        grid-gap: 1em;
-        align-items: center;
-        grid-template-rows: auto;
-    }
+.progression {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-gap: 0.5em;
+    align-items: center;
+    grid-template-rows: auto;
+}
 
-    .progression > div {
-        display: flex;
-        justify-content: center;
-        border: 1px solid var(--color-border);
-        border-radius: 0.5em;
-    }
+.progression > div {
+    display: flex;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5em;
+    grid-column: span var(--cols, 1);
+}
 
-    .progression .w-1 {
-        grid-column: span 1;
-    }
+.progression .w-1 {
+    grid-column: span 1;
+}
 
-    .progression .w-2 {
-        grid-column: span 2;
-    }
+.progression .w-2 {
+    grid-column: span 2;
+}
 
-    .progression .w-3 {
-        grid-column: span 3;
-    }
+.progression .w-3 {
+    grid-column: span 3;
+}
 
-    .progression .w-4 {
-        grid-column: span 4;
-    }
+.progression .w-4 {
+    grid-column: span 4;
+}
 
-    .progression .w-5 {
-        grid-column: span 5;
-    }
+.progression .w-5 {
+    grid-column: span 5;
+}
 
-    .progression .w-6 {
-        grid-column: span 6;
-    }
+.progression .w-6 {
+    grid-column: span 6;
+}
 
-    .progression .w-8 {
-        grid-column: span 8;
-    }
+.progression .w-8 {
+    grid-column: span 8;
+}
 
-    .progression .w-10 {
-        grid-column: span 10;
-    }
+.progression .w-10 {
+    grid-column: span 10;
+}
 
-    .progression .w-12 {
-        grid-column: span 12;
-    }
+.progression .w-12 {
+    grid-column: span 12;
+}
 
-    .progression .w-14 {
-        grid-column: span 14;
-    }
+.progression .w-14 {
+    grid-column: span 14;
+}
 
-    .progression .w-16 {
-        grid-column: span 16;
-    }
+.progression .w-16 {
+    grid-column: span 16;
+}
 
-    .progression .selected {
-        font-weight: 900;
-        color: var(--accent);
-        border-color: var(--accent);
-    }
+.progression .selected {
+    font-weight: 900;
+    color: var(--accent);
+    border-color: var(--accent);
 }

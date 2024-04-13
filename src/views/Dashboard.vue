@@ -170,7 +170,9 @@ const isMobile = window.innerWidth < 800;
                         v-model="filters.artist"
                         :options="[
                             '(any)',
-                            ...new Set(store.songs.map((song) => song.artist))
+                            ...new Set(
+                                store.songs.map((song) => song.artist).sort()
+                            )
                         ]"
                     />
                 </div>
@@ -215,10 +217,29 @@ const isMobile = window.innerWidth < 800;
             </main>
             <aside class="card sticky learn">
                 <div class="content">
-                    <router-link to="/learn">
-                        <h2>Learn Music Theory</h2>
-                    </router-link>
-                    <p>Now in beta!</p>
+                    <h2>Learn Music Theory</h2>
+                    <IconButton
+                        label="Try the Beta"
+                        icon="arrow_forward"
+                        @click="$router.push('/learn')"
+                        :style="'blue'"
+                    />
+                    <hr />
+                    <h2>New editor coming soon!</h2>
+                    <p>
+                        The new editor will let you edit your songs directly
+                        in-place. No more switching between editor and preview.
+                        It also introduces new shortcuts to improve your
+                        workflow.
+                    </p>
+                    <IconButton
+                        label="Try the preview"
+                        icon="arrow_forward"
+                        @click="
+                            $router.push('/editor/v2/' + store.songs[0]?.id)
+                        "
+                        :style="'blue'"
+                    />
                 </div>
             </aside>
         </div>
