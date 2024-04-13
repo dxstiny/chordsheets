@@ -115,7 +115,6 @@ const onMouseDown = (chord: IChord, e: MouseEvent) => {
 const onMouseUp = (chord: IChord, e: MouseEvent) => {
     let before = chord.selected;
     if (!e.shiftKey) {
-        console.log("shift");
         for (const section of props.song.sections) {
             for (const c of section.progression) {
                 c.selected = false;
@@ -124,8 +123,6 @@ const onMouseUp = (chord: IChord, e: MouseEvent) => {
     }
     chord.selected = !before;
 };
-
-const pages = 0;
 
 const deleteProgression = (index: number) => {
     const element = props.song.sections[index];
@@ -154,7 +151,7 @@ const renderTo = async (pdf: jsPDF) => {
 
     const ratio = el.clientHeight / el.clientWidth;
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < elements.length; i++) {
         el = elements[i];
         if (!el) continue;
 
@@ -163,27 +160,34 @@ const renderTo = async (pdf: jsPDF) => {
 
         const scale = 2;
         const dataUrl = await domToImage.toJpeg(el, {
-            height: el.offsetHeight * scale,
-            width: el.offsetWidth * scale,
+            height: el.clientHeight * scale,
+            width: el.clientWidth * scale,
             style: {
                 transform: `scale(${scale}) translate(${
-                    el.offsetWidth / 2 / scale
-                }px, ${el.offsetHeight / 2 / scale}px)`
+                    el.clientWidth / 2 / scale
+                }px, ${el.clientHeight / 2 / scale}px)`
             }
         });
 
         height = ratio * width;
         pdf.addImage(dataUrl, "JPG", 0, 0, width, height);
 
-        if (i + 1 < 1) {
+        if (i + 1 < elements.length) {
             pdf.addPage();
         }
     }
     return pdf;
 };
 
+let waitForRenderResolver: () => void;
+
 const render = async () => {
     printing.value = true;
+
+    const renderPromise = new Promise<void>((resolve) => {
+        waitForRenderResolver = resolve;
+    });
+    await renderPromise;
 
     const pdf = new jsPDF({
         orientation: "portrait",
@@ -192,8 +196,6 @@ const render = async () => {
     });
 
     await renderTo(pdf);
-
-    printing.value = false;
 
     return pdf;
 };
@@ -215,20 +217,79 @@ const download = async () => {
 
 onMounted(() => {
     window.addEventListener("keydown", onKeyDown);
+    updatePages();
 });
 
 onUnmounted(() => {
     window.removeEventListener("keydown", onKeyDown);
 });
+
+// this will store the start/end section indices per page
+interface IPage {
+    start: number;
+    end: number;
+}
+
+const pages = ref<IPage[]>([]);
+
+const updatePages = () => {
+    if (!printing.value || pages.value.length == 0) {
+        pages.value = [
+            {
+                start: 0,
+                end: props.song.sections.length
+            }
+        ];
+
+        if (printing.value) {
+            nextTick(updatePages);
+        }
+
+        return;
+    }
+
+    const sectionElements = document.querySelectorAll(
+        ".section"
+    ) as NodeListOf<HTMLElement>;
+
+    if (sectionElements.length == 0) return;
+
+    const parent = sectionElements[0].parentElement as HTMLElement;
+
+    const computedParent = getComputedStyle(parent);
+    const bottomMinusPadding =
+        parent.clientHeight - parseFloat(computedParent.paddingBottom);
+
+    // find first section that is overflowing its parent
+    for (let i = 0; i < sectionElements.length; i++) {
+        const section = sectionElements[i];
+        const elementBottom = section.offsetTop + section.offsetHeight;
+
+        if (elementBottom > bottomMinusPadding) {
+            pages.value[pages.value.length - 1].end = i;
+            pages.value.push({
+                start: i,
+                end: props.song.sections.length
+            });
+            nextTick(updatePages);
+            return;
+        }
+    }
+
+    waitForRenderResolver?.();
+};
+
+watch(() => props.song, updatePages, { deep: true });
+watch(printing, () => nextTick(updatePages));
 </script>
 <template>
     <div
         class="editor"
         :class="{ resizing, print: printing }"
         @dragover.prevent
-        v-for="page in pages + 1"
+        v-for="(section, index) in pages"
     >
-        <template v-if="page == 1">
+        <template v-if="index == 0">
             <div class="editor__header">
                 <EditableText
                     v-model="song.artist"
@@ -397,6 +458,7 @@ onUnmounted(() => {
             <hr />
         </template>
         <draggable
+            v-if="!printing"
             v-model="song.sections"
             class="editor__content"
             @dragover.stop
@@ -484,6 +546,91 @@ onUnmounted(() => {
                 </div>
             </template>
         </draggable>
+        <div
+            v-else
+            v-for="(element, index) in props.song.sections.slice(
+                section.start,
+                section.end
+            )"
+            class="section"
+            :id="`section-${index}`"
+        >
+            <EditableText
+                v-model="element.type"
+                class="left"
+                placeholder="Click to edit section name"
+                no-outline
+            >
+                <span class="name">
+                    {{ element.type }}
+                </span>
+            </EditableText>
+            <div class="buttons">
+                <span
+                    class="button material-symbols-rounded"
+                    @click="duplicateProgression(index)"
+                >
+                    content_copy
+                </span>
+                <span
+                    class="button material-symbols-rounded"
+                    @click="deleteProgression(index)"
+                >
+                    delete
+                </span>
+            </div>
+            <div
+                class="progression"
+                v-if="element.progression.length === 0"
+            >
+                <div
+                    class="chord create"
+                    :style="{ '--cols': 4 }"
+                    @click.stop="
+                        element.progression.push({
+                            chord: 'C',
+                            duration: 4
+                        })
+                    "
+                >
+                    <span class="material-symbols-rounded"> add </span>
+                    Add Chord
+                </div>
+            </div>
+            <draggable
+                v-else
+                v-model="element.progression"
+                class="progression"
+                @dragover.stop
+            >
+                <template #item="{ element: chord, index: chIndex }">
+                    <div
+                        class="chord"
+                        ref="chordElements"
+                        :id="`chord-${index}-${chIndex}`"
+                        @mousedown="onMouseDown(chord, $event)"
+                        @mouseup="onMouseUp(chord, $event)"
+                        @click.stop
+                        :class="chord.selected ? ' selected' : ''"
+                        :style="{ '--cols': chord.duration }"
+                    >
+                        <EditableText
+                            v-model="chord.chord"
+                            no-outline
+                            placeholder="C"
+                        >
+                            {{ chord.chord }}
+                        </EditableText>
+                        <span
+                            class="insert_chord_here"
+                            @mousedown.stop
+                            @mouseup.stop
+                            @click.stop="insertChord(index, chIndex)"
+                        />
+                    </div>
+                </template>
+            </draggable>
+        </div>
         <div
             class="add-section"
             id="add-section"
@@ -705,6 +852,7 @@ hr {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     --color-heading: black;
     color: black;
@@ -721,6 +869,9 @@ hr {
     height: 100%;
 
     &.print {
+        max-height: calc(var(--display-height) - var(--display-margin));
+        overflow: clip;
+
         .add-option,
         .add-section,
         .chord.create {
