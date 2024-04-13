@@ -21,12 +21,16 @@ const props = defineProps({
     song: {
         type: Object as PropType<ISong>,
         required: true
+    },
+    printing: {
+        type: Boolean,
+        default: false
     }
 });
 
 const store = useSongStore();
 const resizing = ref(false);
-const printing = ref(false);
+const printing = ref(props.printing);
 
 const insertChord = (sectionIndex: number, chordIndex: number) => {
     const section = props.song.sections[sectionIndex];
@@ -281,6 +285,10 @@ const updatePages = () => {
 
 watch(() => props.song, updatePages, { deep: true });
 watch(printing, () => nextTick(updatePages));
+
+defineExpose({
+    renderTo
+});
 </script>
 <template>
     <div

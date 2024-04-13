@@ -9,6 +9,7 @@ import TextInput from "@/components/TextInput.vue";
 import Import from "@/components/modals/Import.vue";
 import draggable from "vuedraggable";
 import type { ISong } from "@/types";
+import Editor from "./editor2/Editor.vue";
 
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof AllPages>[]>();
@@ -248,7 +249,8 @@ const isMobile = window.innerWidth < 800;
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
-                    <AllPages
+                    <Editor
+                        printing
                         v-if="renderProgress >= 0"
                         ref="allPages"
                         :song="store.songs[renderProgress]"

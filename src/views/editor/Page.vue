@@ -101,7 +101,7 @@ const midiPages = computed(() => {
                     }}</span>
                     {{ song.octave }} octave
                 </div>
-                <template v-for="(active, name) in song.options">
+                <template v-for="(active, name) in song.legacy?.options">
                     <div
                         class="info"
                         v-if="active"
@@ -111,10 +111,10 @@ const midiPages = computed(() => {
                     </div>
                 </template>
             </div>
-            <hr v-if="Object.keys(song.instruments).length" />
+            <hr v-if="Object.keys(song.legacy?.instruments ?? {}).length" />
             <div class="instruments">
                 <div
-                    v-for="(instrument, name) in song.instruments"
+                    v-for="(instrument, name) in song.legacy?.instruments"
                     class="instrument"
                 >
                     <div class="flex space-between">
