@@ -188,10 +188,12 @@ let waitForRenderResolver: () => void;
 const render = async () => {
     printing.value = true;
 
-    const renderPromise = new Promise<void>((resolve) => {
-        waitForRenderResolver = resolve;
-    });
-    await renderPromise;
+    if (props.song.sections.length) {
+        const renderPromise = new Promise<void>((resolve) => {
+            waitForRenderResolver = resolve;
+        });
+        await renderPromise;
+    }
 
     const pdf = new jsPDF({
         orientation: "portrait",
@@ -1016,8 +1018,18 @@ hr {
         display: flex;
         align-items: center;
         gap: 0.5em;
-        background: var(--accent);
-        color: white;
+        position: relative;
+        border-color: transparent;
+        color: var(--accent);
+        border-radius: 4px;
+
+        &:before {
+            content: " ";
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            opacity: 0.1;
+        }
 
         & span {
             font-size: 1rem;
