@@ -12,7 +12,7 @@ import type { ISong } from "@/types";
 import Editor from "./editor2/Editor.vue";
 
 const store = useSongStore();
-const allPages = ref<InstanceType<typeof AllPages>[]>();
+const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
 const importDialog = ref<typeof Import>();
@@ -43,6 +43,8 @@ const renderAll = async () => {
     renderProgress.value = 0;
 
     for (const page of allPages.value ?? []) {
+        console.log(page.name());
+
         await page.renderTo(pdf);
         renderProgress.value++;
 
@@ -252,7 +254,6 @@ const isMobile = window.innerWidth < 800;
                     <Editor
                         printing
                         v-if="renderProgress >= 0"
-                        ref="allPages"
                         :song="store.songs[renderProgress]"
                     />
                 </div>
@@ -276,9 +277,10 @@ const isMobile = window.innerWidth < 800;
     <Import ref="importDialog" />
     <div class="void">
         <div class="parent">
-            <AllPages
+            <Editor
                 ref="allPages"
                 v-for="song in store.songs"
+                printing
                 :song="song"
             />
         </div>

@@ -11,6 +11,7 @@ const songs = useSongStore();
 const route = useRoute();
 const router = useRouter();
 let textId = route.params.id as string;
+const editor = ref<typeof Editor>();
 
 if (!textId) {
     const id = songs.addEmptySong();
@@ -24,6 +25,21 @@ if (!textId) {
 const s = songs.song(textId);
 if (!s) router.push("/");
 const song = ref<ISong>(s as ISong);
+
+const print = async () => {
+    await songs.prepareRender();
+    const pdf = await editor.value!.render!();
+    if (!pdf) return;
+    pdf.autoPrint();
+    window.open(pdf.output("bloburl"), "_blank");
+};
+
+const download = async () => {
+    await songs.prepareRender();
+    const pdf = await editor.value!.render!();
+    if (!pdf) return;
+    pdf.save(`${song.value.title}.pdf`);
+};
 
 const save = () => {
     if (!song.value) return;
@@ -52,7 +68,31 @@ const save = () => {
         </router-link>
 
         <div class="editor_container">
-            <Editor :song="song" />
+            <div class="toolbar">
+                <span
+                    class="material-symbols-rounded"
+                    @click="print"
+                >
+                    print
+                </span>
+                <span
+                    class="material-symbols-rounded"
+                    @click="download"
+                >
+                    picture_as_pdf
+                </span>
+                <span
+                    class="material-symbols-rounded"
+                    @click="save"
+                >
+                    save
+                </span>
+            </div>
+
+            <Editor
+                ref="editor"
+                :song="song"
+            />
         </div>
     </MinWidth>
 </template>
@@ -65,6 +105,29 @@ const save = () => {
     top: 1em;
     left: 1em;
     z-index: 1;
+}
+
+.toolbar {
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    background: var(--color-background);
+    border-radius: 0.5em;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    & span {
+        cursor: pointer;
+
+        &:hover {
+            color: var(--color-accent);
+        }
+    }
 }
 
 .editor_container {
