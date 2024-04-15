@@ -56,19 +56,22 @@ const onKeyDown = (e: KeyboardEvent) => {
     if (e.ctrlKey && (e.key === "d" || e.key === "b")) {
         e.preventDefault();
         for (const section of props.song.sections) {
-            for (const chord of section.progression) {
-                if (chord.selected) {
-                    const newChord: IChord = {
-                        chord: chord.chord,
-                        duration: chord.duration
-                    };
-                    section.progression.splice(
-                        section.progression.indexOf(chord) + 1,
-                        0,
-                        newChord
-                    );
-                }
-            }
+            const selectedChords = section.progression.filter(
+                (chord) => chord.selected
+            );
+            // insert all selected chords after the last selected chord
+            section.progression.splice(
+                section.progression.indexOf(
+                    selectedChords[selectedChords.length - 1]
+                ) + 1,
+                0,
+                ...selectedChords.map((chord) => ({
+                    chord: chord.chord,
+                    duration: chord.duration,
+                    selected: true
+                }))
+            );
+            selectedChords.forEach((chord) => (chord.selected = false));
         }
     }
     // ctrl+p
@@ -130,7 +133,6 @@ const onMouseUp = (chord: IChord, e: MouseEvent) => {
 };
 
 const deleteProgression = (index: number) => {
-    const element = props.song.sections[index];
     props.song.sections.splice(index, 1);
 };
 
@@ -726,7 +728,7 @@ hr {
             display: none;
             position: absolute;
             right: 0.25em;
-            top: 0.25em;
+            bottom: 0.25em;
             cursor: pointer;
             background: white;
             z-index: 1;
@@ -919,7 +921,7 @@ hr {
     /*aspect-ratio: 210 / 297;*/
 
     padding: var(--display-margin) 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
     background: white;
     position: relative;
 

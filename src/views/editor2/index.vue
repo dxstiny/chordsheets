@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { type ISong } from "@/types";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import MinWidth from "../MinWidth.vue";
@@ -57,6 +57,26 @@ const save = () => {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 };
+
+const onKeyDown = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        save();
+    } else if (e.ctrlKey && e.shiftKey && e.key === "S") {
+        e.preventDefault();
+        download();
+    } else if (e.ctrlKey && e.key === "p") {
+        e.preventDefault();
+        print();
+    }
+};
+
+onMounted(() => {
+    window.addEventListener("keydown", onKeyDown);
+});
+onUnmounted(() => {
+    window.removeEventListener("keydown", onKeyDown);
+});
 </script>
 <template>
     <MinWidth :minWidth="300">
@@ -72,20 +92,23 @@ const save = () => {
                 <span
                     class="material-symbols-rounded"
                     @click="print"
+                    title="Print (Ctrl+P)"
                 >
                     print
                 </span>
                 <span
                     class="material-symbols-rounded"
                     @click="download"
+                    title="Download as PDF (CTRL+SHIFT+S)"
                 >
                     picture_as_pdf
                 </span>
                 <span
                     class="material-symbols-rounded"
                     @click="save"
+                    title="Download as JSON (CTRL+S)"
                 >
-                    save
+                    file_download
                 </span>
             </div>
 

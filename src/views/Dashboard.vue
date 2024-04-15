@@ -10,7 +10,10 @@ import Import from "@/components/modals/Import.vue";
 import draggable from "vuedraggable";
 import type { ISong } from "@/types";
 import Editor from "./editor2/Editor.vue";
+import Switch from "@/components/Switch.vue";
+import { useSettingsStore } from "@/stores/settings";
 
+const settings = useSettingsStore();
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
@@ -189,7 +192,7 @@ const isMobile = window.innerWidth < 800;
                     :disabled="isMobile"
                 >
                     <template #item="{ element: song }">
-                        <router-link :to="`/editor/${song.id}`">
+                        <router-link :to="settings.editorUrl(song.id)">
                             <div class="song">
                                 <div class="cover">
                                     <img
@@ -228,20 +231,17 @@ const isMobile = window.innerWidth < 800;
                         :style="'blue'"
                     />
                     <hr />
-                    <h2>New editor coming soon!</h2>
+                    <h2>Try the new editor!</h2>
                     <p>
                         The new editor will let you edit your songs directly
                         in-place. No more switching between editor and preview.
                         It also introduces new shortcuts to improve your
                         workflow.
                     </p>
-                    <IconButton
-                        label="Try the preview"
-                        icon="arrow_forward"
-                        @click="
-                            $router.push('/editor/v2/' + store.songs[0]?.id)
-                        "
-                        :style="'blue'"
+                    <Switch
+                        class="try-new-editor"
+                        v-model="settings.newEditor"
+                        label="Try the new editor"
                     />
                 </div>
             </aside>
@@ -297,6 +297,10 @@ const isMobile = window.innerWidth < 800;
         text-decoration: underline;
         color: var(--accent);
     }
+}
+
+.try-new-editor {
+    margin-top: 1em;
 }
 
 progress {
