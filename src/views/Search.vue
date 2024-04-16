@@ -128,6 +128,7 @@ input {
     font-size: 1.2rem;
     min-width: 50ch;
     padding: 0.5rem;
+    font-family: inherit;
 }
 
 .dialog {
