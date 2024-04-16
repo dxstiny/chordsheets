@@ -132,7 +132,7 @@ const isMobile = window.innerWidth < 800;
         <div class="wrap">
             <main>
                 <div class="title">
-                    <img src="favicon.svg" />
+                    <img :src="'favicon.svg'" />
                     <h1>Chord<span class="accent">Sheets</span></h1>
                 </div>
                 <div class="flex">
