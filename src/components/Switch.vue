@@ -33,7 +33,6 @@ const emitInput = (value: boolean) => {
 <style scoped>
 h2 {
     margin: 0;
-    margin-bottom: 0.5em;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;

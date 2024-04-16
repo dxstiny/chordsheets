@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
-import AllPages from "./editor/AllPages.vue";
+import Search from "./Search.vue";
 import { ref, watch, watchEffect } from "vue";
 import { jsPDF } from "jspdf";
 import Dropdown from "@/components/Dropdown.vue";
@@ -131,7 +131,10 @@ const isMobile = window.innerWidth < 800;
     <div class="dashboard">
         <div class="wrap">
             <main>
-                <h1>Chord<span class="accent">Sheets</span></h1>
+                <div class="title">
+                    <img src="favicon.svg" />
+                    <h1>Chord<span class="accent">Sheets</span></h1>
+                </div>
                 <div class="flex">
                     <IconButton
                         icon="add"
@@ -247,6 +250,7 @@ const isMobile = window.innerWidth < 800;
             </aside>
         </div>
     </div>
+    <Search />
     <dialog ref="renderDialog">
         <div class="content">
             <div class="preview-container">
@@ -296,6 +300,23 @@ const isMobile = window.innerWidth < 800;
     &:hover {
         text-decoration: underline;
         color: var(--accent);
+    }
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin: 0.25em 0 1em;
+
+    & img {
+        width: 50px;
+        aspect-ratio: 1/1;
+    }
+
+    & h1 .accent {
+        color: var(--accent);
+        font-weight: 900;
     }
 }
 
@@ -501,18 +522,9 @@ hr {
     border-bottom: 1px solid var(--color-border);
 }
 
-h1 {
-    margin: 0.25em 0 1em;
-}
-
 h2 {
     font-size: 1.25em;
     font-weight: 500;
-}
-
-h1 .accent {
-    color: var(--accent);
-    font-weight: 900;
 }
 
 .parent {

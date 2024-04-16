@@ -80,14 +80,14 @@ onUnmounted(() => {
 </script>
 <template>
     <MinWidth :minWidth="300">
-        <router-link
-            to="/"
-            class="back-button"
-        >
-            <span class="material-symbols-rounded">arrow_back</span>
-        </router-link>
-
         <div class="editor_container">
+            <router-link
+                to="/"
+                class="back-button"
+            >
+                <span class="material-symbols-rounded">arrow_back</span>
+            </router-link>
+
             <div class="toolbar">
                 <span
                     class="material-symbols-rounded"
@@ -124,7 +124,7 @@ onUnmounted(() => {
 
 <style scoped>
 .back-button {
-    position: absolute;
+    position: fixed;
     top: 1em;
     left: 1em;
     z-index: 1;
@@ -140,8 +140,8 @@ onUnmounted(() => {
     border-radius: 0.5em;
     border: 1px solid var(--color-border);
     box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
+    position: fixed;
+    top: 1em;
     z-index: 1;
 
     & span {
@@ -163,5 +163,7 @@ onUnmounted(() => {
     overflow: auto;
     min-height: 100vh;
     min-height: 100svh;
+    padding-top: 6em;
+    width: 100%;
 }
 </style>
