@@ -150,8 +150,6 @@ const duplicateProgression = (index: number) => {
 };
 
 const renderTo = async (pdf: jsPDF) => {
-    console.log("rendering to pdf");
-
     const elements = parent.value!.querySelectorAll(
         ".editor"
     ) as NodeListOf<HTMLElement>;

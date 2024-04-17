@@ -131,61 +131,65 @@ const isMobile = window.innerWidth < 800;
     <div class="dashboard">
         <div class="wrap">
             <main>
-                <div class="title">
-                    <img :src="'favicon.svg'" />
-                    <h1>Chord<span class="accent">Sheets</span></h1>
+                <div class="toolbar">
+                    <div class="title">
+                        <img :src="'favicon.svg'" />
+                        <h1>Chord<span class="accent">Sheets</span></h1>
+                    </div>
+                    <div class="flex">
+                        <IconButton
+                            icon="add"
+                            label="New Song"
+                            @click="$router.push('/editor')"
+                            :style="'green'"
+                        />
+                        <IconButton
+                            icon="file_download"
+                            label="Save Library"
+                            @click="exportLib"
+                            :style="'yellow'"
+                        />
+                        <IconButton
+                            icon="file_upload"
+                            label="Import"
+                            @click="importLib"
+                            :style="'yellow'"
+                        />
+                        <IconButton
+                            label="Export all as PDF"
+                            icon="picture_as_pdf"
+                            @click="exportAll"
+                            :style="'blue'"
+                        />
+                        <IconButton
+                            label="Print All"
+                            icon="print"
+                            @click="printAll"
+                            :style="'blue'"
+                        />
+                    </div>
+                    <hr />
+                    <div class="filters">
+                        <TextInput
+                            label="Search"
+                            v-model="filters.query"
+                            placeholder="Search for a song"
+                        />
+                        <Dropdown
+                            label="Artist"
+                            v-model="filters.artist"
+                            :options="[
+                                '(any)',
+                                ...new Set(
+                                    store.songs
+                                        .map((song) => song.artist)
+                                        .sort()
+                                )
+                            ]"
+                        />
+                    </div>
+                    <hr />
                 </div>
-                <div class="flex">
-                    <IconButton
-                        icon="add"
-                        label="New Song"
-                        @click="$router.push('/editor')"
-                        :style="'green'"
-                    />
-                    <IconButton
-                        icon="file_download"
-                        label="Save Library"
-                        @click="exportLib"
-                        :style="'yellow'"
-                    />
-                    <IconButton
-                        icon="file_upload"
-                        label="Import"
-                        @click="importLib"
-                        :style="'yellow'"
-                    />
-                    <IconButton
-                        label="Export all as PDF"
-                        icon="picture_as_pdf"
-                        @click="exportAll"
-                        :style="'blue'"
-                    />
-                    <IconButton
-                        label="Print All"
-                        icon="print"
-                        @click="printAll"
-                        :style="'blue'"
-                    />
-                </div>
-                <hr />
-                <div class="filters">
-                    <TextInput
-                        label="Search"
-                        v-model="filters.query"
-                        placeholder="Search for a song"
-                    />
-                    <Dropdown
-                        label="Artist"
-                        v-model="filters.artist"
-                        :options="[
-                            '(any)',
-                            ...new Set(
-                                store.songs.map((song) => song.artist).sort()
-                            )
-                        ]"
-                    />
-                </div>
-                <hr />
                 <draggable
                     v-model="filteredSongs"
                     class="songs"
@@ -303,6 +307,14 @@ const isMobile = window.innerWidth < 800;
     }
 }
 
+.toolbar {
+    background: var(--color-background);
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    padding-top: 1em;
+}
+
 .title {
     display: flex;
     align-items: center;
@@ -322,6 +334,14 @@ const isMobile = window.innerWidth < 800;
 
 .try-new-editor {
     margin-top: 1em;
+}
+
+main {
+    grid-column: 1;
+}
+
+aside {
+    grid-column: 2;
 }
 
 progress {
@@ -495,7 +515,7 @@ dialog {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1em;
+    padding: 0 1em;
 
     .wrap {
         display: grid;

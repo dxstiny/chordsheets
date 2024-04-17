@@ -12,8 +12,6 @@ export const useSongStore = defineStore("songs", () => {
 
     const songs = ref<ISong[]>(fromLocalStorage());
 
-    console.log(songs.value);
-
     window.addEventListener("storage", () => {
         songs.value = JSON.parse(localStorage.getItem(ITEM_NAME) || "[]");
     });

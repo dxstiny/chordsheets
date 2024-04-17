@@ -57,7 +57,10 @@ const onClick = async () => {
         <header>
             <div class="limit-width content">
                 <router-link to="/">
-                    <h1>Chord<span class="accent">Sheets</span></h1>
+                    <div class="title">
+                        <img :src="'favicon.svg'" />
+                        <h1>Chord<span class="accent">Sheets</span></h1>
+                    </div>
                 </router-link>
                 <p class="material-symbols-rounded">school</p>
             </div>
@@ -96,9 +99,21 @@ const onClick = async () => {
     height: 100svh;
 }
 
-h1 .accent {
-    color: var(--accent);
-    font-weight: 900;
+.title {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin: 0.25em 0 1em;
+
+    & img {
+        width: 50px;
+        aspect-ratio: 1/1;
+    }
+
+    & h1 .accent {
+        color: var(--accent);
+        font-weight: 900;
+    }
 }
 
 header {
@@ -113,6 +128,7 @@ header {
         display: flex;
         gap: 0.5em;
         align-items: flex-start;
+        color: var(--color-heading);
     }
 }
 

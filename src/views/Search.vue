@@ -129,6 +129,7 @@ input {
     min-width: 50ch;
     padding: 0.5rem;
     font-family: inherit;
+    color: var(--color-heading);
 }
 
 .dialog {
