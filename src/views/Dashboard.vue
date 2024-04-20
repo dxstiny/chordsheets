@@ -449,7 +449,8 @@ dialog {
 
     &.sticky {
         position: sticky;
-        top: 1em;
+        margin-top: 1em;
+        top: 0;
     }
 }
 
