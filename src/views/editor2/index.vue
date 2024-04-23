@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { type ISong } from "@/types";
+import { type Chord, type ISong } from "@/types";
 import { ref, onMounted, onUnmounted } from "vue";
 import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import MinWidth from "../MinWidth.vue";
 import Editor from "./Editor.vue";
+import { getSongInfo, parseId } from "@/spotifyApi";
 
 const songs = useSongStore();
 
@@ -71,6 +72,21 @@ const onKeyDown = (e: KeyboardEvent) => {
     }
 };
 
+const linkSpotify = async () => {
+    const input = prompt("Enter Spotify URI", song.value.spotify);
+    song.value.spotify = input || song.value.spotify;
+    console.log(input);
+    if (input) {
+        const info = await getSongInfo(parseId(song.value.spotify));
+        console.log(info);
+        song.value.artist = info.artist;
+        song.value.title = info.name;
+        song.value.bpm = info.tempo;
+        song.value.key = info.key as Chord;
+        song.value.cover = info.cover ?? "";
+    }
+};
+
 onMounted(() => {
     window.addEventListener("keydown", onKeyDown);
 });
@@ -109,6 +125,13 @@ onUnmounted(() => {
                     title="Download as JSON (CTRL+S)"
                 >
                     file_download
+                </span>
+                <span
+                    class="material-symbols-rounded"
+                    @click="linkSpotify"
+                    title="Link Spotify"
+                >
+                    link
                 </span>
             </div>
 
