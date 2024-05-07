@@ -5,7 +5,7 @@ import { useSongStore } from "@/stores/songs";
 import { useRoute, useRouter } from "vue-router";
 import MinWidth from "../MinWidth.vue";
 import Editor from "./Editor.vue";
-import { getSongInfo, parseId } from "@/spotifyApi";
+import LinkSpotify from "@/components//modals/LinkSpotify.vue";
 
 const songs = useSongStore();
 
@@ -13,6 +13,7 @@ const route = useRoute();
 const router = useRouter();
 let textId = route.params.id as string;
 const editor = ref<typeof Editor>();
+const linkSpotify = ref<typeof LinkSpotify>();
 
 if (!textId) {
     const id = songs.addEmptySong();
@@ -72,21 +73,6 @@ const onKeyDown = (e: KeyboardEvent) => {
     }
 };
 
-const linkSpotify = async () => {
-    const input = prompt("Enter Spotify URI", song.value.spotify);
-    song.value.spotify = input || song.value.spotify;
-    console.log(input);
-    if (input) {
-        const info = await getSongInfo(parseId(song.value.spotify));
-        console.log(info);
-        song.value.artist = info.artist;
-        song.value.title = info.name;
-        song.value.bpm = info.tempo;
-        song.value.key = info.key as Chord;
-        song.value.cover = info.cover ?? "";
-    }
-};
-
 onMounted(() => {
     window.addEventListener("keydown", onKeyDown);
 });
@@ -96,6 +82,10 @@ onUnmounted(() => {
 </script>
 <template>
     <MinWidth :minWidth="300">
+        <LinkSpotify
+            ref="linkSpotify"
+            :song="song"
+        />
         <div class="editor_container">
             <router-link
                 to="/"
@@ -128,7 +118,7 @@ onUnmounted(() => {
                 </span>
                 <span
                     class="material-symbols-rounded"
-                    @click="linkSpotify"
+                    @click="linkSpotify?.show()"
                     title="Link Spotify"
                 >
                     link

@@ -374,51 +374,6 @@ progress {
     }
 }
 
-dialog {
-    color: var(--color-text);
-    gap: 1em;
-    background: var(--color-background-soft);
-    border: 1px solid var(--color-border);
-    border-radius: 1em;
-    padding: 1em;
-    outline: none;
-
-    inset: 0;
-    margin: auto;
-    position: fixed;
-
-    &::backdrop {
-        background: rgba(0, 0, 0, 0.5);
-    }
-
-    .content {
-        .preview-container {
-            position: relative;
-            height: 25vh;
-            width: 100%;
-            margin-bottom: 1em;
-        }
-
-        .preview.scale-sm {
-            position: absolute;
-            margin: auto;
-            overflow: auto;
-            justify-self: center;
-            align-self: center;
-            max-height: 50vh;
-            scale: 0.5;
-            transform-origin: top;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr max-content;
-            align-items: center;
-            gap: 1em;
-        }
-    }
-}
-
 .filters {
     display: flex;
     flex-direction: row;
