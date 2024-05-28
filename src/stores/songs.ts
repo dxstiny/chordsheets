@@ -75,6 +75,15 @@ export const useSongStore = defineStore("songs", () => {
         return songs.value.find((song) => song.id == id);
     };
 
+    const createNew = () => {
+        const song = {
+            ...empty,
+            id: Math.round(Math.random() * 1000000)
+        };
+        songs.value.push(song);
+        return song as ISong;
+    };
+
     return {
         songs,
         addSong,
@@ -83,6 +92,7 @@ export const useSongStore = defineStore("songs", () => {
         addEmptySong,
         prepareRender,
         moveTo,
-        song
+        song,
+        createNew
     };
 });

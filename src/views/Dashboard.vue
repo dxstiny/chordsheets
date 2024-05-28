@@ -12,9 +12,11 @@ import type { ISong } from "@/types";
 import Editor from "./editor2/Editor.vue";
 import Switch from "@/components/Switch.vue";
 import { useSettingsStore } from "@/stores/settings";
+import { useRouter } from "vue-router";
 
 const settings = useSettingsStore();
 const store = useSongStore();
+const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
@@ -125,13 +127,18 @@ const updateOrder = ({
     store.moveTo(from, to);
 };
 
+const newSong = () => {
+    const song = store.createNew();
+    router.push(settings.editorUrl(song.id));
+};
+
 const isMobile = window.innerWidth < 800;
 </script>
 <template>
     <div class="dashboard">
         <div class="wrap">
             <main>
-                <div class="toolbar">
+                <div class="titlebar">
                     <div class="title">
                         <img :src="'favicon.svg'" />
                         <h1>Chord<span class="accent">Sheets</span></h1>
@@ -140,7 +147,7 @@ const isMobile = window.innerWidth < 800;
                         <IconButton
                             icon="add"
                             label="New Song"
-                            @click="$router.push('/editor')"
+                            @click="newSong"
                             :style="'green'"
                         />
                         <IconButton
@@ -169,6 +176,8 @@ const isMobile = window.innerWidth < 800;
                         />
                     </div>
                     <hr />
+                </div>
+                <div class="toolbar">
                     <div class="filters">
                         <TextInput
                             label="Search"
