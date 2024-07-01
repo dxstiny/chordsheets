@@ -144,79 +144,38 @@ const isMobile = window.innerWidth < 800;
                         <h1>Chord<span class="accent">Sheets</span></h1>
                     </div>
                     <div class="flex">
-                        <IconButton
-                            icon="add"
-                            label="New Song"
-                            @click="newSong"
-                            :style="'green'"
-                        />
-                        <IconButton
-                            icon="file_download"
-                            label="Save Library"
-                            @click="exportLib"
-                            :style="'yellow'"
-                        />
-                        <IconButton
-                            icon="file_upload"
-                            label="Import"
-                            @click="importLib"
-                            :style="'yellow'"
-                        />
-                        <IconButton
-                            label="Export all as PDF"
-                            icon="picture_as_pdf"
-                            @click="exportAll"
-                            :style="'blue'"
-                        />
-                        <IconButton
-                            label="Print All"
-                            icon="print"
-                            @click="printAll"
-                            :style="'blue'"
-                        />
+                        <IconButton icon="add" label="New Song" @click="newSong" :style="'green'" />
+                        <IconButton icon="file_download" label="Save Library" @click="exportLib" :style="'yellow'" />
+                        <IconButton icon="file_upload" label="Import" @click="importLib" :style="'yellow'" />
+                        <IconButton label="Export all as PDF" icon="picture_as_pdf" @click="exportAll"
+                            :style="'blue'" />
+                        <IconButton label="Print All" icon="print" @click="printAll" :style="'blue'" />
                     </div>
                     <hr />
                 </div>
                 <div class="toolbar">
                     <div class="filters">
-                        <TextInput
-                            label="Search"
-                            v-model="filters.query"
-                            placeholder="Search for a song"
-                        />
-                        <Dropdown
-                            label="Artist"
-                            v-model="filters.artist"
-                            :options="[
-                                '(any)',
-                                ...new Set(
-                                    store.songs
-                                        .map((song) => song.artist)
-                                        .sort()
-                                )
-                            ]"
-                        />
+                        <TextInput label="Search" v-model="filters.query" placeholder="Search for a song" />
+                        <Dropdown label="Artist" v-model="filters.artist" :options="[
+                            '(any)',
+                            ...new Set(
+                                store.songs
+                                    .map((song) => song.artist)
+                                    .sort()
+                            )
+                        ]" />
                     </div>
                     <hr />
                 </div>
-                <draggable
-                    v-model="filteredSongs"
-                    class="songs"
-                    @change="updateOrder"
-                    item-key="id"
-                    @dragover.stop
-                    :disabled="isMobile"
-                >
+                <draggable v-model="filteredSongs" class="songs" @change="updateOrder" item-key="id" @dragover.stop
+                    :disabled="isMobile">
                     <template #item="{ element: song }">
                         <router-link :to="settings.editorUrl(song.id)">
                             <div class="song">
                                 <div class="cover">
-                                    <img
-                                        :src="
-                                            song.cover ||
-                                            'placeholders/song.svg'
-                                        "
-                                    />
+                                    <img :src="song.cover ||
+                                        'placeholders/song.svg'
+                                        " />
                                 </div>
                                 <div class="info">
                                     <h2>{{ song.title }}</h2>
@@ -226,10 +185,7 @@ const isMobile = window.innerWidth < 800;
                                 <span class="key">
                                     {{ song.key }}
                                 </span>
-                                <span
-                                    class="material-symbols-rounded delete"
-                                    @click.prevent="store.removeSong(song)"
-                                >
+                                <span class="material-symbols-rounded delete" @click.prevent="store.removeSong(song)">
                                     delete
                                 </span>
                             </div>
@@ -240,12 +196,8 @@ const isMobile = window.innerWidth < 800;
             <aside class="card sticky learn">
                 <div class="content">
                     <h2>Learn Music Theory</h2>
-                    <IconButton
-                        label="Try the Beta"
-                        icon="arrow_forward"
-                        @click="$router.push('/learn')"
-                        :style="'blue'"
-                    />
+                    <IconButton label="Try the Beta" icon="arrow_forward" @click="$router.push('/learn')"
+                        :style="'blue'" />
                     <hr />
                     <h2>Try the new editor!</h2>
                     <p>
@@ -254,11 +206,7 @@ const isMobile = window.innerWidth < 800;
                         It also introduces new shortcuts to improve your
                         workflow.
                     </p>
-                    <Switch
-                        class="try-new-editor"
-                        v-model="settings.newEditor"
-                        label="Try the new editor"
-                    />
+                    <Switch class="try-new-editor" v-model="settings.newEditor" label="Try the new editor" />
                 </div>
             </aside>
         </div>
@@ -268,11 +216,7 @@ const isMobile = window.innerWidth < 800;
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
-                    <Editor
-                        printing
-                        v-if="renderProgress >= 0"
-                        :song="store.songs[renderProgress]"
-                    />
+                    <Editor printing v-if="renderProgress >= 0" :song="store.songs[renderProgress]" />
                 </div>
             </div>
             <h2>Rendering...</h2>
@@ -281,10 +225,7 @@ const isMobile = window.innerWidth < 800;
                 while.
             </p>
             <div class="row">
-                <progress
-                    :value="renderProgress"
-                    :max="allPages?.length"
-                />
+                <progress :value="renderProgress" :max="allPages?.length" />
                 <p>
                     <span>{{ renderProgress }}</span> / {{ allPages?.length }}
                 </p>
@@ -294,12 +235,7 @@ const isMobile = window.innerWidth < 800;
     <Import ref="importDialog" />
     <div class="void">
         <div class="parent">
-            <Editor
-                ref="allPages"
-                v-for="song in store.songs"
-                printing
-                :song="song"
-            />
+            <Editor ref="allPages" v-for="song in store.songs" printing :song="song" />
         </div>
     </div>
 </template>
@@ -320,7 +256,7 @@ const isMobile = window.innerWidth < 800;
     background: var(--color-background);
     position: sticky;
     z-index: 1;
-    top: 0;
+    top: -1px;
     padding-top: 1em;
 }
 
@@ -450,6 +386,7 @@ progress {
         background: var(--color-background-soft);
         border: 1px solid var(--color-border);
     }
+
     .material-symbols-rounded {
         font-size: 1.5rem;
         cursor: pointer;
@@ -517,7 +454,7 @@ h2 {
     top: 0;
     left: 0;
 
-    & > * {
+    &>* {
         position: absolute;
         top: 0;
         left: 0;
