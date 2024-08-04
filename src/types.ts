@@ -165,6 +165,11 @@ export interface ISong {
     id: number;
 }
 
+export interface ISongEditedHistoryEntry {
+    songId: number;
+    date: string;
+}
+
 export type PageContent = ISection | IMidiTrack | null;
 
 export const empty: ISong = {

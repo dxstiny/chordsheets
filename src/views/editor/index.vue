@@ -46,17 +46,13 @@ const save = () => {
 </script>
 <template>
     <MinWidth :minWidth="300">
-        <div
-            class="editor"
-            v-if="song"
+        <router-link
+            to="/browse"
+            class="back-button"
         >
-            <router-link
-                to="/"
-                class="back-button"
-            >
-                <span class="material-symbols-rounded">arrow_back</span>
-            </router-link>
-
+            <span class="material-symbols-rounded">arrow_back</span>
+        </router-link>
+        <div class="editor">
             <div class="preview">
                 <div
                     class="pages"
@@ -108,7 +104,7 @@ const save = () => {
                 :minWidth="1100"
                 error=""
             >
-                <div class="config">
+                <div class="config container">
                     <Editor :song="song" />
                 </div>
             </MinWidth>
@@ -126,44 +122,36 @@ const save = () => {
 
 <style scoped>
 .back-button {
-    position: absolute;
-    top: 1em;
-    left: 1em;
+    position: fixed;
+    top: 2em;
+    left: calc(1em + 220px + 2em);
     z-index: 1;
 }
 
 .editor {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    height: 100vh;
-    height: 100svh;
-    width: 100vw;
-    overflow: hidden;
+    display: flex;
+    flex-direction: row;
     position: relative;
     z-index: 0;
+    gap: 1em;
+    background: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
 
-    @media screen and (max-width: 1100px) {
-        grid-template-columns: 1fr;
-    }
+.config {
+    flex: 1;
 }
 
 .preview {
-    background: var(--color-background-soft);
-    border-radius: 0 2rem 2rem 0;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     gap: 1em;
-    padding: 0 10em;
-
-    @media screen and (max-width: 1100px) {
-        border-radius: 0;
-        height: 100vh;
-        height: 100svh;
-        width: 100vw;
-        padding: 1em;
-    }
 
     .pages {
         display: flex;

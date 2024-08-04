@@ -54,19 +54,8 @@ const onClick = async () => {
 </script>
 <template>
     <div class="learn">
-        <header>
-            <div class="limit-width content">
-                <router-link to="/">
-                    <div class="title">
-                        <img :src="'favicon.svg'" />
-                        <h1>Chord<span class="accent">Sheets</span></h1>
-                    </div>
-                </router-link>
-                <p class="material-symbols-rounded">school</p>
-            </div>
-        </header>
         <div class="main limit-width">
-            <aside class="sidebar">
+            <aside class="sidebar container">
                 <router-link to="/learn/scale-finder">Scale Finder</router-link>
                 <router-link to="/learn/scales">Scales</router-link>
                 <router-link to="/learn/scale-quiz">Scale Quiz</router-link>
@@ -80,6 +69,7 @@ const onClick = async () => {
                 <component
                     v-if="activeTab"
                     :is="activeTab"
+                    class="container"
                 />
                 <div v-else>
                     <h1>Learn Music Theory</h1>
@@ -95,8 +85,11 @@ const onClick = async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
-    height: 100svh;
+    height: 100%;
+    background: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
 }
 
 .title {
@@ -145,21 +138,14 @@ header {
     display: grid;
     align-items: start;
     grid-template-columns: 200px 1fr;
-    padding: 1em 0;
-    gap: 2em;
-    height: 100%;
+    gap: 1em;
 
     .sidebar {
-        border: 1px solid var(--color-border);
-        background: var(--color-background-soft);
-        padding: 1em;
-        border-radius: 1em;
-
         display: flex;
         flex-direction: column;
 
         position: sticky;
-        top: 1em;
+        top: 0;
 
         & a {
             color: var(--color-text);
@@ -177,12 +163,6 @@ header {
             border: none;
             border-bottom: 1px solid var(--color-border);
             margin: 0.3rem 0;
-        }
-
-        @media screen and (max-width: 1400px) {
-            border-left: none;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
         }
     }
 }

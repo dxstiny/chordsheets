@@ -129,6 +129,70 @@ a,
     transition: 0.4s;
 }
 
+.muted {
+    color: var(--color-text-mute);
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    &.centre {
+        align-items: center;
+    }
+
+    &.space-between {
+        justify-content: space-between;
+    }
+}
+
+.wght-100 {
+    font-weight: 100;
+}
+
+.wght-200 {
+    font-weight: 200;
+}
+
+.wght-300 {
+    font-weight: 300;
+}
+
+.wght-400 {
+    font-weight: 400;
+}
+
+.wght-500 {
+    font-weight: 500;
+}
+
+.wght-600 {
+    font-weight: 600;
+}
+
+.wght-700 {
+    font-weight: 700;
+}
+
+.wght-800 {
+    font-weight: 800;
+}
+
+.wght-900 {
+    font-weight: 900;
+}
+
+.gap-2 {
+    gap: 0.5em;
+}
+
 h1,
 h2,
 h3,

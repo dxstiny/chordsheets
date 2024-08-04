@@ -45,22 +45,12 @@ const onDragleave = (e: any) => {
 };
 </script>
 <template>
-    <div
-        class="dropzone"
-        :class="{ drophover }"
-        @drop.prevent="onDrop"
-        @dragenter.prevent
-        @dragover.prevent="drophover = true"
-        @dragleave.prevent="onDragleave"
-    >
+    <div class="dropzone" :class="{ drophover }" @drop.prevent="onDrop" @dragenter.prevent
+        @dragover.prevent="drophover = true" @dragleave.prevent="onDragleave">
         <slot />
     </div>
 </template>
 <style scoped>
-.dropzone * {
-    pointer-events: none;
-}
-
 .dropzone {
     min-height: 100vh;
     min-height: 100svh;

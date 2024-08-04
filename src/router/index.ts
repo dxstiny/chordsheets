@@ -9,6 +9,16 @@ const router = createRouter({
             component: () => import("../views/Dashboard.vue")
         },
         {
+            path: "/browse",
+            name: "Songs",
+            component: () => import("../views/Songs.vue")
+        },
+        {
+            path: "/settings",
+            name: "Settings",
+            component: () => import("../views/Settings.vue")
+        },
+        {
             path: "/editor/v2/:id",
             name: "EditorNext",
             component: () => import("../views/editor2/index.vue")

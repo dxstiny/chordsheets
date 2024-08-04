@@ -138,7 +138,7 @@ const tab = ref(tabs[0]);
 }
 
 .settings {
-    max-height: 100vh;
+    height: calc(100% - 2em);
     overflow: hidden;
     display: flex;
     flex-direction: column;

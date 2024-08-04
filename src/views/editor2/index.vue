@@ -2,18 +2,22 @@
 import { type Chord, type ISong } from "@/types";
 import { ref, onMounted, onUnmounted } from "vue";
 import { useSongStore } from "@/stores/songs";
+import { useHistoryStore } from "@/stores/history";
 import { useRoute, useRouter } from "vue-router";
 import MinWidth from "../MinWidth.vue";
 import Editor from "./Editor.vue";
-import LinkSpotify from "@/components//modals/LinkSpotify.vue";
+import LinkSpotify from "@/components/modals/LinkSpotify.vue";
+import CleanupEmptySong from "@/components/modals/CleanupEmptySong.vue";
 
 const songs = useSongStore();
+const songHistory = useHistoryStore();
 
 const route = useRoute();
 const router = useRouter();
 let textId = route.params.id as string;
 const editor = ref<typeof Editor>();
 const linkSpotify = ref<typeof LinkSpotify>();
+const cleanupEmptySong = ref<typeof CleanupEmptySong>();
 
 if (!textId) {
     const id = songs.addEmptySong();
@@ -27,6 +31,23 @@ if (!textId) {
 const s = songs.song(textId);
 if (!s) router.push("/");
 const song = ref<ISong>(s as ISong);
+
+const isSongEmpty = () => {
+    if (song.value.artist) return false;
+    if (song.value.title) return false;
+    if (song.value.instruments.length) return false;
+    if (song.value.sections.length) return false;
+    if (song.value.structure.length) return false;
+    return true;
+};
+
+const navigateBack = () => {
+    if (isSongEmpty()) {
+        cleanupEmptySong.value?.show();
+        return;
+    }
+    router.push("/");
+};
 
 const print = async () => {
     await songs.prepareRender();
@@ -75,6 +96,7 @@ const onKeyDown = (e: KeyboardEvent) => {
 
 onMounted(() => {
     window.addEventListener("keydown", onKeyDown);
+    songHistory.songEdited(song.value.id);
 });
 onUnmounted(() => {
     window.removeEventListener("keydown", onKeyDown);
@@ -86,13 +108,17 @@ onUnmounted(() => {
             ref="linkSpotify"
             :song="song"
         />
+        <CleanupEmptySong
+            ref="cleanupEmptySong"
+            @close="$router.push('/browse')"
+        />
         <div class="editor_container">
-            <router-link
-                to="/"
+            <a
+                @click="navigateBack"
                 class="back-button"
             >
                 <span class="material-symbols-rounded">arrow_back</span>
-            </router-link>
+            </a>
 
             <div class="toolbar">
                 <span
@@ -139,8 +165,9 @@ onUnmounted(() => {
 .back-button {
     position: fixed;
     top: 1em;
-    left: 1em;
+    left: calc(1em + 220px + 2em);
     z-index: 1;
+    cursor: pointer;
 }
 
 .toolbar {
@@ -167,16 +194,17 @@ onUnmounted(() => {
 }
 
 .editor_container {
-    background: var(--color-background-soft);
+    background: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1em;
-    padding: 1em;
     overflow: auto;
-    min-height: 100vh;
-    min-height: 100svh;
+    height: 100%;
     padding-top: 6em;
-    width: 100%;
+    overflow-y: auto;
 }
 </style>

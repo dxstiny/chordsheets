@@ -1,26 +1,21 @@
 <script lang="ts" setup>
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
-import Search from "./Search.vue";
-import { ref, watch, watchEffect } from "vue";
+import { ref, computed } from "vue";
 import { jsPDF } from "jspdf";
-import Dropdown from "@/components/Dropdown.vue";
-import TextInput from "@/components/TextInput.vue";
-import Import from "@/components/modals/Import.vue";
-import draggable from "vuedraggable";
-import type { ISong } from "@/types";
 import Editor from "./editor2/Editor.vue";
-import Switch from "@/components/Switch.vue";
 import { useSettingsStore } from "@/stores/settings";
+import { useHistoryStore } from "@/stores/history";
+import type { ISong } from "@/types";
 import { useRouter } from "vue-router";
 
 const settings = useSettingsStore();
 const store = useSongStore();
+const songHistory = useHistoryStore();
 const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
-const importDialog = ref<typeof Import>();
 
 const exportLib = async () => {
     await store.prepareRender();
@@ -31,10 +26,6 @@ const exportLib = async () => {
     a.href = URL.createObjectURL(file);
     a.download = "chordsheets.json";
     a.click();
-};
-
-const importLib = () => {
-    importDialog.value?.show();
 };
 
 const renderAll = async () => {
@@ -75,148 +66,135 @@ const exportAll = async () => {
     pdf.save("chordsheets.pdf");
 };
 
-const filters = ref({
-    artist: "",
-    query: ""
-});
-
-const filteredSongs = ref<ISong[]>([]);
-
-watchEffect(() => {
-    filteredSongs.value = store.songs.filter((song) => {
-        if (
-            filters.value.artist &&
-            filters.value.artist !== "(any)" &&
-            !song.artist
-                .toLowerCase()
-                .includes(filters.value.artist.toLowerCase())
-        ) {
-            return false;
-        }
-
-        const queryCouldMatch = `${song.title} ${song.artist}`.toLowerCase();
-
-        if (
-            filters.value.query &&
-            !queryCouldMatch.includes(filters.value.query.toLowerCase())
-        ) {
-            return false;
-        }
-
-        return true;
-    });
-});
-
-const updateOrder = ({
-    moved
-}: {
-    moved: {
-        newIndex: number;
-        oldIndex: number;
-        element: ISong;
-    };
-}) => {
-    const from = store.songs.findIndex((song) => song.id === moved.element.id);
-    const prevElement =
-        filteredSongs.value[moved.newIndex - (1 % filteredSongs.value.length)];
-    const prev = prevElement
-        ? store.songs.findIndex((song) => song.id === prevElement.id)
-        : -1;
-    const to = moved.newIndex > moved.oldIndex ? prev : prev + 1;
-
-    store.moveTo(from, to);
-};
-
 const newSong = () => {
     const song = store.createNew();
     router.push(settings.editorUrl(song.id));
 };
 
-const isMobile = window.innerWidth < 800;
+const favArtist = computed(() => {
+    const favArtists = store.songs.map((song) => song.artist);
+    const favArtistsCount = favArtists.reduce((acc, artist) => {
+        acc[artist] = (acc[artist] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    const favArtistsSorted = Object.entries(favArtistsCount).sort(
+        (a, b) => b[1] - a[1]
+    );
+
+    return favArtistsSorted[0][0];
+});
+
+const recentlyEdited = computed(() => {
+    return songHistory.history
+        .slice(0, 3)
+        .map((song) => store.song(song.songId)) as ISong[];
+});
 </script>
 <template>
-    <div class="dashboard">
-        <div class="wrap">
-            <main>
-                <div class="titlebar">
-                    <div class="title">
-                        <img :src="'favicon.svg'" />
-                        <h1>Chord<span class="accent">Sheets</span></h1>
+    <div class="grid">
+        <div class="container column w-2 h-2">
+            <p class="muted row gap-2">
+                <span class="material-symbols-rounded">history</span>
+                Recently edited
+            </p>
+            <router-link
+                :to="settings.editorUrl(song.id)"
+                v-for="song in recentlyEdited"
+            >
+                <div class="song">
+                    <div class="cover">
+                        <img :src="song.cover || 'placeholders/song.svg'" />
                     </div>
-                    <div class="flex">
-                        <IconButton icon="add" label="New Song" @click="newSong" :style="'green'" />
-                        <IconButton icon="file_download" label="Save Library" @click="exportLib" :style="'yellow'" />
-                        <IconButton icon="file_upload" label="Import" @click="importLib" :style="'yellow'" />
-                        <IconButton label="Export all as PDF" icon="picture_as_pdf" @click="exportAll"
-                            :style="'blue'" />
-                        <IconButton label="Print All" icon="print" @click="printAll" :style="'blue'" />
+                    <div class="info">
+                        <h2>{{ song.title }}</h2>
+                        <span>{{ song.artist }}</span>
                     </div>
-                    <hr />
+                    <span class="bpm"> {{ song.bpm }} BPM </span>
+                    <span class="key">
+                        {{ song.key }}
+                    </span>
+                    <span
+                        class="material-symbols-rounded delete"
+                        @click.prevent="store.removeSong(song)"
+                    >
+                        delete
+                    </span>
                 </div>
-                <div class="toolbar">
-                    <div class="filters">
-                        <TextInput label="Search" v-model="filters.query" placeholder="Search for a song" />
-                        <Dropdown label="Artist" v-model="filters.artist" :options="[
-                            '(any)',
-                            ...new Set(
-                                store.songs
-                                    .map((song) => song.artist)
-                                    .sort()
-                            )
-                        ]" />
-                    </div>
-                    <hr />
+            </router-link>
+        </div>
+        <RouterLink to="/browse">
+            <div class="container column clickable">
+                <p class="muted row gap-2">
+                    <span class="material-symbols-rounded">list</span>
+                    Library
+                </p>
+                <h1 class="wght-900">
+                    {{ store.songs.length }}
+                </h1>
+                <div class="row space-between gap-2 centre">
+                    <p class="muted row gap-2">Chord Sheets</p>
+                    <IconButton
+                        icon="add"
+                        @click.prevent="newSong"
+                        :style="'green'"
+                    />
                 </div>
-                <draggable v-model="filteredSongs" class="songs" @change="updateOrder" item-key="id" @dragover.stop
-                    :disabled="isMobile">
-                    <template #item="{ element: song }">
-                        <router-link :to="settings.editorUrl(song.id)">
-                            <div class="song">
-                                <div class="cover">
-                                    <img :src="song.cover ||
-                                        'placeholders/song.svg'
-                                        " />
-                                </div>
-                                <div class="info">
-                                    <h2>{{ song.title }}</h2>
-                                    <span>{{ song.artist }}</span>
-                                </div>
-                                <span class="bpm"> {{ song.bpm }} BPM </span>
-                                <span class="key">
-                                    {{ song.key }}
-                                </span>
-                                <span class="material-symbols-rounded delete" @click.prevent="store.removeSong(song)">
-                                    delete
-                                </span>
-                            </div>
-                        </router-link>
-                    </template>
-                </draggable>
-            </main>
-            <aside class="card sticky learn">
-                <div class="content">
-                    <h2>Learn Music Theory</h2>
-                    <IconButton label="Try the Beta" icon="arrow_forward" @click="$router.push('/learn')"
-                        :style="'blue'" />
-                    <hr />
-                    <h2>Try the new editor!</h2>
-                    <p>
-                        The new editor will let you edit your songs directly
-                        in-place. No more switching between editor and preview.
-                        It also introduces new shortcuts to improve your
-                        workflow.
-                    </p>
-                    <Switch class="try-new-editor" v-model="settings.newEditor" label="Try the new editor" />
-                </div>
-            </aside>
+            </div>
+        </RouterLink>
+        <div class="container column gap-2">
+            <p class="muted row gap-2">
+                <span class="material-symbols-rounded">list</span>
+                Library
+            </p>
+            <div class="row space-between gap-2 centre">
+                <IconButton
+                    label="Export all as PDF"
+                    icon="picture_as_pdf"
+                    @click="exportAll"
+                    :style="'blue'"
+                />
+                <IconButton
+                    label="Print All"
+                    icon="print"
+                    @click="printAll"
+                    :style="'blue'"
+                />
+            </div>
+        </div>
+        <div class="container column gap-2">
+            <p class="muted row gap-2">
+                <span class="material-symbols-rounded">school</span>
+                Learn
+            </p>
+
+            <p>How well do you know your scales?</p>
+
+            <IconButton
+                label="Start learning"
+                icon="arrow_forward"
+                @click="$router.push('/learn/scale-quiz')"
+                :style="'blue'"
+            />
+        </div>
+        <div class="container column">
+            <p class="muted row gap-2">
+                <span class="material-symbols-rounded">favorite</span>
+                Favourite Artist
+            </p>
+            <h1 class="wght-900">{{ favArtist }}</h1>
+            <p>Most common artist in your library</p>
         </div>
     </div>
-    <Search />
     <dialog ref="renderDialog">
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
-                    <Editor printing v-if="renderProgress >= 0" :song="store.songs[renderProgress]" />
+                    <Editor
+                        printing
+                        v-if="renderProgress >= 0"
+                        :song="store.songs[renderProgress]"
+                    />
                 </div>
             </div>
             <h2>Rendering...</h2>
@@ -225,17 +203,24 @@ const isMobile = window.innerWidth < 800;
                 while.
             </p>
             <div class="row">
-                <progress :value="renderProgress" :max="allPages?.length" />
+                <progress
+                    :value="renderProgress"
+                    :max="allPages?.length"
+                />
                 <p>
                     <span>{{ renderProgress }}</span> / {{ allPages?.length }}
                 </p>
             </div>
         </div>
     </dialog>
-    <Import ref="importDialog" />
     <div class="void">
         <div class="parent">
-            <Editor ref="allPages" v-for="song in store.songs" printing :song="song" />
+            <Editor
+                ref="allPages"
+                v-for="song in store.songs"
+                printing
+                :song="song"
+            />
         </div>
     </div>
 </template>
@@ -328,14 +313,6 @@ progress {
 }
 
 .card {
-    color: var(--color-text);
-    display: flex;
-    gap: 1em;
-    background: var(--color-background-soft);
-    border: 1px solid var(--color-border);
-    border-radius: 1em;
-    padding: 1em;
-
     &.min-h-screen {
         min-height: calc(100vh - 2em);
         min-height: calc(100svh - 2em);
@@ -454,7 +431,7 @@ h2 {
     top: 0;
     left: 0;
 
-    &>* {
+    & > * {
         position: absolute;
         top: 0;
         left: 0;
