@@ -26,23 +26,23 @@ const newSong = () => {
                 <div class="links">
                     <RouterLink to="/">
                         <span class="material-symbols-rounded">home</span>
-                        Home
+                        <span class="label">Home</span>
                     </RouterLink>
                     <a @click="newSong">
                         <span class="material-symbols-rounded">add_circle</span>
-                        Create
+                        <span class="label">Create</span>
                     </a>
                     <RouterLink to="/browse">
                         <span class="material-symbols-rounded">list</span>
-                        Songs
+                        <span class="label">Songs</span>
                     </RouterLink>
                     <RouterLink to="/learn">
                         <span class="material-symbols-rounded">school</span>
-                        Learn
+                        <span class="label">Learn</span>
                     </RouterLink>
                     <RouterLink to="/settings">
                         <span class="material-symbols-rounded">settings</span>
-                        Settings
+                        <span class="label">Settings</span>
                     </RouterLink>
                 </div>
             </aside>
@@ -92,20 +92,37 @@ main a:has(.clickable) {
     gap: 1em;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 
-    & .w-2 {
-        grid-column: span 2;
+    @media (min-width: 800px) {
+        & .w-2 {
+            grid-column: span 2;
+        }
+
+        & .w-3 {
+            grid-column: span 3;
+        }
+
+        & .h-2 {
+            grid-row: span 2;
+        }
+
+        & .h-3 {
+            grid-row: span 3;
+        }
     }
 
-    & .w-3 {
-        grid-column: span 3;
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr;
     }
+}
 
-    & .h-2 {
-        grid-row: span 2;
-    }
+@media (max-width: 800px) {
+    .song {
+        grid-template-columns: max-content 1fr max-content !important;
 
-    & .h-3 {
-        grid-row: span 3;
+        .bpm,
+        .key {
+            display: none !important;
+        }
     }
 }
 </style>
@@ -118,7 +135,28 @@ main a:has(.clickable) {
     overflow: clip;
     gap: 1em;
     min-height: 100vh;
+
     background: var(--color-background-soft);
+
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr;
+        overflow: auto;
+        padding-bottom: calc(2em + 74px);
+
+        & aside {
+            grid-row: 2;
+
+            .links {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+
+            .title,
+            .label {
+                display: none;
+            }
+        }
+    }
 }
 
 .title {
@@ -148,12 +186,27 @@ aside {
     flex-direction: column;
     justify-content: space-between;
     max-height: calc(100vh - 2em);
+
+    @media (max-width: 800px) {
+        z-index: 1;
+        top: unset;
+        bottom: 1em;
+        left: 1em;
+        right: 1em;
+        position: fixed;
+    }
 }
 
 main {
     max-height: calc(100vh - 2em);
     display: flex;
     flex-direction: column;
+
+    @media (max-width: 800px) {
+        z-index: 0;
+        max-height: unset;
+        gap: 1em;
+    }
 }
 
 .links {

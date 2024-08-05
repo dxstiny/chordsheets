@@ -126,6 +126,10 @@ main {
 
 aside {
     grid-column: 2;
+
+    @media screen and (max-width: 800px) {
+        grid-column: 1;
+    }
 }
 
 progress {

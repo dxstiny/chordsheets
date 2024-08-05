@@ -897,6 +897,10 @@ hr {
     min-height: var(--display-height);
     height: 100%;
 
+    @media screen and (max-width: 800px) {
+        --display-height: 60vh;
+    }
+
     &.print {
         max-height: calc(var(--display-height) - var(--display-margin));
         overflow: clip;
