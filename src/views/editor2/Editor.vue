@@ -938,7 +938,15 @@ hr {
         font-size: 10px;
     }
 
+    @media (-webkit-device-pixel-ratio: 1.25) {
+        font-size: 10px;
+    }
+
     @media screen and (max-width: 400px) {
+        font-size: 8px;
+    }
+
+    @media (-webkit-device-pixel-ratio: 1.5) {
         font-size: 8px;
     }
 

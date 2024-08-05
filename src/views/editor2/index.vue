@@ -168,6 +168,10 @@ onUnmounted(() => {
     left: calc(1em + 220px + 2em);
     z-index: 1;
     cursor: pointer;
+
+    @media (max-width: 800px) {
+        left: 1em;
+    }
 }
 
 .toolbar {

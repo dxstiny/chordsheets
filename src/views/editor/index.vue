@@ -126,6 +126,10 @@ const save = () => {
     top: 2em;
     left: calc(1em + 220px + 2em);
     z-index: 1;
+
+    @media (max-width: 800px) {
+        left: 1em;
+    }
 }
 
 .editor {

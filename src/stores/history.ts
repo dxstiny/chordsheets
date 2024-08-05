@@ -21,9 +21,12 @@ export const useHistoryStore = defineStore("history", () => {
 
     const songEdited = (songId: number) => {
         const date = new Date().toISOString();
-        history.value.unshift({ songId, date });
-        // keep only the last 10 entries
-        history.value = history.value.slice(0, 10);
+        history.value = [
+            { songId, date },
+            ...history.value
+                .filter((entry) => entry.songId !== songId)
+                .slice(0, 9)
+        ];
     };
 
     return {
