@@ -41,7 +41,35 @@ const router = createRouter({
         {
             path: "/learn",
             name: "Learn",
-            component: () => import("../views/learn/index.vue")
+            component: () => import("../views/learn/index.vue"),
+            children: [
+                {
+                    path: "scale-finder",
+                    name: "Scale Finder",
+                    component: () => import("../views/learn/ScaleFinder.vue")
+                },
+                {
+                    path: "Scales",
+                    name: "Scales",
+                    component: () => import("../views/learn/Scales.vue")
+                },
+                {
+                    path: "scale-quiz",
+                    name: "Scale Quiz",
+                    component: () => import("../views/learn/ScaleQuiz.vue")
+                },
+                {
+                    path: "chord-finder",
+                    name: "Chord Finder",
+                    component: () => import("../views/learn/ChordFinder.vue")
+                },
+                {
+                    path: "chord-progressions",
+                    name: "Chord Progressions",
+                    component: () =>
+                        import("../views/learn/ChordProgressions.vue")
+                }
+            ]
         },
         {
             path: "/learn/scale-finder",

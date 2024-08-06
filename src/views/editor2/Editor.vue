@@ -11,6 +11,7 @@ import {
     type PropType
 } from "vue";
 import EditableText from "@/components/EditableText.vue";
+import EditableNumber from "@/components/EditableNumber.vue";
 import type { ISection } from "@/types";
 import { useSongStore } from "@/stores/songs";
 import { jsPDF } from "jspdf";
@@ -331,13 +332,13 @@ defineExpose({
                 <div class="wrap-to-line">
                     <div class="info">
                         <span class="material-symbols-rounded">music_note</span>
-                        <EditableText
+                        <EditableNumber
                             v-model="song.bpm"
                             class="left short"
                             placeholder="120"
                         >
                             {{ song.bpm }}
-                        </EditableText>
+                        </EditableNumber>
                         BPM
                     </div>
                     <div class="info">
@@ -360,13 +361,13 @@ defineExpose({
                                     : "drag_handle"
                             }}
                         </span>
-                        <EditableText
+                        <EditableNumber
                             v-model="song.transpose"
                             class="left short"
                             placeholder="0"
                         >
                             {{ song.transpose }}
-                        </EditableText>
+                        </EditableNumber>
                     </div>
                     <template
                         v-if="song.options"
@@ -430,13 +431,13 @@ defineExpose({
                                 <span class="material-symbols-rounded">
                                     volume_up
                                 </span>
-                                <EditableText
+                                <EditableNumber
                                     v-model="instrument.volume"
                                     class="left short"
                                     placeholder="100"
                                 >
                                     {{ instrument?.volume }}
-                                </EditableText>
+                                </EditableNumber>
                             </span>
                         </div>
                         <div class="settings">
@@ -484,6 +485,7 @@ defineExpose({
                 v-model="song.sections"
                 class="editor__content"
                 @dragover.stop
+                itemKey="id"
             >
                 <template #item="{ element, index }">
                     <div
@@ -539,6 +541,7 @@ defineExpose({
                             v-model="element.progression"
                             class="progression"
                             @dragover.stop
+                            itemKey="id"
                         >
                             <template
                                 #item="{ element: chord, index: chIndex }"
@@ -630,6 +633,7 @@ defineExpose({
                     v-model="element.progression"
                     class="progression"
                     @dragover.stop
+                    itemKey="id"
                 >
                     <template #item="{ element: chord, index: chIndex }">
                         <div

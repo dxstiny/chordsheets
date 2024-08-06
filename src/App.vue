@@ -114,17 +114,6 @@ main a:has(.clickable) {
         grid-template-columns: 1fr;
     }
 }
-
-@media (max-width: 800px) {
-    .song {
-        grid-template-columns: max-content 1fr max-content !important;
-
-        .bpm,
-        .key {
-            display: none !important;
-        }
-    }
-}
 </style>
 
 <style scoped>

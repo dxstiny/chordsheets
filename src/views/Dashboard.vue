@@ -99,7 +99,7 @@ const recentlyEdited = computed(() => {
                 Recently edited
             </p>
             <router-link
-                :to="settings.editorUrl(song.id)"
+                :to="settings.editorUrl(song?.id ?? 0)"
                 v-for="song in recentlyEdited"
             >
                 <div class="song">
@@ -328,65 +328,6 @@ progress {
         position: sticky;
         margin-top: 1em;
         top: 1em;
-    }
-}
-
-.song {
-    display: grid;
-    grid-template-columns: max-content 1fr 100px 30px max-content;
-    align-items: center;
-    gap: 1em;
-    color: var(--color-text);
-    border-radius: 1em;
-    padding: 0.5em 1em;
-    border: 1px solid transparent;
-
-    @media screen and (max-width: 400px) {
-        grid-template-columns: max-content 1fr max-content;
-        font-size: 0.8em;
-
-        .bpm,
-        .key {
-            display: none;
-        }
-    }
-
-    & span {
-        text-align: center;
-    }
-
-    .delete {
-        padding-left: 1em;
-    }
-
-    &:hover {
-        background: var(--color-background-soft);
-        border: 1px solid var(--color-border);
-    }
-
-    .material-symbols-rounded {
-        font-size: 1.5rem;
-        cursor: pointer;
-
-        &:hover {
-            color: var(--color-heading);
-        }
-    }
-
-    .cover {
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-
-        & img {
-            width: 50px;
-            aspect-ratio: 1/1;
-            border-radius: 0.5em;
-
-            @media screen and (max-width: 400px) {
-                width: 30px;
-            }
-        }
     }
 }
 

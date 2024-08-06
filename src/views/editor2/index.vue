@@ -110,6 +110,7 @@ onUnmounted(() => {
         />
         <CleanupEmptySong
             ref="cleanupEmptySong"
+            :song="song"
             @close="$router.push('/browse')"
         />
         <div class="editor_container">

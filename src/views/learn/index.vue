@@ -5,6 +5,8 @@ import Scales from "./Scales.vue";
 import ScaleQuiz from "./ScaleQuiz.vue";
 import ChordProgressions from "./ChordProgressions.vue";
 
+import IconButton from "@/components/IconButton.vue";
+
 import { useRoute } from "vue-router";
 import { computed, onMounted } from "vue";
 
@@ -57,7 +59,7 @@ const onClick = async () => {
         <div class="main limit-width">
             <aside class="sidebar container">
                 <router-link to="/learn/scale-finder">Scale Finder</router-link>
-                <router-link to="/learn/scales">Scales</router-link>
+                <router-link to="/learn/scales">Scale Browser</router-link>
                 <router-link to="/learn/scale-quiz">Scale Quiz</router-link>
                 <hr />
                 <router-link to="/learn/chord-finder">Chord Finder</router-link>
@@ -71,9 +73,63 @@ const onClick = async () => {
                     :is="activeTab"
                     class="container"
                 />
-                <div v-else>
+                <div
+                    v-else
+                    class="overview"
+                >
                     <h1>Learn Music Theory</h1>
-                    <p>Choose a topic from the sidebar.</p>
+                    <div class="container learn-card">
+                        <span class="material-symbols-rounded">search</span>
+                        <div>
+                            <h3>What am I playing?</h3>
+                            <div class="actions">
+                                <IconButton
+                                    label="Which scale is this?"
+                                    icon="arrow_forward"
+                                    @click="$router.push('/learn/scale-finder')"
+                                    :style="'blue'"
+                                />
+                                <IconButton
+                                    label="Which chord is this?"
+                                    icon="arrow_forward"
+                                    @click="$router.push('/learn/chord-finder')"
+                                    :style="'blue'"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container learn-card">
+                        <span class="material-symbols-rounded">explore</span>
+                        <div>
+                            <h3>Explore</h3>
+                            <div class="actions">
+                                <IconButton
+                                    label="Scale Browser"
+                                    icon="arrow_forward"
+                                    @click="$router.push('/learn/scales')"
+                                    :style="'blue'"
+                                />
+                                <IconButton
+                                    label="Chord Progressions"
+                                    icon="arrow_forward"
+                                    @click="
+                                        $router.push(
+                                            '/learn/chord-progressions'
+                                        )
+                                    "
+                                    :style="'blue'"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <router-link to="/learn/scale-quiz">
+                        <div class="container clickable learn-card">
+                            <span class="material-symbols-rounded">school</span>
+                            <div>
+                                <h3>Scale Quiz</h3>
+                            </div>
+                        </div>
+                    </router-link>
                 </div>
             </main>
         </div>
@@ -90,6 +146,32 @@ const onClick = async () => {
     box-shadow: none;
     border: none;
     padding: 0;
+}
+
+.overview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    margin-top: 1em;
+
+    & h1 {
+        grid-column: span 2;
+    }
+}
+
+.learn-card {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+
+    & h3 {
+        margin: 0;
+    }
+
+    & .actions {
+        display: flex;
+        gap: 1em;
+    }
 }
 
 .title {
@@ -139,6 +221,10 @@ header {
     align-items: start;
     grid-template-columns: 200px 1fr;
     gap: 1em;
+
+    @media screen and (max-width: 1200px) {
+        grid-template-columns: 1fr;
+    }
 
     .sidebar {
         display: flex;
