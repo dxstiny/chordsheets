@@ -17,6 +17,7 @@ import { useSongStore } from "@/stores/songs";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import domToImage from "dom-to-image";
+import { isMobile } from "@/helper";
 
 const props = defineProps({
     song: {
@@ -86,7 +87,7 @@ const onKeyDown = (e: KeyboardEvent) => {
 // if we press the chord, selection will be toggled
 // if we press the right border, we will try to resize it using mouse move
 const onMouseDown = (chord: IChord, e: MouseEvent) => {
-    if (e.button === 2) {
+    if (e.button === 2 || isMobile()) {
         return;
     }
 
@@ -486,6 +487,7 @@ defineExpose({
                 class="editor__content"
                 @dragover.stop
                 itemKey="id"
+                :disabled="isMobile()"
             >
                 <template #item="{ element, index }">
                     <div
@@ -542,6 +544,7 @@ defineExpose({
                             class="progression"
                             @dragover.stop
                             itemKey="id"
+                            :disabled="isMobile()"
                         >
                             <template
                                 #item="{ element: chord, index: chIndex }"
@@ -634,6 +637,7 @@ defineExpose({
                     class="progression"
                     @dragover.stop
                     itemKey="id"
+                    :disabled="isMobile()"
                 >
                     <template #item="{ element: chord, index: chIndex }">
                         <div
