@@ -31,17 +31,13 @@ const emit = defineEmits(["update:modelValue", "change"]);
 
 const update = (newValue: string) => {
     const numericValue = Number(newValue);
-    value.value = numericValue;
+    value.value = newValue;
     emit("change", numericValue);
     emit("update:modelValue", numericValue);
 };
 </script>
 <template>
-    <EditableText
-        v-model="value"
-        @change="update"
-        :no-outline="noOutline"
-        :locked="locked"
-        :placeholder="placeholder"
-    />
+    <EditableText v-model="value" @change="update" :no-outline="noOutline" :locked="locked" :placeholder="placeholder">
+        <slot />
+    </EditableText>
 </template>

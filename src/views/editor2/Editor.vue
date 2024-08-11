@@ -171,9 +171,8 @@ const renderTo = async (pdf: jsPDF) => {
             height: el.clientHeight * scale,
             width: el.clientWidth * scale,
             style: {
-                transform: `scale(${scale}) translate(${
-                    el.clientWidth / 2 / scale
-                }px, ${el.clientHeight / 2 / scale}px)`
+                transform: `scale(${scale}) translate(${el.clientWidth / 2 / scale
+                    }px, ${el.clientHeight / 2 / scale}px)`
             }
         });
 
@@ -305,50 +304,28 @@ defineExpose({
 </script>
 <template>
     <div ref="parent">
-        <div
-            class="editor"
-            :class="{ resizing, print: printing }"
-            @dragover.prevent
-            v-for="(section, index) in pages"
-        >
+        <div class="editor" :class="{ resizing, print: printing }" @dragover.prevent v-for="(section, index) in pages">
             <template v-if="index == 0">
                 <div class="editor__header">
-                    <EditableText
-                        v-model="song.artist"
-                        class="left"
-                        placeholder="Click to edit artist name"
-                        no-outline
-                    >
+                    <EditableText v-model="song.artist" class="left" placeholder="Click to edit artist name" no-outline>
                         <h3>{{ song.artist }}</h3>
                     </EditableText>
-                    <EditableText
-                        v-model="song.title"
-                        class="left h1"
-                        placeholder="Click to edit song title"
-                        no-outline
-                    >
+                    <EditableText v-model="song.title" class="left h1" placeholder="Click to edit song title"
+                        no-outline>
                         <h1>{{ song.title }}</h1>
                     </EditableText>
                 </div>
                 <div class="wrap-to-line">
                     <div class="info">
                         <span class="material-symbols-rounded">music_note</span>
-                        <EditableNumber
-                            v-model="song.bpm"
-                            class="left short"
-                            placeholder="120"
-                        >
+                        <EditableNumber v-model="song.bpm" class="left short" placeholder="120">
                             {{ song.bpm }}
                         </EditableNumber>
                         BPM
                     </div>
                     <div class="info">
                         <span class="material-symbols-rounded">piano</span>
-                        <EditableText
-                            v-model="song.key"
-                            class="left short"
-                            placeholder="C"
-                        >
+                        <EditableText v-model="song.key" class="left short" placeholder="C">
                             {{ song.key }}
                         </EditableText>
                     </div>
@@ -357,326 +334,183 @@ defineExpose({
                             {{
                                 song.transpose > 0
                                     ? "arrow_upward"
-                                    : song.transpose < 0
-                                    ? "arrow_downward"
-                                    : "drag_handle"
-                            }}
-                        </span>
-                        <EditableNumber
-                            v-model="song.transpose"
-                            class="left short"
-                            placeholder="0"
-                        >
-                            {{ song.transpose }}
-                        </EditableNumber>
+                                    : song.transpose < 0 ? "arrow_downward" : "drag_handle" }} </span>
+                                <EditableNumber v-model="song.transpose" class="left short" placeholder="0">
+                                    {{ song.transpose }}
+                                </EditableNumber>
                     </div>
-                    <template
-                        v-if="song.options"
-                        v-for="(name, index) in song.options"
-                    >
+                    <template v-if="song.options" v-for="(name, index) in song.options">
                         <div class="info">
                             <span class="material-symbols-rounded">
                                 check
                             </span>
-                            <EditableText
-                                v-model="song.options[index]"
-                                class="left"
-                                placeholder="Option"
-                            >
+                            <EditableText v-model="song.options[index]" class="left" placeholder="Option">
                                 <span class="capitalise">
                                     {{ name }}
                                 </span>
                             </EditableText>
-                            <span
-                                @click="song.options!.splice(index, 1)"
-                                class="delete material-symbols-rounded"
-                            >
+                            <span @click="song.options!.splice(index, 1)" class="delete material-symbols-rounded">
                                 delete
                             </span>
                         </div>
                     </template>
-                    <div
-                        class="info add-option"
-                        @click="
-                            !song.options
-                                ? (song.options = ['Sustain'])
-                                : song.options.push('Sustain')
-                        "
-                    >
+                    <div class="info add-option" @click="
+                        !song.options
+                            ? (song.options = ['Sustain'])
+                            : song.options.push('Sustain')
+                        ">
                         <span class="material-symbols-rounded"> add </span>
                         Add Option
                     </div>
                 </div>
                 <hr />
                 <div class="instruments">
-                    <div
-                        v-for="(instrument, index) in song.instruments"
-                        class="instrument"
-                    >
-                        <span
-                            @click="song.instruments.splice(index, 1)"
-                            class="delete material-symbols-rounded"
-                        >
+                    <div v-for="(instrument, index) in song.instruments" class="instrument">
+                        <span @click="song.instruments.splice(index, 1)" class="delete material-symbols-rounded">
                             delete
                         </span>
                         <div class="flex space-between">
-                            <EditableText
-                                v-model="instrument.for"
-                                class="left short"
-                                placeholder="Click to edit instrument"
-                                no-outline
-                            >
+                            <EditableText v-model="instrument.for" class="left short"
+                                placeholder="Click to edit instrument" no-outline>
                                 <span>{{ instrument.for }}</span>
                             </EditableText>
                             <span class="flex gap-2">
                                 <span class="material-symbols-rounded">
                                     volume_up
                                 </span>
-                                <EditableNumber
-                                    v-model="instrument.volume"
-                                    class="left short"
-                                    placeholder="100"
-                                >
+                                <EditableNumber v-model="instrument.volume" class="left short" placeholder="100">
                                     {{ instrument?.volume }}
                                 </EditableNumber>
                             </span>
                         </div>
                         <div class="settings">
-                            <EditableText
-                                v-model="instrument.name"
-                                class="left h3"
-                                placeholder="Click to edit instrument name"
-                                no-outline
-                            >
+                            <EditableText v-model="instrument.name" class="left h3"
+                                placeholder="Click to edit instrument name" no-outline>
                                 <h3>
                                     {{ instrument.name }}
                                 </h3>
                             </EditableText>
                             <span class="muted">
-                                <EditableText
-                                    v-model="instrument.type"
-                                    class="left"
-                                    placeholder="Click to edit instrument type"
-                                    no-outline
-                                >
+                                <EditableText v-model="instrument.type" class="left"
+                                    placeholder="Click to edit instrument type" no-outline>
                                     {{ instrument?.type }}
                                 </EditableText>
                             </span>
                         </div>
                     </div>
-                    <div
-                        class="instrument add-option"
-                        @click="
-                            song.instruments.push({
-                                name: 'ConcertGrand',
-                                for: 'R1',
-                                type: 'Piano',
-                                volume: 100
-                            })
-                        "
-                    >
+                    <div class="instrument add-option" @click="
+                        song.instruments.push({
+                            name: 'ConcertGrand',
+                            for: 'R1',
+                            type: 'Piano',
+                            volume: 100
+                        })
+                        ">
                         <span class="material-symbols-rounded"> add </span>
                         Add Instrument
                     </div>
                 </div>
                 <hr />
             </template>
-            <draggable
-                v-if="!printing"
-                v-model="song.sections"
-                class="editor__content"
-                @dragover.stop
-                itemKey="id"
-                :disabled="isMobile()"
-            >
+            <draggable v-if="!printing" v-model="song.sections" class="editor__content" @dragover.stop itemKey="id"
+                :disabled="isMobile()">
                 <template #item="{ element, index }">
-                    <div
-                        class="section"
-                        :id="`section-${index}`"
-                    >
-                        <EditableText
-                            v-model="element.type"
-                            class="left"
-                            placeholder="Click to edit section name"
-                            no-outline
-                        >
+                    <div class="section" :id="`section-${index}`">
+                        <EditableText v-model="element.type" class="left" placeholder="Click to edit section name"
+                            no-outline>
                             <span class="name">
                                 {{ element.type }}
                             </span>
                         </EditableText>
                         <div class="buttons">
-                            <span
-                                class="button material-symbols-rounded"
-                                @click="duplicateProgression(index)"
-                            >
+                            <span class="button material-symbols-rounded" @click="duplicateProgression(index)">
                                 content_copy
                             </span>
-                            <span
-                                class="button material-symbols-rounded"
-                                @click="deleteProgression(index)"
-                            >
+                            <span class="button material-symbols-rounded" @click="deleteProgression(index)">
                                 delete
                             </span>
                         </div>
-                        <div
-                            class="progression"
-                            v-if="element.progression.length === 0"
-                        >
-                            <div
-                                class="chord create"
-                                :style="{ '--cols': 4 }"
-                                @click.stop="
-                                    element.progression.push({
-                                        chord: 'C',
-                                        duration: 4
-                                    })
-                                "
-                            >
+                        <div class="progression" v-if="element.progression.length === 0">
+                            <div class="chord create" :style="{ '--cols': 4 }" @click.stop="
+                                element.progression.push({
+                                    chord: 'C',
+                                    duration: 4
+                                })
+                                ">
                                 <span class="material-symbols-rounded">
                                     add
                                 </span>
                                 Add Chord
                             </div>
                         </div>
-                        <draggable
-                            v-else
-                            v-model="element.progression"
-                            class="progression"
-                            @dragover.stop
-                            itemKey="id"
-                            :disabled="isMobile()"
-                        >
-                            <template
-                                #item="{ element: chord, index: chIndex }"
-                            >
-                                <div
-                                    class="chord"
-                                    ref="chordElements"
-                                    :id="`chord-${index}-${chIndex}`"
-                                    @mousedown="onMouseDown(chord, $event)"
-                                    @mouseup="onMouseUp(chord, $event)"
-                                    @click.stop
-                                    :class="chord.selected ? ' selected' : ''"
-                                    :style="{ '--cols': chord.duration }"
-                                >
-                                    <EditableText
-                                        v-model="chord.chord"
-                                        no-outline
-                                        placeholder="C"
-                                    >
+                        <draggable v-else v-model="element.progression" class="progression" @dragover.stop itemKey="id"
+                            :disabled="isMobile()">
+                            <template #item="{ element: chord, index: chIndex }">
+                                <div class="chord" ref="chordElements" :id="`chord-${index}-${chIndex}`"
+                                    @mousedown="onMouseDown(chord, $event)" @mouseup="onMouseUp(chord, $event)"
+                                    @click.stop :class="chord.selected ? ' selected' : ''"
+                                    :style="{ '--cols': chord.duration }">
+                                    <EditableText v-model="chord.chord" no-outline placeholder="C">
                                         {{ chord.chord }}
                                     </EditableText>
-                                    <span
-                                        class="insert_chord_here"
-                                        @mousedown.stop
-                                        @mouseup.stop
-                                        @click.stop="
-                                            insertChord(index, chIndex)
-                                        "
-                                    />
+                                    <span class="insert_chord_here" @mousedown.stop @mouseup.stop @click.stop="
+                                        insertChord(index, chIndex)
+                                        " />
                                 </div>
                             </template>
                         </draggable>
                     </div>
                 </template>
             </draggable>
-            <div
-                v-else
-                v-for="(element, index) in props.song.sections.slice(
-                    section.start,
-                    section.end
-                )"
-                class="section"
-                :id="`section-${index}`"
-            >
-                <EditableText
-                    v-model="element.type"
-                    class="left"
-                    placeholder="Click to edit section name"
-                    no-outline
-                >
+            <div v-else v-for="(element, index) in props.song.sections.slice(
+                section.start,
+                section.end
+            )" class="section" :id="`section-${index}`">
+                <EditableText v-model="element.type" class="left" placeholder="Click to edit section name" no-outline>
                     <span class="name">
                         {{ element.type }}
                     </span>
                 </EditableText>
                 <div class="buttons">
-                    <span
-                        class="button material-symbols-rounded"
-                        @click="duplicateProgression(index)"
-                    >
+                    <span class="button material-symbols-rounded" @click="duplicateProgression(index)">
                         content_copy
                     </span>
-                    <span
-                        class="button material-symbols-rounded"
-                        @click="deleteProgression(index)"
-                    >
+                    <span class="button material-symbols-rounded" @click="deleteProgression(index)">
                         delete
                     </span>
                 </div>
-                <div
-                    class="progression"
-                    v-if="element.progression.length === 0"
-                >
-                    <div
-                        class="chord create"
-                        :style="{ '--cols': 4 }"
-                        @click.stop="
-                            element.progression.push({
-                                chord: 'C',
-                                duration: 4
-                            })
-                        "
-                    >
+                <div class="progression" v-if="element.progression.length === 0">
+                    <div class="chord create" :style="{ '--cols': 4 }" @click.stop="
+                        element.progression.push({
+                            chord: 'C',
+                            duration: 4
+                        })
+                        ">
                         <span class="material-symbols-rounded"> add </span>
                         Add Chord
                     </div>
                 </div>
-                <draggable
-                    v-else
-                    v-model="element.progression"
-                    class="progression"
-                    @dragover.stop
-                    itemKey="id"
-                    :disabled="isMobile()"
-                >
+                <draggable v-else v-model="element.progression" class="progression" @dragover.stop itemKey="id"
+                    :disabled="isMobile()">
                     <template #item="{ element: chord, index: chIndex }">
-                        <div
-                            class="chord"
-                            ref="chordElements"
-                            :id="`chord-${index}-${chIndex}`"
-                            @mousedown="onMouseDown(chord, $event)"
-                            @mouseup="onMouseUp(chord, $event)"
-                            @click.stop
-                            :class="chord.selected ? ' selected' : ''"
-                            :style="{ '--cols': chord.duration }"
-                        >
-                            <EditableText
-                                v-model="chord.chord"
-                                no-outline
-                                placeholder="C"
-                            >
+                        <div class="chord" ref="chordElements" :id="`chord-${index}-${chIndex}`"
+                            @mousedown="onMouseDown(chord, $event)" @mouseup="onMouseUp(chord, $event)" @click.stop
+                            :class="chord.selected ? ' selected' : ''" :style="{ '--cols': chord.duration }">
+                            <EditableText v-model="chord.chord" no-outline placeholder="C">
                                 {{ chord.chord }}
                             </EditableText>
-                            <span
-                                class="insert_chord_here"
-                                @mousedown.stop
-                                @mouseup.stop
-                                @click.stop="insertChord(index, chIndex)"
-                            />
+                            <span class="insert_chord_here" @mousedown.stop @mouseup.stop
+                                @click.stop="insertChord(index, chIndex)" />
                         </div>
                     </template>
                 </draggable>
             </div>
-            <div
-                class="add-section"
-                id="add-section"
-                @click="
-                    song.sections.push({
-                        type: 'New Section',
-                        progression: []
-                    })
-                "
-            >
+            <div class="add-section" id="add-section" @click="
+                song.sections.push({
+                    type: 'New Section',
+                    progression: []
+                })
+                ">
                 <span class="material-symbols-rounded"> add </span>
                 Add Section
             </div>
@@ -721,7 +555,7 @@ hr {
         position: relative;
 
         .material-symbols-rounded {
-            font-size: 1rem;
+            font-size: 1em;
         }
 
         &:hover {
@@ -772,7 +606,7 @@ hr {
         .muted {
             font-style: italic;
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.8em;
             letter-spacing: 0.1em;
         }
 
@@ -805,7 +639,7 @@ hr {
 
         display: flex;
         align-items: center;
-        gap: 0.5em;
+        gap: 0.15em;
 
         &:hover {
             .delete {
@@ -830,7 +664,7 @@ hr {
         }
 
         .material-symbols-rounded {
-            font-size: 1rem;
+            font-size: 1em;
         }
 
         &:not(:last-child) {
@@ -935,8 +769,8 @@ hr {
     background: white;
     position: relative;
 
-    > div:not(.editor__content),
-    .editor__content > div {
+    >div:not(.editor__content),
+    .editor__content>div {
         padding: 0 var(--display-margin);
     }
 
