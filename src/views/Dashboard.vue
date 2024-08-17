@@ -17,17 +17,6 @@ const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
 
-const exportLib = async () => {
-    await store.prepareRender();
-
-    const text = JSON.stringify(store.songs, null, 4);
-    const a = document.createElement("a");
-    const file = new Blob([text], { type: "text/plain" });
-    a.href = URL.createObjectURL(file);
-    a.download = "chordsheets.json";
-    a.click();
-};
-
 const renderAll = async () => {
     renderDialog.value?.showModal();
     let pdf = new jsPDF({
@@ -82,7 +71,7 @@ const favArtist = computed(() => {
         (a, b) => b[1] - a[1]
     );
 
-    return favArtistsSorted[0][0];
+    return favArtistsSorted?.[0]?.[0];
 });
 
 const recentlyEdited = computed(() => {
@@ -98,10 +87,7 @@ const recentlyEdited = computed(() => {
                 <span class="material-symbols-rounded">history</span>
                 Recently edited
             </p>
-            <router-link
-                :to="settings.editorUrl(song?.id ?? 0)"
-                v-for="song in recentlyEdited"
-            >
+            <router-link :to="settings.editorUrl(song?.id ?? 0)" v-for="song in recentlyEdited">
                 <div class="song">
                     <div class="cover">
                         <img :src="song.cover || 'placeholders/song.svg'" />
@@ -114,10 +100,7 @@ const recentlyEdited = computed(() => {
                     <span class="key">
                         {{ song.key }}
                     </span>
-                    <span
-                        class="material-symbols-rounded delete"
-                        @click.prevent="store.removeSong(song)"
-                    >
+                    <span class="material-symbols-rounded delete" @click.prevent="store.removeSong(song)">
                         delete
                     </span>
                 </div>
@@ -134,11 +117,7 @@ const recentlyEdited = computed(() => {
                 </h1>
                 <div class="row space-between gap-2 centre">
                     <p class="muted row gap-2">Chord Sheets</p>
-                    <IconButton
-                        icon="add"
-                        @click.prevent="newSong"
-                        :style="'green'"
-                    />
+                    <IconButton icon="add" @click.prevent="newSong" :style="'green'" />
                 </div>
             </div>
         </RouterLink>
@@ -148,18 +127,8 @@ const recentlyEdited = computed(() => {
                 Library
             </p>
             <div class="row space-between gap-2 centre">
-                <IconButton
-                    label="Export all as PDF"
-                    icon="picture_as_pdf"
-                    @click="exportAll"
-                    :style="'blue'"
-                />
-                <IconButton
-                    label="Print All"
-                    icon="print"
-                    @click="printAll"
-                    :style="'blue'"
-                />
+                <IconButton label="Export all as PDF" icon="picture_as_pdf" @click="exportAll" :style="'blue'" />
+                <IconButton label="Print All" icon="print" @click="printAll" :style="'blue'" />
             </div>
         </div>
         <div class="container column gap-2">
@@ -170,12 +139,8 @@ const recentlyEdited = computed(() => {
 
             <p>How well do you know your scales?</p>
 
-            <IconButton
-                label="Start learning"
-                icon="arrow_forward"
-                @click="$router.push('/learn/scale-quiz')"
-                :style="'blue'"
-            />
+            <IconButton label="Start learning" icon="arrow_forward" @click="$router.push('/learn/scale-quiz')"
+                :style="'blue'" />
         </div>
         <div class="container column">
             <p class="muted row gap-2">
@@ -190,11 +155,7 @@ const recentlyEdited = computed(() => {
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
-                    <Editor
-                        printing
-                        v-if="renderProgress >= 0"
-                        :song="store.songs[renderProgress]"
-                    />
+                    <Editor printing v-if="renderProgress >= 0" :song="store.songs[renderProgress]" />
                 </div>
             </div>
             <h2>Rendering...</h2>
@@ -203,10 +164,7 @@ const recentlyEdited = computed(() => {
                 while.
             </p>
             <div class="row">
-                <progress
-                    :value="renderProgress"
-                    :max="allPages?.length"
-                />
+                <progress :value="renderProgress" :max="allPages?.length" />
                 <p>
                     <span>{{ renderProgress }}</span> / {{ allPages?.length }}
                 </p>
@@ -215,12 +173,7 @@ const recentlyEdited = computed(() => {
     </dialog>
     <div class="void">
         <div class="parent">
-            <Editor
-                ref="allPages"
-                v-for="song in store.songs"
-                printing
-                :song="song"
-            />
+            <Editor ref="allPages" v-for="song in store.songs" printing :song="song" />
         </div>
     </div>
 </template>
@@ -372,7 +325,7 @@ h2 {
     top: 0;
     left: 0;
 
-    & > * {
+    &>* {
         position: absolute;
         top: 0;
         left: 0;

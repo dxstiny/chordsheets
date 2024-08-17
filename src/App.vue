@@ -5,6 +5,8 @@ import { useSettingsStore } from "@/stores/settings";
 import DropImport from "./views/DropImport.vue";
 import { useRouter } from "vue-router";
 
+import { version } from "../package.json";
+
 const router = useRouter();
 const store = useSongStore();
 const settings = useSettingsStore();
@@ -13,6 +15,8 @@ const newSong = () => {
     const song = store.createNew();
     router.push(settings.editorUrl(song.id));
 };
+
+console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
 </script>
 
 <template>
@@ -60,7 +64,7 @@ const newSong = () => {
 }
 
 aside,
-main > div:not(.grid),
+main>div:not(.grid),
 main .container {
     background: var(--color-background);
     border: 1px solid var(--color-border);
@@ -83,7 +87,7 @@ main a:has(.clickable) {
     color: inherit;
 }
 
-.main > .grid {
+.main>.grid {
     display: grid;
     border: none;
     background: none;
