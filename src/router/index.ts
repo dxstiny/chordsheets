@@ -34,6 +34,18 @@ const router = createRouter({
             component: () => import("../views/editor/index.vue")
         },
         {
+            path: "/setlists",
+            name: "Setlists",
+            component: () => import("../views/setlist/index.vue"),
+            children: [
+                {
+                    path: "edit/:id",
+                    name: "SetlistEditor",
+                    component: () => import("../views/setlist/Editor.vue")
+                }
+            ]
+        },
+        {
             path: "/midi",
             name: "Midi",
             component: () => import("../views/midi/index.vue")
@@ -70,31 +82,6 @@ const router = createRouter({
                         import("../views/learn/ChordProgressions.vue")
                 }
             ]
-        },
-        {
-            path: "/learn/scale-finder",
-            name: "Learn - Scale Finder",
-            component: () => import("../views/learn/index.vue")
-        },
-        {
-            path: "/learn/scales",
-            name: "Learn - Scales",
-            component: () => import("../views/learn/index.vue")
-        },
-        {
-            path: "/learn/scale-quiz",
-            name: "Learn - Scale Quiz",
-            component: () => import("../views/learn/index.vue")
-        },
-        {
-            path: "/learn/chord-finder",
-            name: "Learn - Chord Finder",
-            component: () => import("../views/learn/index.vue")
-        },
-        {
-            path: "/learn/chord-progressions",
-            name: "Learn - Chord Progressions",
-            component: () => import("../views/learn/index.vue")
         }
     ]
 });

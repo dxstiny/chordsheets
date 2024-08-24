@@ -17,6 +17,7 @@ const router = useRouter();
 let textId = route.params.id as string;
 const editor = ref<typeof Editor>();
 const linkSpotify = ref<typeof LinkSpotify>();
+const previewing = ref(false);
 const cleanupEmptySong = ref<typeof CleanupEmptySong>();
 
 if (!textId) {
@@ -91,6 +92,9 @@ const onKeyDown = (e: KeyboardEvent) => {
     } else if (e.ctrlKey && e.key === "p") {
         e.preventDefault();
         print();
+    } else if (e.ctrlKey && e.shiftKey && e.key === "P") {
+        e.preventDefault();
+        previewing.value = !previewing.value;
     }
 };
 
@@ -143,6 +147,7 @@ onUnmounted(() => {
                 >
                     file_download
                 </span>
+                <div class="divider"></div>
                 <span
                     class="material-symbols-rounded"
                     @click="linkSpotify?.show()"
@@ -150,11 +155,20 @@ onUnmounted(() => {
                 >
                     link
                 </span>
+                <div class="divider"></div>
+                <span
+                    class="material-symbols-rounded"
+                    @click="previewing = !previewing"
+                    title="Preview (CTRL+SHIFT+P)"
+                >
+                    {{ previewing ? "preview_off" : "preview" }}
+                </span>
             </div>
 
             <Editor
                 ref="editor"
                 :song="song"
+                :printing="previewing"
             />
         </div>
     </MinWidth>
@@ -173,6 +187,12 @@ onUnmounted(() => {
     @media (max-width: 800px) {
         left: 1em;
     }
+}
+
+.divider {
+    width: 1px;
+    height: 1em;
+    background: var(--color-border);
 }
 
 .toolbar {

@@ -329,3 +329,20 @@ export const convertLegacySong = (legacySong: any): ISong => {
     if (!legacySong.id) legacySong.id = Math.round(Math.random() * 1000000);
     return legacySong;
 };
+
+interface ISetlistSection {
+    name: string;
+    songs: (
+        | ISong
+        | {
+              id: number;
+          }
+    )[];
+    id: number;
+}
+
+export interface ISetlist {
+    name: string;
+    sections: ISetlistSection[];
+    id: number;
+}
