@@ -119,6 +119,7 @@ const isMobile = window.innerWidth < 800;
                 <Song
                     :song="song"
                     allow-delete
+                    @delete="store.removeSong(song)"
                 />
             </router-link>
         </template>

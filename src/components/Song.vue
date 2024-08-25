@@ -5,7 +5,6 @@ import type { ISong } from "@/types";
 import { useSettingsStore } from "@/stores/settings";
 
 const settings = useSettingsStore();
-const store = useSongStore();
 
 defineProps({
     song: {
@@ -15,8 +14,14 @@ defineProps({
     allowDelete: {
         type: Boolean,
         default: false
+    },
+    openEditorOnClick: {
+        type: Boolean,
+        default: false
     }
 });
+
+const emit = defineEmits(["delete"]);
 </script>
 <template>
     <router-link :to="settings.editorUrl(song.id)">
@@ -35,7 +40,7 @@ defineProps({
             <span
                 v-if="allowDelete"
                 class="material-symbols-rounded delete"
-                @click.prevent="store.removeSong(song)"
+                @click.prevent="emit('delete', song)"
             >
                 delete
             </span>
@@ -70,6 +75,10 @@ defineProps({
 
     .delete {
         padding-left: 1em;
+
+        &:hover {
+            color: var(--color-red) !important;
+        }
     }
 
     &:hover {

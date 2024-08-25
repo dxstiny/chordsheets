@@ -35,6 +35,10 @@ const props = defineProps({
     sectionName: {
         type: String,
         required: false
+    },
+    disableHotkeys: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -55,6 +59,8 @@ const insertChord = (sectionIndex: number, chordIndex: number) => {
 };
 
 const onKeyDown = (e: KeyboardEvent) => {
+    if (props.disableHotkeys) return;
+
     if (e.key === "Delete") {
         for (const section of props.song.sections) {
             section.progression = section.progression.filter(

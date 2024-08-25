@@ -47,7 +47,7 @@ const navigateBack = () => {
         cleanupEmptySong.value?.show();
         return;
     }
-    router.push("/");
+    router.back();
 };
 
 const print = async () => {

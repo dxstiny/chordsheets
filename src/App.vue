@@ -3,7 +3,7 @@ import { RouterView } from "vue-router";
 import { useSongStore } from "@/stores/songs";
 import { useSettingsStore } from "@/stores/settings";
 import DropImport from "./views/DropImport.vue";
-import Search from "./views/Search.vue";
+import QuickActionModal from "./views/QuickActionModal.vue";
 import { useRouter } from "vue-router";
 
 import { version } from "../package.json";
@@ -21,7 +21,7 @@ console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
 </script>
 
 <template>
-    <Search />
+    <QuickActionModal />
     <DropImport>
         <div class="screen">
             <aside class="sidebar">

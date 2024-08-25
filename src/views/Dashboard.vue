@@ -9,10 +9,12 @@ import { useHistoryStore } from "@/stores/history";
 import type { ISong } from "@/types";
 import { useRouter } from "vue-router";
 import Song from "@/components/Song.vue";
+import { useSetlistStore } from "@/stores/setlists";
 
 const settings = useSettingsStore();
 const store = useSongStore();
 const songHistory = useHistoryStore();
+const setlistStore = useSetlistStore();
 const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
@@ -28,13 +30,15 @@ const renderAll = async () => {
 
     renderProgress.value = 0;
 
-    for (const page of allPages.value ?? []) {
+    const pages = allPages.value ?? [];
+
+    for (const [index, page] of pages.entries()) {
         console.log(page.name());
 
         await page.renderTo(pdf);
         renderProgress.value++;
 
-        if (page.song !== store.songs[store.songs.length - 1]) {
+        if (index < pages.length - 1) {
             pdf.addPage();
         }
     }
@@ -61,6 +65,11 @@ const newSong = () => {
     router.push(settings.editorUrl(song.id));
 };
 
+const newSetlist = () => {
+    const { id } = setlistStore.addEmptySetlist();
+    router.push("/setlists/edit/" + id);
+};
+
 const favArtist = computed(() => {
     const favArtists = store.songs.map((song) => song.artist);
     const favArtistsCount = favArtists.reduce((acc, artist) => {
@@ -77,8 +86,9 @@ const favArtist = computed(() => {
 
 const recentlyEdited = computed(() => {
     return songHistory.history
-        .slice(0, 3)
-        .map((song) => store.song(song.songId)) as ISong[];
+        .map((song) => store.song(song.songId))
+        .filter((song) => song !== undefined)
+        .slice(0, 3);
 });
 </script>
 <template>
@@ -97,7 +107,7 @@ const recentlyEdited = computed(() => {
         <RouterLink to="/browse">
             <div class="container column clickable">
                 <p class="muted row gap-2">
-                    <span class="material-symbols-rounded">list</span>
+                    <span class="material-symbols-rounded">library_music</span>
                     Library
                 </p>
                 <h1 class="wght-900">
@@ -108,6 +118,25 @@ const recentlyEdited = computed(() => {
                     <IconButton
                         icon="add"
                         @click.prevent="newSong"
+                        :style="'green'"
+                    />
+                </div>
+            </div>
+        </RouterLink>
+        <RouterLink to="/setlists">
+            <div class="container column clickable">
+                <p class="muted row gap-2">
+                    <span class="material-symbols-rounded">list</span>
+                    Library
+                </p>
+                <h1 class="wght-900">
+                    {{ setlistStore.setlists.length }}
+                </h1>
+                <div class="row space-between gap-2 centre">
+                    <p class="muted row gap-2">Sets</p>
+                    <IconButton
+                        icon="add"
+                        @click.prevent="newSetlist"
                         :style="'green'"
                     />
                 </div>
@@ -243,24 +272,6 @@ main {
 
 aside {
     grid-column: 2;
-}
-
-progress {
-    width: 100%;
-    height: 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    appearance: none;
-
-    &::-webkit-progress-bar {
-        border-radius: 0.5rem;
-        background-color: var(--color-background);
-    }
-
-    &::-webkit-progress-value {
-        border-radius: 0.5rem;
-        background-color: var(--accent);
-    }
 }
 
 .flex {
