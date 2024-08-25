@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
-import Search from "./Search.vue";
 import { ref, watchEffect } from "vue";
 import Dropdown from "@/components/Dropdown.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -9,6 +8,7 @@ import draggable from "vuedraggable";
 import type { ISong } from "@/types";
 import { useSettingsStore } from "@/stores/settings";
 import { useRouter } from "vue-router";
+import Song from "@/components/Song.vue";
 
 const settings = useSettingsStore();
 const store = useSongStore();
@@ -116,29 +116,14 @@ const isMobile = window.innerWidth < 800;
     >
         <template #item="{ element: song }">
             <router-link :to="settings.editorUrl(song.id)">
-                <div class="song">
-                    <div class="cover">
-                        <img :src="song.cover || 'placeholders/song.svg'" />
-                    </div>
-                    <div class="info">
-                        <h2>{{ song.title }}</h2>
-                        <span>{{ song.artist }}</span>
-                    </div>
-                    <span class="bpm"> {{ song.bpm }} BPM </span>
-                    <span class="key">
-                        {{ song.key }}
-                    </span>
-                    <span
-                        class="material-symbols-rounded delete"
-                        @click.prevent="store.removeSong(song)"
-                    >
-                        delete
-                    </span>
-                </div>
+                <Song
+                    :song="song"
+                    allow-delete
+                    @delete="store.removeSong(song)"
+                />
             </router-link>
         </template>
     </draggable>
-    <Search />
 </template>
 
 <style scoped>
@@ -244,65 +229,6 @@ aside {
         position: sticky;
         margin-top: 1em;
         top: 1em;
-    }
-}
-
-.song {
-    display: grid;
-    grid-template-columns: max-content 1fr 100px 30px max-content;
-    align-items: center;
-    gap: 1em;
-    color: var(--color-text);
-    border-radius: 1em;
-    padding: 0.5em 1em;
-    border: 1px solid transparent;
-
-    @media screen and (max-width: 400px) {
-        grid-template-columns: max-content 1fr max-content;
-        font-size: 0.8em;
-
-        .bpm,
-        .key {
-            display: none;
-        }
-    }
-
-    & span {
-        text-align: center;
-    }
-
-    .delete {
-        padding-left: 1em;
-    }
-
-    &:hover {
-        background: var(--color-background-soft);
-        border: 1px solid var(--color-border);
-    }
-
-    .material-symbols-rounded {
-        font-size: 1.5rem;
-        cursor: pointer;
-
-        &:hover {
-            color: var(--color-heading);
-        }
-    }
-
-    .cover {
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-
-        & img {
-            width: 50px;
-            aspect-ratio: 1/1;
-            border-radius: 0.5em;
-
-            @media screen and (max-width: 400px) {
-                width: 30px;
-            }
-        }
     }
 }
 

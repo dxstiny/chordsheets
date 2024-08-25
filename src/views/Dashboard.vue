@@ -8,10 +8,13 @@ import { useSettingsStore } from "@/stores/settings";
 import { useHistoryStore } from "@/stores/history";
 import type { ISong } from "@/types";
 import { useRouter } from "vue-router";
+import Song from "@/components/Song.vue";
+import { useSetlistStore } from "@/stores/setlists";
 
 const settings = useSettingsStore();
 const store = useSongStore();
 const songHistory = useHistoryStore();
+const setlistStore = useSetlistStore();
 const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
@@ -27,13 +30,15 @@ const renderAll = async () => {
 
     renderProgress.value = 0;
 
-    for (const page of allPages.value ?? []) {
+    const pages = allPages.value ?? [];
+
+    for (const [index, page] of pages.entries()) {
         console.log(page.name());
 
         await page.renderTo(pdf);
         renderProgress.value++;
 
-        if (page.song !== store.songs[store.songs.length - 1]) {
+        if (index < pages.length - 1) {
             pdf.addPage();
         }
     }
@@ -60,6 +65,11 @@ const newSong = () => {
     router.push(settings.editorUrl(song.id));
 };
 
+const newSetlist = () => {
+    const { id } = setlistStore.addEmptySetlist();
+    router.push("/setlists/edit/" + id);
+};
+
 const favArtist = computed(() => {
     const favArtists = store.songs.map((song) => song.artist);
     const favArtistsCount = favArtists.reduce((acc, artist) => {
@@ -76,8 +86,9 @@ const favArtist = computed(() => {
 
 const recentlyEdited = computed(() => {
     return songHistory.history
-        .slice(0, 3)
-        .map((song) => store.song(song.songId)) as ISong[];
+        .map((song) => store.song(song.songId))
+        .filter((song) => song !== undefined)
+        .slice(0, 3);
 });
 </script>
 <template>
@@ -87,29 +98,16 @@ const recentlyEdited = computed(() => {
                 <span class="material-symbols-rounded">history</span>
                 Recently edited
             </p>
-            <router-link :to="settings.editorUrl(song?.id ?? 0)" v-for="song in recentlyEdited">
-                <div class="song">
-                    <div class="cover">
-                        <img :src="song.cover || 'placeholders/song.svg'" />
-                    </div>
-                    <div class="info">
-                        <h2>{{ song.title }}</h2>
-                        <span>{{ song.artist }}</span>
-                    </div>
-                    <span class="bpm"> {{ song.bpm }} BPM </span>
-                    <span class="key">
-                        {{ song.key }}
-                    </span>
-                    <span class="material-symbols-rounded delete" @click.prevent="store.removeSong(song)">
-                        delete
-                    </span>
-                </div>
-            </router-link>
+
+            <Song
+                v-for="song in recentlyEdited"
+                :song="song"
+            />
         </div>
         <RouterLink to="/browse">
             <div class="container column clickable">
                 <p class="muted row gap-2">
-                    <span class="material-symbols-rounded">list</span>
+                    <span class="material-symbols-rounded">library_music</span>
                     Library
                 </p>
                 <h1 class="wght-900">
@@ -117,7 +115,30 @@ const recentlyEdited = computed(() => {
                 </h1>
                 <div class="row space-between gap-2 centre">
                     <p class="muted row gap-2">Chord Sheets</p>
-                    <IconButton icon="add" @click.prevent="newSong" :style="'green'" />
+                    <IconButton
+                        icon="add"
+                        @click.prevent="newSong"
+                        :style="'green'"
+                    />
+                </div>
+            </div>
+        </RouterLink>
+        <RouterLink to="/setlists">
+            <div class="container column clickable">
+                <p class="muted row gap-2">
+                    <span class="material-symbols-rounded">list</span>
+                    Library
+                </p>
+                <h1 class="wght-900">
+                    {{ setlistStore.setlists.length }}
+                </h1>
+                <div class="row space-between gap-2 centre">
+                    <p class="muted row gap-2">Sets</p>
+                    <IconButton
+                        icon="add"
+                        @click.prevent="newSetlist"
+                        :style="'green'"
+                    />
                 </div>
             </div>
         </RouterLink>
@@ -127,8 +148,18 @@ const recentlyEdited = computed(() => {
                 Library
             </p>
             <div class="row space-between gap-2 centre">
-                <IconButton label="Export all as PDF" icon="picture_as_pdf" @click="exportAll" :style="'blue'" />
-                <IconButton label="Print All" icon="print" @click="printAll" :style="'blue'" />
+                <IconButton
+                    label="Export all as PDF"
+                    icon="picture_as_pdf"
+                    @click="exportAll"
+                    :style="'blue'"
+                />
+                <IconButton
+                    label="Print All"
+                    icon="print"
+                    @click="printAll"
+                    :style="'blue'"
+                />
             </div>
         </div>
         <div class="container column gap-2">
@@ -139,8 +170,12 @@ const recentlyEdited = computed(() => {
 
             <p>How well do you know your scales?</p>
 
-            <IconButton label="Start learning" icon="arrow_forward" @click="$router.push('/learn/scale-quiz')"
-                :style="'blue'" />
+            <IconButton
+                label="Start learning"
+                icon="arrow_forward"
+                @click="$router.push('/learn/scale-quiz')"
+                :style="'blue'"
+            />
         </div>
         <div class="container column">
             <p class="muted row gap-2">
@@ -155,7 +190,11 @@ const recentlyEdited = computed(() => {
         <div class="content">
             <div class="preview-container">
                 <div class="preview scale-sm">
-                    <Editor printing v-if="renderProgress >= 0" :song="store.songs[renderProgress]" />
+                    <Editor
+                        printing
+                        v-if="renderProgress >= 0"
+                        :song="store.songs[renderProgress]"
+                    />
                 </div>
             </div>
             <h2>Rendering...</h2>
@@ -164,7 +203,10 @@ const recentlyEdited = computed(() => {
                 while.
             </p>
             <div class="row">
-                <progress :value="renderProgress" :max="allPages?.length" />
+                <progress
+                    :value="renderProgress"
+                    :max="allPages?.length"
+                />
                 <p>
                     <span>{{ renderProgress }}</span> / {{ allPages?.length }}
                 </p>
@@ -173,7 +215,12 @@ const recentlyEdited = computed(() => {
     </dialog>
     <div class="void">
         <div class="parent">
-            <Editor ref="allPages" v-for="song in store.songs" printing :song="song" />
+            <Editor
+                ref="allPages"
+                v-for="song in store.songs"
+                printing
+                :song="song"
+            />
         </div>
     </div>
 </template>
@@ -225,24 +272,6 @@ main {
 
 aside {
     grid-column: 2;
-}
-
-progress {
-    width: 100%;
-    height: 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    appearance: none;
-
-    &::-webkit-progress-bar {
-        border-radius: 0.5rem;
-        background-color: var(--color-background);
-    }
-
-    &::-webkit-progress-value {
-        border-radius: 0.5rem;
-        background-color: var(--accent);
-    }
 }
 
 .flex {
@@ -309,12 +338,6 @@ progress {
     }
 }
 
-hr {
-    margin: 1em 0;
-    border: none;
-    border-bottom: 1px solid var(--color-border);
-}
-
 h2 {
     font-size: 1.25em;
     font-weight: 500;
@@ -325,7 +348,7 @@ h2 {
     top: 0;
     left: 0;
 
-    &>* {
+    & > * {
         position: absolute;
         top: 0;
         left: 0;

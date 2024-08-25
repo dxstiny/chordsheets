@@ -37,6 +37,7 @@
     --accent: #00bd7e;
 
     --color-green: var(--accent);
+    --color-green-dark: #00a86b;
     --color-red: #e85454;
     --color-yellow: #c7aa19;
     --color-blue: #189de4;
@@ -79,6 +80,7 @@
 
         --display-height: 80vh;
         --display-margin: calc(var(--display-height) * (20 / 297));
+        --display-margin-min: calc(var(--display-height) * (10 / 297));
 
         height: var(--display-height);
         width: calc(var(--display-height) * (210 / 297));
@@ -122,11 +124,25 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+hr {
+    margin: 1em 0;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+}
+
 a,
 .green {
     text-decoration: none;
     color: var(--accent);
     transition: 0.4s;
+}
+
+a.link-on-hover {
+    color: unset;
+
+    &:hover {
+        color: var(--accent);
+    }
 }
 
 .muted {
@@ -247,68 +263,20 @@ dialog {
     }
 }
 
-.song {
-    display: grid;
-    grid-template-columns: max-content 1fr 100px 30px max-content;
-    align-items: center;
-    gap: 1em;
-    color: var(--color-text);
-    border-radius: 1em;
-    padding: 0.5em 1em;
-    border: 1px solid transparent;
+progress {
+    width: 100%;
+    height: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    appearance: none;
 
-    @media (max-width: 800px) {
-        grid-template-columns: max-content 1fr max-content !important;
-
-        .bpm,
-        .key {
-            display: none !important;
-        }
+    &::-webkit-progress-bar {
+        border-radius: 0.5rem;
+        background-color: var(--color-background);
     }
 
-    @media screen and (max-width: 400px) {
-        font-size: 0.8em;
-    }
-
-    & span {
-        text-align: center;
-    }
-
-    .delete {
-        padding-left: 1em;
-    }
-
-    &:hover {
-        background: var(--color-background-soft);
-        border: 1px solid var(--color-border);
-    }
-
-    .material-symbols-rounded {
-        font-size: 1.5rem;
-        cursor: pointer;
-
-        &:hover {
-            color: var(--color-heading);
-        }
-    }
-
-    .cover {
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-
-        & img {
-            width: 50px;
-            aspect-ratio: 1/1;
-            border-radius: 0.5em;
-
-            @media screen and (max-width: 400px) {
-                width: 30px;
-            }
-        }
-    }
-
-    .info {
-        display: block;
+    &::-webkit-progress-value {
+        border-radius: 0.5rem;
+        background-color: var(--accent);
     }
 }

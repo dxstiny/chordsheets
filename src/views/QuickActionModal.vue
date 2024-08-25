@@ -14,6 +14,7 @@ const settings = useSettingsStore();
 const selection = ref<number>(-1);
 const windowSelector = ref(0);
 const router = useRouter();
+const isOpen = ref(false);
 
 const search = debounce(() => {
     results.value = songs.songs.filter((s) =>
@@ -35,10 +36,14 @@ const onKeyDown = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.key === "k") {
         e.preventDefault();
         dialog.value.showModal();
+        isOpen.value = true;
     } else if (e.ctrlKey && e.key === "f") {
         e.preventDefault();
         dialog.value.close();
+        isOpen.value = false;
     }
+
+    if (!isOpen.value) return;
 
     if (e.key === "ArrowDown") {
         e.preventDefault();

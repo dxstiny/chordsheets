@@ -3,6 +3,7 @@ import { RouterView } from "vue-router";
 import { useSongStore } from "@/stores/songs";
 import { useSettingsStore } from "@/stores/settings";
 import DropImport from "./views/DropImport.vue";
+import QuickActionModal from "./views/QuickActionModal.vue";
 import { useRouter } from "vue-router";
 
 import { version } from "../package.json";
@@ -20,13 +21,16 @@ console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
 </script>
 
 <template>
+    <QuickActionModal />
     <DropImport>
         <div class="screen">
             <aside class="sidebar">
-                <div class="title">
-                    <img :src="'favicon.svg'" />
-                    <h1>Chord<span class="accent">Sheets</span></h1>
-                </div>
+                <RouterLink to="/">
+                    <div class="title">
+                        <img :src="'favicon.svg'" />
+                        <h1>Chord<span class="accent">Sheets</span></h1>
+                    </div>
+                </RouterLink>
                 <div class="links">
                     <RouterLink to="/">
                         <span class="material-symbols-rounded">home</span>
@@ -37,8 +41,14 @@ console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
                         <span class="label">Create</span>
                     </a>
                     <RouterLink to="/browse">
-                        <span class="material-symbols-rounded">list</span>
+                        <span class="material-symbols-rounded"
+                            >library_music</span
+                        >
                         <span class="label">Songs</span>
+                    </RouterLink>
+                    <RouterLink to="/setlists">
+                        <span class="material-symbols-rounded">list</span>
+                        <span class="label">Setlists</span>
                     </RouterLink>
                     <RouterLink to="/learn">
                         <span class="material-symbols-rounded">school</span>
@@ -64,7 +74,7 @@ console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
 }
 
 aside,
-main>div:not(.grid),
+main > div:not(.grid),
 main .container {
     background: var(--color-background);
     border: 1px solid var(--color-border);
@@ -87,7 +97,7 @@ main a:has(.clickable) {
     color: inherit;
 }
 
-.main>.grid {
+.main > .grid {
     display: grid;
     border: none;
     background: none;
