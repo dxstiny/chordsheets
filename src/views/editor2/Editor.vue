@@ -442,7 +442,7 @@ const emit = defineEmits(["onPageCount"]);
                         Add Option
                     </div>
                 </div>
-                <hr v-if="song.instruments.length" />
+                <hr v-if="song.instruments?.length" />
                 <div class="instruments">
                     <div
                         v-for="(instrument, index) in song.instruments"

@@ -28,6 +28,7 @@ export const useSetlistStore = defineStore("setlists", () => {
 
     function addEmptySetlist() {
         const setlist: ISetlist = {
+            type: "setlist",
             name: "Setlist " + (setlists.value.length + 1),
             sections: [
                 {

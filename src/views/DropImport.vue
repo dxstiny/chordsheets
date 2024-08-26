@@ -1,11 +1,30 @@
 <script setup lang="ts">
-import { type ISong } from "@/types";
+import { type ISetlist, type ISong } from "@/types";
 import { useSongStore } from "@/stores/songs";
 import { ref } from "vue";
+import { useSetlistStore } from "@/stores/setlists";
+import { useRouter } from "vue-router";
 
 const drophover = ref(false);
 
+const router = useRouter();
 const songs = useSongStore();
+const setlists = useSetlistStore();
+
+const addItem = (item: ISong | ISetlist) => {
+    if ("type" in item) {
+        if (item.type == "setlist") {
+            setlists.addSetlist(item);
+            return "/setlists";
+        } else {
+            console.error("Unknown item type", item);
+            return "/";
+        }
+    } else {
+        songs.addSong(item);
+        return "/browse";
+    }
+};
 
 const addFiles = async (files: FileList) => {
     // read all as json
@@ -17,15 +36,19 @@ const addFiles = async (files: FileList) => {
     const texts: string[] = await Promise.all(promises);
     const items: (ISong | ISong[])[] = texts.map((x) => JSON.parse(x));
 
+    let redirect = "";
+
     for (const item of items) {
         if (Array.isArray(item)) {
             for (const song of item) {
-                songs.addSong(song);
+                redirect = addItem(song);
             }
         } else {
-            songs.addSong(item);
+            redirect = addItem(item);
         }
     }
+
+    router.push(redirect);
 };
 
 const onDrop = (e: DragEvent) => {
@@ -45,8 +68,14 @@ const onDragleave = (e: any) => {
 };
 </script>
 <template>
-    <div class="dropzone" :class="{ drophover }" @drop.prevent="onDrop" @dragenter.prevent
-        @dragover.prevent="drophover = true" @dragleave.prevent="onDragleave">
+    <div
+        class="dropzone"
+        :class="{ drophover }"
+        @drop.prevent="onDrop"
+        @dragenter.prevent
+        @dragover.prevent="drophover = true"
+        @dragleave.prevent="onDragleave"
+    >
         <slot />
     </div>
 </template>

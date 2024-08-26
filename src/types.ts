@@ -345,4 +345,5 @@ export interface ISetlist {
     name: string;
     sections: ISetlistSection[];
     id: number;
+    type: "setlist";
 }

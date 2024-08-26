@@ -9,7 +9,6 @@ import type { ISetlist, ISong } from "@/types";
 import EditableText from "@/components/EditableText.vue";
 import { isMobile } from "@/helper";
 import SongSearcher from "@/components/SongSearcher.vue";
-import IconButton from "@/components/IconButton.vue";
 import { useSetlistStore } from "@/stores/setlists";
 import { useRoute, useRouter } from "vue-router";
 
@@ -20,6 +19,22 @@ const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
+
+const songsNotInSetlist = computed(() =>
+    store.songs.filter(
+        (song) =>
+            !setlist.value.sections.some((section) =>
+                section.songs.some((s) => s.id === song.id)
+            )
+    )
+);
+const songsInSetlist = computed(() =>
+    store.songs.filter((song) =>
+        setlist.value.sections.some((section) =>
+            section.songs.some((s) => s.id === song.id)
+        )
+    )
+);
 
 if (route.params.id === "new") {
     const { id } = setlistStore.addEmptySetlist();
@@ -91,7 +106,7 @@ const saveAll = async () => {
 
 const setlist = ref(
     setlistStore.setlist(Number(route.params.id)) ||
-        ({ id: -1, name: "", sections: [] } as ISetlist)
+        ({ type: "setlist", id: -1, name: "", sections: [] } as ISetlist)
 );
 
 const pageCounts = ref<number[][]>(
@@ -144,9 +159,9 @@ const pagesInSection = (sectionIndex: number) => {
         .reduce((a, b) => a + b, 0);
 };
 
-const estimatedDuration = (section: { songs: { id: number }[] }) => {
-    // returns the estimated duration of a section in minutes
-    const inMinutes = section.songs.reduce((acc, song) => acc + 3, 0);
+const durationAsString = (duration: number) => {
+    // returns the duration as a string
+    const inMinutes = duration;
     const inHours = Math.floor(inMinutes / 60);
     if (inHours === 0) {
         return `${inMinutes}m`;
@@ -154,6 +169,47 @@ const estimatedDuration = (section: { songs: { id: number }[] }) => {
 
     return `${inHours}h ${inMinutes % 60}m`;
 };
+
+const estimatedDuration = (section: { songs: { id: number }[] }) => {
+    // returns the estimated duration of a section in minutes
+    return section.songs.reduce((acc, _) => acc + 4, 0);
+};
+
+const estimatedTotalDurationWithBreaks = () => {
+    // returns the estimated total duration of the setlist in minutes
+    return (
+        setlist.value.sections.reduce(
+            (acc, section) => acc + estimatedDuration(section),
+            0
+        ) +
+        (setlist.value.sections.length - 1) * 15
+    );
+};
+
+const estimatedDurationAsString = (section: { songs: { id: number }[] }) => {
+    // returns the estimated duration of a section as a string
+    return durationAsString(estimatedDuration(section));
+};
+
+const duplicateSongs = computed(() => {
+    // songs that are in the setlist more than once
+    // return { song: ISong, count: number }[]
+    const entries = Array.from(
+        setlist.value.sections
+            .flatMap((section) => section.songs)
+            .reduce((acc, song) => {
+                acc.set(song.id, (acc.get(song.id) ?? 0) + 1);
+                return acc;
+            }, new Map<number, number>())
+            .entries()
+    );
+    return entries
+        .filter(([_, count]) => count > 1)
+        .map(([id, count]) => ({
+            song: store.songs.find((s) => s.id === id) as ISong,
+            count
+        }));
+});
 
 const hasAnySong = computed(() =>
     setlist.value.sections.some((section) => section.songs.length)
@@ -179,6 +235,8 @@ const onKeyDown = (e: KeyboardEvent) => {
     }
 };
 
+const previewTab = ref<"preview" | "insights" | "add">("preview");
+
 onMounted(() => {
     document.addEventListener("click", onClick);
     window.addEventListener("keydown", onKeyDown);
@@ -191,7 +249,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="browser">
+    <div
+        class="browser"
+        @dragover.stop
+    >
         <div
             class="editor"
             @dragstart.stop
@@ -251,12 +312,12 @@ onUnmounted(() => {
                         </div>
                         <div
                             class="duration"
-                            title="Estimated duration (1 song = 3 minutes)"
+                            title="Estimated duration (1 song = 4 minutes)"
                         >
                             <span class="material-symbols-rounded">
                                 schedule
                             </span>
-                            about {{ estimatedDuration(section) }}
+                            about {{ estimatedDurationAsString(section) }}
                         </div>
                         <div
                             title="Delete Section"
@@ -274,8 +335,8 @@ onUnmounted(() => {
                         class="songs"
                         item-key="id"
                         @dragover.stop
-                        group="songs"
                         :disabled="isMobile()"
+                        group="songs"
                     >
                         <template #item="{ element: song }">
                             <Song
@@ -343,9 +404,37 @@ onUnmounted(() => {
                 >
                     file_download
                 </span>
+                <div class="divider"></div>
+                <span
+                    class="material-symbols-rounded"
+                    @click="previewTab = 'preview'"
+                    title="Insights"
+                    :class="{ active: previewTab === 'preview' }"
+                >
+                    preview
+                </span>
+                <span
+                    class="material-symbols-rounded"
+                    @click="previewTab = 'add'"
+                    title="Add songs"
+                    :class="{ active: previewTab === 'add' }"
+                >
+                    playlist_add
+                </span>
+                <span
+                    class="material-symbols-rounded"
+                    @click="previewTab = 'insights'"
+                    title="Insights"
+                    :class="{ active: previewTab === 'insights' }"
+                >
+                    insights
+                </span>
             </div>
             <div class="content">
-                <template v-for="(section, sectionIndex) in setlist.sections">
+                <template
+                    v-if="previewTab == 'preview'"
+                    v-for="(section, sectionIndex) in setlist.sections"
+                >
                     <hr v-if="sectionIndex > 0" />
                     <h2>{{ section.name }}</h2>
                     <Editor
@@ -362,6 +451,105 @@ onUnmounted(() => {
                         :section-name="section.name"
                         disable-hotkeys
                     />
+                </template>
+                <template v-else-if="previewTab == 'add'">
+                    <h2 v-if="songsNotInSetlist.length">Add new songs</h2>
+                    <draggable
+                        v-if="songsNotInSetlist.length"
+                        v-model="songsNotInSetlist"
+                        class="songs"
+                        item-key="id"
+                        @dragover.stop
+                        group="songs"
+                        :disabled="isMobile()"
+                    >
+                        <template #item="{ element: song }">
+                            <Song
+                                :key="song.id"
+                                :song="song"
+                            />
+                        </template>
+                    </draggable>
+                    <hr v-if="songsInSetlist.length" />
+                    <h2 v-if="songsInSetlist.length">Add songs again</h2>
+                    <draggable
+                        v-if="songsInSetlist.length"
+                        v-model="songsInSetlist"
+                        class="songs"
+                        item-key="id"
+                        @dragover.stop
+                        group="songs"
+                        :disabled="isMobile()"
+                    >
+                        <template #item="{ element: song }">
+                            <Song
+                                :key="song.id"
+                                :song="song"
+                            />
+                        </template>
+                    </draggable>
+                </template>
+                <template v-else-if="previewTab == 'insights'">
+                    <h2>Insights</h2>
+                    <div class="insights">
+                        <div class="container">
+                            <h3>{{ setlist.sections.length }}</h3>
+                            <span class="muted">Sections</span>
+                        </div>
+                        <div class="container">
+                            <h3>
+                                {{
+                                    setlist.sections
+                                        .map((s) => s.songs.length)
+                                        .reduce((a, b) => a + b, 0)
+                                }}
+                            </h3>
+                            <span class="muted">Songs</span>
+                        </div>
+                        <div class="container">
+                            <h3>
+                                {{
+                                    setlist.sections
+                                        .map((s, i) => pagesInSection(i))
+                                        .reduce((a, b) => a + b, 0)
+                                }}
+                            </h3>
+                            <span class="muted">Pages</span>
+                        </div>
+                        <div class="container">
+                            <h3>
+                                {{
+                                    estimatedDurationAsString({
+                                        songs: setlist.sections.flatMap(
+                                            (s) => s.songs
+                                        )
+                                    })
+                                }}
+                            </h3>
+                            <span class="muted">of playing time</span>
+                        </div>
+                        <div class="container">
+                            <h3>
+                                {{
+                                    durationAsString(
+                                        estimatedTotalDurationWithBreaks()
+                                    )
+                                }}
+                            </h3>
+                            <span class="muted">including breaks</span>
+                        </div>
+                        <div
+                            class="container warning"
+                            v-for="duplicate in duplicateSongs"
+                        >
+                            <h3>
+                                {{ duplicate.song.title }}
+                            </h3>
+                            <span class="muted">
+                                Duplicated {{ duplicate.count }} times
+                            </span>
+                        </div>
+                    </div>
                 </template>
             </div>
         </div>
@@ -407,6 +595,41 @@ onUnmounted(() => {
     .editable-text {
         text-align: left;
         margin: 0;
+    }
+}
+
+.divider {
+    width: 1px;
+    height: 1em;
+    background: var(--color-border);
+}
+
+.insights {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1em;
+
+    .container {
+        display: flex;
+        flex-direction: column;
+
+        &.warning {
+            color: var(--color-yellow);
+            border-color: var(--color-yellow);
+            isolation: isolate;
+            overflow: clip;
+
+            &::before {
+                content: " ";
+                display: block;
+                position: absolute;
+                inset: 0;
+                background: var(--color-yellow);
+                opacity: 0.1;
+                z-index: -1;
+            }
+        }
     }
 }
 
@@ -485,6 +708,7 @@ onUnmounted(() => {
     overflow: clip;
     margin-top: 1em;
     padding: 1em;
+    isolation: isolate;
 
     &::after {
         content: " ";
@@ -493,6 +717,7 @@ onUnmounted(() => {
         inset: 0;
         background: var(--accent);
         opacity: 0.1;
+        z-index: -1;
         pointer-events: none;
     }
 }
@@ -514,7 +739,7 @@ onUnmounted(() => {
 .browser > .preview {
     flex: 2;
     overflow: auto;
-    max-width: max-content;
+    max-width: 570px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -550,7 +775,11 @@ onUnmounted(() => {
         cursor: pointer;
 
         &:hover {
-            color: var(--color-accent);
+            color: var(--accent);
+        }
+
+        &.active {
+            color: var(--accent);
         }
     }
 }

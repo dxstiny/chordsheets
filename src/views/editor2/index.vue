@@ -213,7 +213,7 @@ onUnmounted(() => {
         cursor: pointer;
 
         &:hover {
-            color: var(--color-accent);
+            color: var(--accent);
         }
     }
 }
