@@ -70,7 +70,7 @@ watchEffect(() => {
 <template>
     <div
         class="editable-text"
-        :class="{ outlined: !noOutline && editing }"
+        :class="{ outlined: !noOutline && editing, editing }"
         @dblclick.stop="startEditing"
     >
         <slot v-if="showSlot" />
@@ -95,6 +95,7 @@ watchEffect(() => {
     width: 100%;
     text-align: center;
     margin: 0 0.5em;
+    z-index: 1;
 
     &.left {
         text-align: left;

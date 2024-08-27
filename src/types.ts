@@ -135,6 +135,7 @@ export interface IInstruments {
 }
 
 export interface ISong {
+    type?: "song";
     title: string;
     artist: string;
 

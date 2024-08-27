@@ -1,6 +1,7 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
-import { empty, type ISong, type ISetlist } from "@/types";
+import { type ISetlist } from "@/types";
+import { useSongStore } from "./songs";
 
 const ITEM_NAME = "chordsheets.setlists";
 
@@ -23,6 +24,21 @@ export const useSetlistStore = defineStore("setlists", () => {
     );
 
     function addSetlist(setlist: ISetlist) {
+        const songs = useSongStore();
+
+        // for song in setlist, if it is a song and not just an id, add it to the songs store
+
+        setlist.sections.forEach((section) => {
+            section.songs.forEach((song) => {
+                if ("title" in song) {
+                    songs.addSong(song);
+                }
+            });
+            section.songs = section.songs.map((song) => ({
+                id: song.id
+            }));
+        });
+
         setlists.value.push(setlist);
     }
 

@@ -25,6 +25,8 @@ export const useSongStore = defineStore("songs", () => {
     );
 
     function addSong(song: ISong) {
+        if (songs.value.find((s) => s.id === song.id)) return;
+
         songs.value.push(song);
     }
 

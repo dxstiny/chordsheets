@@ -737,9 +737,12 @@ onUnmounted(() => {
 }
 
 .browser > .preview {
+    --display-height: 80vh;
+    --display-width: calc(var(--display-height) * (210 / 297));
+
     flex: 2;
     overflow: auto;
-    max-width: 570px;
+    max-width: calc(var(--display-width) + 3em);
     position: relative;
     display: flex;
     flex-direction: column;

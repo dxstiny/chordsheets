@@ -650,6 +650,20 @@ const emit = defineEmits(["onPageCount"]);
                     </div>
                 </div>
             </div>
+            <div
+                v-if="!printing"
+                class="add-section"
+                id="add-section"
+                @click="
+                    song.sections.push({
+                        type: 'New Section',
+                        progression: []
+                    })
+                "
+            >
+                <span class="material-symbols-rounded"> add </span>
+                Add Section
+            </div>
             <span
                 v-if="printing"
                 class="pageNumber"
