@@ -1,21 +1,11 @@
 <script lang="ts" setup>
-import IconButton from "@/components/IconButton.vue";
 import { useSongStore } from "@/stores/songs";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import Editor from "./editor2/Editor.vue";
-import { useSettingsStore } from "@/stores/settings";
-import { useHistoryStore } from "@/stores/history";
-import type { ISong } from "@/types";
-import { useRouter } from "vue-router";
-import Song from "@/components/Song.vue";
-import { useSetlistStore } from "@/stores/setlists";
+import QuickActionMenu from "@/components/QuickActionMenu.vue";
 
-const settings = useSettingsStore();
 const store = useSongStore();
-const songHistory = useHistoryStore();
-const setlistStore = useSetlistStore();
-const router = useRouter();
 const allPages = ref<InstanceType<typeof Editor>[]>();
 const renderDialog = ref<HTMLDialogElement>();
 const renderProgress = ref(-1);
@@ -59,131 +49,24 @@ const exportAll = async () => {
     const pdf = await renderAll();
     pdf.save("chordsheets.pdf");
 };
-
-const newSong = () => {
-    const song = store.createNew();
-    router.push(settings.editorUrl(song.id));
-};
-
-const newSetlist = () => {
-    const { id } = setlistStore.addEmptySetlist();
-    router.push("/setlists/edit/" + id);
-};
-
-const favArtist = computed(() => {
-    const favArtists = store.songs.map((song) => song.artist);
-    const favArtistsCount = favArtists.reduce((acc, artist) => {
-        acc[artist] = (acc[artist] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    const favArtistsSorted = Object.entries(favArtistsCount).sort(
-        (a, b) => b[1] - a[1]
-    );
-
-    return favArtistsSorted?.[0]?.[0];
-});
-
-const recentlyEdited = computed(() => {
-    return songHistory.history
-        .map((song) => store.song(song.songId))
-        .filter((song) => song !== undefined)
-        .slice(0, 3);
-});
 </script>
 <template>
-    <div class="grid">
-        <div class="container column w-2 h-2">
-            <p class="muted row gap-2">
-                <span class="material-symbols-rounded">history</span>
-                Recently edited
-            </p>
-
-            <Song
-                v-for="song in recentlyEdited"
-                :song="song"
+    <div class="content">
+        <h1>What would you like to do today?</h1>
+        <div class="search">
+            <QuickActionMenu
+                start-collapsed
+                :features="[
+                    'export',
+                    'print',
+                    'setlist.create',
+                    'settings',
+                    'song.create',
+                    'learn'
+                ]"
+                @print="printAll"
+                @export="exportAll"
             />
-        </div>
-        <RouterLink to="/browse">
-            <div class="container column clickable">
-                <p class="muted row gap-2">
-                    <span class="material-symbols-rounded">library_music</span>
-                    Library
-                </p>
-                <h1 class="wght-900">
-                    {{ store.songs.length }}
-                </h1>
-                <div class="row space-between gap-2 centre">
-                    <p class="muted row gap-2">Chord Sheets</p>
-                    <IconButton
-                        icon="add"
-                        @click.prevent="newSong"
-                        :style="'green'"
-                    />
-                </div>
-            </div>
-        </RouterLink>
-        <RouterLink to="/setlists">
-            <div class="container column clickable">
-                <p class="muted row gap-2">
-                    <span class="material-symbols-rounded">list</span>
-                    Library
-                </p>
-                <h1 class="wght-900">
-                    {{ setlistStore.setlists.length }}
-                </h1>
-                <div class="row space-between gap-2 centre">
-                    <p class="muted row gap-2">Sets</p>
-                    <IconButton
-                        icon="add"
-                        @click.prevent="newSetlist"
-                        :style="'green'"
-                    />
-                </div>
-            </div>
-        </RouterLink>
-        <div class="container column gap-2">
-            <p class="muted row gap-2">
-                <span class="material-symbols-rounded">list</span>
-                Library
-            </p>
-            <div class="row space-between gap-2 centre">
-                <IconButton
-                    label="Export all as PDF"
-                    icon="picture_as_pdf"
-                    @click="exportAll"
-                    :style="'blue'"
-                />
-                <IconButton
-                    label="Print All"
-                    icon="print"
-                    @click="printAll"
-                    :style="'blue'"
-                />
-            </div>
-        </div>
-        <div class="container column gap-2">
-            <p class="muted row gap-2">
-                <span class="material-symbols-rounded">school</span>
-                Learn
-            </p>
-
-            <p>How well do you know your scales?</p>
-
-            <IconButton
-                label="Start learning"
-                icon="arrow_forward"
-                @click="$router.push('/learn/scale-quiz')"
-                :style="'blue'"
-            />
-        </div>
-        <div class="container column">
-            <p class="muted row gap-2">
-                <span class="material-symbols-rounded">favorite</span>
-                Favourite Artist
-            </p>
-            <h1 class="wght-900">{{ favArtist }}</h1>
-            <p>Most common artist in your library</p>
         </div>
     </div>
     <dialog ref="renderDialog">
@@ -352,6 +235,27 @@ h2 {
         position: absolute;
         top: 0;
         left: 0;
+    }
+}
+
+main > .content {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    width: calc(70ch + 2em);
+    overflow: clip;
+
+    .search {
+        background: var(--color-background-soft);
+        border: 1px solid var(--color-border);
+        border-radius: 1em;
+        padding: 1em;
     }
 }
 </style>

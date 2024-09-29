@@ -39,8 +39,11 @@
     --color-green: var(--accent);
     --color-green-dark: #00a86b;
     --color-red: #e85454;
+    --color-red-dark: #a53131;
     --color-yellow: #c7aa19;
+    --color-yellow-dark: #85710f;
     --color-blue: #189de4;
+    --color-blue-dark: #144794;
 
     --section-gap: 160px;
 }

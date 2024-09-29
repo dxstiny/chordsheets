@@ -101,6 +101,12 @@ const onKeyDown = (e: KeyboardEvent) => {
 onMounted(() => {
     window.addEventListener("keydown", onKeyDown);
     songHistory.songEdited(song.value.id);
+
+    console.log("showing link spotify", song.value.spotify, song.value.title);
+
+    if (song.value.spotify && !song.value.title) {
+        setTimeout(() => linkSpotify.value?.show(), 100);
+    }
 });
 onUnmounted(() => {
     window.removeEventListener("keydown", onKeyDown);

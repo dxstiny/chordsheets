@@ -86,6 +86,17 @@ export const useSongStore = defineStore("songs", () => {
         return song as ISong;
     };
 
+    const saveLib = async () => {
+        await prepareRender();
+
+        const text = JSON.stringify(songs.value, null, 4);
+        const a = document.createElement("a");
+        const file = new Blob([text], { type: "text/plain" });
+        a.href = URL.createObjectURL(file);
+        a.download = "chordsheets.json";
+        a.click();
+    };
+
     return {
         songs,
         addSong,
@@ -95,6 +106,7 @@ export const useSongStore = defineStore("songs", () => {
         prepareRender,
         moveTo,
         song,
-        createNew
+        createNew,
+        saveLib
     };
 });
