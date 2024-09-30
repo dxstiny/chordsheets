@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { type PropType, ref, computed, onMounted, onUnmounted } from "vue";
+import {
+    type PropType,
+    ref,
+    computed,
+    onMounted,
+    onUnmounted,
+    watch
+} from "vue";
 import { debounce } from "lodash";
+import { loadText } from "@/textLoader";
 
 export type Item = {
     id: any;
@@ -23,6 +31,8 @@ const selection = ref<number>(-1);
 const windowSelector = ref(0);
 const searchField = ref<HTMLInputElement | null>(null);
 const isFocused = ref(false);
+const placeholderIndex = ref(0);
+const placeholderInterval = ref(0);
 
 const props = defineProps({
     startCollapsed: {
@@ -36,8 +46,14 @@ const props = defineProps({
     search: {
         type: Object as PropType<(query: string) => Item[]>,
         required: true
+    },
+    rotatingPlaceholder: {
+        type: Array as PropType<string[]>,
+        default: () => ["Search..."]
     }
 });
+
+const placeholderText = ref(props.rotatingPlaceholder[0] ?? "Search...");
 
 const expanded = ref(!props.startCollapsed);
 
@@ -89,8 +105,24 @@ const showResults = computed(() => {
     );
 });
 
+watch(
+    () => props.rotatingPlaceholder,
+    () => startPlaceholderRotation()
+);
+
+const startPlaceholderRotation = () => {
+    window.clearInterval(placeholderInterval.value);
+    placeholderIndex.value = 0;
+    placeholderInterval.value = window.setInterval(() => {
+        placeholderIndex.value =
+            (placeholderIndex.value + 1) % props.rotatingPlaceholder.length;
+        loadText(props.rotatingPlaceholder[placeholderIndex.value], (str) => {
+            placeholderText.value = str;
+        });
+    }, 5000);
+};
+
 onMounted(() => {
-    console.log("mounted", searchField.value);
     window.addEventListener("keydown", onKeyDown);
 
     if (searchField.value && props.autoFocus) {
@@ -100,6 +132,10 @@ onMounted(() => {
     if (!props.startCollapsed) {
         results.value = props.search(query.value);
         expanded.value = true;
+    }
+
+    if (props.rotatingPlaceholder.length > 1) {
+        startPlaceholderRotation();
     }
 });
 onUnmounted(() => {
@@ -136,7 +172,7 @@ const emit = defineEmits(["select"]);
     >
         <input
             type="text"
-            placeholder="Search..."
+            :placeholder="placeholderText"
             v-model="query"
             ref="searchField"
             @input="search"

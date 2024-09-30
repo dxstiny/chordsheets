@@ -67,88 +67,90 @@ const filterSetlists = (query: string): Item[] => {
         }));
 };
 
-const allActions = (query: string) => [
-    {
-        id: "setlist.create",
-        title: "Create setlist",
-        subtitle: "Start from scratch",
-        icon: "playlist_add",
-        action: () => {
-            const setlist = setlists.addEmptySetlist();
-            router.push("/setlists/edit/" + setlist.id);
-        }
-    },
-    {
-        id: "export",
-        title: "Export all",
-        subtitle: "Export all songs to PDF",
-        icon: "file_download",
-        action: () => {
-            emit("export");
-        }
-    },
-    {
-        id: "print",
-        title: "Print all",
-        subtitle: "Print all songs to PDF (export + print)",
-        icon: "file_download",
-        action: () => {
-            emit("print");
-        }
-    },
-    {
-        id: "library.save",
-        title: "Save library",
-        subtitle: "Save all songs to file",
-        icon: "file_download",
-        action: () => {
-            songs.saveLib();
-        }
-    },
-    {
-        id: "library.import",
-        title: "Import library",
-        subtitle: "Import songs from file",
-        icon: "file_download",
-        action: () => {
-            emit("import");
-        }
-    },
-    {
-        id: "learn",
-        title: "Learn",
-        subtitle: "Learn music theory",
-        icon: { name: "school", tint: "red" },
-        action: () => {
-            router.push("/learn");
-        }
-    },
-    {
-        id: "settings",
-        title: "Settings",
-        subtitle: "Change app settings",
-        icon: { name: "settings", tint: "red" },
-        action: () => {
-            router.push("/settings");
-        }
-    },
-    {
-        id: "song.create",
-        title: "Create new song",
-        subtitle:
-            (query.startsWith("http") ? "Using Spotify link: " : "") + query,
-        icon: "add",
-        action: () => {
-            const song = songs.createNew();
-            if (query.startsWith("http")) {
-                song.spotify = query;
-            } else {
-                song.title = query;
+const allActions = (query: string) =>
+    [
+        {
+            id: "setlist.create",
+            title: "Create setlist",
+            subtitle: "Start from scratch",
+            icon: "playlist_add",
+            action: () => {
+                const setlist = setlists.addEmptySetlist();
+                router.push("/setlists/edit/" + setlist.id);
             }
-            router.push(settings.editorUrl(song.id));
+        },
+        {
+            id: "export",
+            title: "Export all",
+            subtitle: "Export all songs to PDF",
+            icon: "file_download",
+            action: () => {
+                emit("export");
+            }
+        },
+        {
+            id: "print",
+            title: "Print all",
+            subtitle: "Print all songs to PDF (export + print)",
+            icon: "file_download",
+            action: () => {
+                emit("print");
+            }
+        },
+        {
+            id: "library.save",
+            title: "Save library",
+            subtitle: "Save all songs to file",
+            icon: "file_download",
+            action: () => {
+                songs.saveLib();
+            }
+        },
+        {
+            id: "library.import",
+            title: "Import library",
+            subtitle: "Import songs from file",
+            icon: "file_download",
+            action: () => {
+                emit("import");
+            }
+        },
+        {
+            id: "learn",
+            title: "Learn",
+            subtitle: "Learn music theory",
+            icon: { name: "school", tint: "red" },
+            action: () => {
+                router.push("/learn");
+            }
+        },
+        {
+            id: "settings",
+            title: "Settings",
+            subtitle: "Change app settings",
+            icon: { name: "settings", tint: "red" },
+            action: () => {
+                router.push("/settings");
+            }
+        },
+        {
+            id: "song.create",
+            title: "Create new song",
+            subtitle:
+                (query.startsWith("http") ? "Using Spotify link: " : "") +
+                query,
+            icon: "add",
+            action: () => {
+                const song = songs.createNew();
+                if (query.startsWith("http")) {
+                    song.spotify = query;
+                } else {
+                    song.title = query;
+                }
+                router.push(settings.editorUrl(song.id));
+            }
         }
-    }
-];
+    ] as Item[];
 
 const filterActions = (query: string): Item[] => {
     return allActions(query).filter(
@@ -175,6 +177,13 @@ const search = (query: string): Item[] => {
     <Search
         :search="search"
         @select="(...args) => emit('select', ...args)"
+        :rotatingPlaceholder="[
+            'Search songs...',
+            'Search setlists...',
+            'Enter a song name to create it from scratch...',
+            'Search actions...',
+            'Paste a Spotify link to create a new song...'
+        ]"
     />
 </template>
 
