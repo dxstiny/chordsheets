@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import Editor from "./editor2/Editor.vue";
 import QuickActionMenu from "@/components/QuickActionMenu.vue";
+import Import from "@/components/modals/Import.vue";
 
 const store = useSongStore();
 const allPages = ref<InstanceType<typeof Editor>[]>();
@@ -62,13 +63,17 @@ const exportAll = async () => {
                     'setlist.create',
                     'settings',
                     'song.create',
+                    'library.import',
+                    'library.save',
                     'learn'
                 ]"
                 @print="printAll"
                 @export="exportAll"
+                @import="$refs.importDialog?.show()"
             />
         </div>
     </div>
+    <Import ref="importDialog" />
     <dialog ref="renderDialog">
         <div class="content">
             <div class="preview-container">
@@ -249,6 +254,7 @@ main > .content {
     justify-content: center;
     margin: 0 auto;
     width: calc(70ch + 2em);
+    max-width: calc(100vw - 2em);
     overflow: clip;
 
     .search {

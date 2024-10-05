@@ -1,21 +1,10 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import { useSongStore } from "@/stores/songs";
-import { useSettingsStore } from "@/stores/settings";
 import DropImport from "./views/DropImport.vue";
 import QuickActionModal from "./views/QuickActionModal.vue";
-import { useRouter } from "vue-router";
 
 import { version } from "../package.json";
-
-const router = useRouter();
-const store = useSongStore();
-const settings = useSettingsStore();
-
-const newSong = () => {
-    const song = store.createNew();
-    router.push(settings.editorUrl(song.id));
-};
+import Sidebar from "./components/Sidebar.vue";
 
 console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
 </script>
@@ -24,42 +13,7 @@ console.log(`%cChordSheets v${version}`, "color:#00bd7e;font-size:2rem");
     <QuickActionModal />
     <DropImport>
         <div class="screen">
-            <aside class="sidebar">
-                <RouterLink to="/">
-                    <div class="title">
-                        <img :src="'favicon.svg'" />
-                        <h1>Chord<span class="accent">Sheets</span></h1>
-                    </div>
-                </RouterLink>
-                <div class="links">
-                    <RouterLink to="/">
-                        <span class="material-symbols-rounded">home</span>
-                        <span class="label">Home</span>
-                    </RouterLink>
-                    <a @click="newSong">
-                        <span class="material-symbols-rounded">add_circle</span>
-                        <span class="label">Create</span>
-                    </a>
-                    <RouterLink to="/browse">
-                        <span class="material-symbols-rounded"
-                            >library_music</span
-                        >
-                        <span class="label">Songs</span>
-                    </RouterLink>
-                    <RouterLink to="/setlists">
-                        <span class="material-symbols-rounded">list</span>
-                        <span class="label">Setlists</span>
-                    </RouterLink>
-                    <RouterLink to="/learn">
-                        <span class="material-symbols-rounded">school</span>
-                        <span class="label">Learn</span>
-                    </RouterLink>
-                    <RouterLink to="/settings">
-                        <span class="material-symbols-rounded">settings</span>
-                        <span class="label">Settings</span>
-                    </RouterLink>
-                </div>
-            </aside>
+            <Sidebar />
             <main class="main">
                 <RouterView />
             </main>
@@ -133,7 +87,7 @@ main a:has(.clickable) {
 <style scoped>
 .screen {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: max-content 1fr;
     padding: 1em;
     overflow: clip;
     gap: 1em;
@@ -145,58 +99,6 @@ main a:has(.clickable) {
         grid-template-columns: 1fr;
         overflow: auto;
         padding-bottom: calc(2em + 74px);
-
-        & aside {
-            grid-row: 2;
-
-            .links {
-                flex-direction: row;
-                justify-content: space-around;
-            }
-
-            .title,
-            .label {
-                display: none;
-            }
-        }
-    }
-}
-
-.title {
-    display: flex;
-    align-items: center;
-    gap: 1em;
-    margin: 0.25em 0 1em;
-
-    font-size: 0.9rem;
-
-    & img {
-        width: 35px;
-        aspect-ratio: 1/1;
-    }
-
-    & h1 .accent {
-        color: var(--accent);
-        font-weight: 900;
-    }
-}
-
-aside {
-    position: sticky;
-    top: 1em;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    max-height: calc(100vh - 2em);
-
-    @media (max-width: 800px) {
-        z-index: 1;
-        top: unset;
-        bottom: 1em;
-        left: 1em;
-        right: 1em;
-        position: fixed;
     }
 }
 
@@ -209,31 +111,6 @@ main {
         z-index: 0;
         max-height: unset;
         gap: 1em;
-    }
-}
-
-.links {
-    display: flex;
-    flex-direction: column;
-
-    & a {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        gap: 0.5em;
-        padding: 0.5em 1em;
-        border-radius: 0.5em;
-        transition: background-color 0.2s;
-        color: var(--color-text);
-
-        &.router-link-active {
-            background: var(--color-background-soft);
-            color: var(--accent);
-        }
-
-        &:hover {
-            background: var(--color-background-soft);
-        }
     }
 }
 </style>

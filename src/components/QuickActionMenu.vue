@@ -14,9 +14,11 @@ const settings = useSettingsStore();
 type Action =
     | "print"
     | "export"
-    | "setlist.create"
     | "settings"
+    | "setlist.create"
+    | "setlist.browse"
     | "song.create"
+    | "song.browse"
     | "library.save"
     | "library.import"
     | "learn";
@@ -67,6 +69,28 @@ const filterSetlists = (query: string): Item[] => {
         }));
 };
 
+const extractSongInfoFromQuery = (query: string) => {
+    if (query.startsWith("http")) {
+        return { spotify: query };
+    }
+    // if 'artist - title' format
+    if (query.includes(" - ")) {
+        const [artist, title] = query.split(" - ");
+        return { artist, title };
+    }
+    return { title: query };
+};
+
+const createSongDescription = (query: string) => {
+    const { title, artist, spotify } = extractSongInfoFromQuery(query);
+    console.log(title, artist, spotify);
+    if (spotify) {
+        console.log("spotify", spotify);
+        return `Create song from Spotify link: ${spotify}`;
+    }
+    return `Create song: ${query}`;
+};
+
 const allActions = (query: string) =>
     [
         {
@@ -77,6 +101,15 @@ const allActions = (query: string) =>
             action: () => {
                 const setlist = setlists.addEmptySetlist();
                 router.push("/setlists/edit/" + setlist.id);
+            }
+        },
+        {
+            id: "setlist.browse",
+            title: "Browse setlists",
+            subtitle: "View and edit existing setlists",
+            icon: { name: "list", tint: "red" },
+            action: () => {
+                router.push("/setlists");
             }
         },
         {
@@ -92,7 +125,7 @@ const allActions = (query: string) =>
             id: "print",
             title: "Print all",
             subtitle: "Print all songs to PDF (export + print)",
-            icon: "file_download",
+            icon: "print",
             action: () => {
                 emit("print");
             }
@@ -136,18 +169,29 @@ const allActions = (query: string) =>
         {
             id: "song.create",
             title: "Create new song",
-            subtitle:
-                (query.startsWith("http") ? "Using Spotify link: " : "") +
-                query,
+            subtitle: createSongDescription(query),
             icon: "add",
             action: () => {
+                const { title, artist, spotify } =
+                    extractSongInfoFromQuery(query);
+
                 const song = songs.createNew();
-                if (query.startsWith("http")) {
-                    song.spotify = query;
+                if (spotify) {
+                    song.spotify = spotify;
                 } else {
-                    song.title = query;
+                    song.title = title || "";
+                    song.artist = artist || "";
                 }
                 router.push(settings.editorUrl(song.id));
+            }
+        },
+        {
+            id: "song.browse",
+            title: "Browse songs",
+            subtitle: "View and edit existing songs",
+            icon: { name: "library_music", tint: "red" },
+            action: () => {
+                router.push("/browse");
             }
         }
     ] as Item[];

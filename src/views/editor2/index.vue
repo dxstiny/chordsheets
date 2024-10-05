@@ -186,7 +186,7 @@ onUnmounted(() => {
 .back-button {
     position: fixed;
     top: 1em;
-    left: calc(1em + 220px + 2em);
+    left: calc(1em + var(--sidebar-width) + 2em);
     z-index: 1;
     cursor: pointer;
 

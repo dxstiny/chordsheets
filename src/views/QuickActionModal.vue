@@ -33,7 +33,9 @@ onUnmounted(() => {
             v-if="isOpen"
             :features="[
                 'song.create',
+                'song.browse',
                 'setlist.create',
+                'setlist.browse',
                 'settings',
                 'library.save',
                 'learn'
